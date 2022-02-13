@@ -1,0 +1,16 @@
+.textarea {
+	/* background-color: #871012; ignored for some reason */
+	/* color: #6cbee3; ignored fro some reason */
+	font-size: 24pt;
+	padding: 14pt 24pt 24pt 24pt;
+}
+
+.button {
+	border: 0;
+	background: none;
+	box-shadow: none;
+}
+
+.button:hover {
+	background-color: red;
+}

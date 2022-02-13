@@ -1,0 +1,45 @@
+<!-- File currently unused! see better template under v/contacts? -->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="MDSend Beta" />
+  <title>Printable Envelopes</title>
+  <style type="text/css">
+    body { white-space: pre-wrap; padding: 0; margin: 0; font-family: "Open Sans Condensed"; }
+    @page {
+        size: 9.5in 4.125in; /* is this correct? */
+        margin: 0;
+        padding: 0;
+    }
+    section {
+        padding: 30mm 30mm 0 75mm;
+    }
+    aside {
+        font-size: 80%;
+        color: #747474;
+        position: fixed;
+        top: 0mm;
+        left: 8mm;
+        padding: 0;
+        margin: 0;
+    }
+    hr.break {
+        height: 0;
+        border: 0;
+        visibility: hidden;
+        page-break-before: always;
+    }
+  </style>
+</head><body><main>
+
+<aside>{{ .from }}</aside>
+
+{{ range .to }}
+  <hr class="break" />
+  <section>
+    <strong>{{ .name }}</strong>
+    {{ .address }}
+  </section>
+{{ end }}
+
+</main></body></html>
