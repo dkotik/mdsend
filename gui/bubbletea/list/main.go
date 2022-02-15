@@ -10,7 +10,7 @@ import (
 func main() {
 	var rs []Recipient
 
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 300; i++ {
 		rs = append(rs, Recipient{
 			Name:    fmt.Sprintf("Friend #%d", i),
 			Address: "test@gmail.com",
@@ -19,7 +19,7 @@ func main() {
 
 	p := tea.NewProgram(RecipientList{
 		recipients: rs,
-	})
+	}, tea.WithAltScreen())
 	if err := p.Start(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)
