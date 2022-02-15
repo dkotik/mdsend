@@ -13,6 +13,7 @@ require (
 	github.com/OneOfOne/xxhash v1.2.7
 	github.com/alecthomas/gocyclo v0.0.0-20150208221726-aa8f8b160214 // indirect
 	github.com/alexkohler/nakedret v1.0.0 // indirect
+	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/charmbracelet/bubbles v0.10.2 // indirect
 	github.com/charmbracelet/bubbletea v0.19.3 // indirect
 	github.com/charmbracelet/lipgloss v0.4.0 // indirect

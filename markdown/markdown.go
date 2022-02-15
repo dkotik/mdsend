@@ -1,6 +1,8 @@
 package markdown
 
 import (
+	"errors"
+
 	"github.com/yuin/goldmark"
 	meta "github.com/yuin/goldmark-meta"
 	"github.com/yuin/goldmark/renderer"
@@ -14,7 +16,11 @@ func New() goldmark.Markdown {
 		),
 		goldmark.WithRendererOptions(
 			renderer.WithNodeRenderers(
-				util.Prioritized(&imageRenderer{}, 500),
+				util.Prioritized(&imageRenderer{
+					attachmentProvider: func(source string) (contentID string, err error) {
+						return "", errors.New("attachment provided is not implemented")
+					},
+				}, 500),
 			),
 		),
 	)
