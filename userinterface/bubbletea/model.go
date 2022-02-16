@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/bubbles/progress"
 	tea "github.com/charmbracelet/bubbletea"
@@ -12,6 +13,30 @@ const (
 	padding  = 2
 	maxWidth = 80
 )
+
+type msgDelivered struct {
+	Address          string
+	ConfirmationCode string
+}
+
+func (m model) readEvents() tea.Cmd {
+	return func() tea.Msg {
+		t := time.NewTimer(time.Millisecond * 1000)
+		delivered := make([]msgDelivered, 0)
+
+	loop:
+		for {
+			select {
+			case <-t.C:
+				break loop
+			case msg := <-m.messages:
+				delivered = append(delivered, msg)
+				// case errors, can return those as well!
+			}
+		}
+		return delivered
+	}
+}
 
 type model struct {
 	progress progress.Model

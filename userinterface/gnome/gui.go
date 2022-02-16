@@ -1,9 +1,8 @@
 package gui
 
-//go:generate zassets --embed --var assets --package gui -o gui.gen.go interface.glade style.css
-
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"io"
 	"log"
@@ -17,7 +16,11 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 )
 
-var _ loggers.Logger = &GUI{}
+var (
+	_ loggers.Logger = &GUI{}
+	//go:embed interface.glade style.css
+	assets embed.FS
+)
 
 // GUI presents a graphical user interface that satisfies the Logger interface.
 type GUI struct {

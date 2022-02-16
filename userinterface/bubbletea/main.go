@@ -2,39 +2,37 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
+	"mdsend/userinterface/bubbletea/recipientlist"
 	"os"
-	"time"
 
-	"github.com/charmbracelet/bubbles/progress"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type msgDelivered struct {
-	Address          string
-	ConfirmationCode string
-}
+func main() {
+	var rs []recipientlist.Recipient
 
-func (m model) readEvents() tea.Cmd {
-	return func() tea.Msg {
-		t := time.NewTimer(time.Millisecond * 1000)
-		delivered := make([]msgDelivered, 0)
+	for i := 0; i < 500; i++ {
+		rs = append(rs, recipientlist.Recipient{
+			Name:    fmt.Sprintf("Friend #%d", i),
+			Address: "test@gmail.com",
+			State:   recipientlist.DeliveryState(i) % 3,
+		})
+	}
 
-	loop:
-		for {
-			select {
-			case <-t.C:
-				break loop
-			case msg := <-m.messages:
-				delivered = append(delivered, msg)
-				// case errors, can return those as well!
-			}
-		}
-		return delivered
+	p := tea.NewProgram(recipientlist.Model{
+		Recipients:    rs,
+		ControlsTimer: make(chan (*struct{}), 1),
+	}, tea.WithAltScreen())
+	if err := p.Start(); err != nil {
+		fmt.Printf("Alas, there's been an error: %v", err)
+		os.Exit(1)
 	}
 }
 
+/*
 func main() {
+
+
 	rand.Seed(time.Now().UTC().UnixNano())
 	var messages = make(chan (msgDelivered))
 	go func() {
@@ -63,3 +61,4 @@ func main() {
 		os.Exit(1)
 	}
 }
+*/
