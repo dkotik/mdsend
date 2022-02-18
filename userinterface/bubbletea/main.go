@@ -2,32 +2,59 @@ package main
 
 import (
 	"fmt"
-	"mdsend/userinterface/bubbletea/recipientlist"
+	"mdsend/userinterface/bubbletea/echobox"
+	"mdsend/userinterface/bubbletea/scroll"
 	"os"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 func main() {
-	var rs []recipientlist.Recipient
+	style := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#aa2f1c"))
+		// Background(lipgloss.Color("#33c987"))
 
-	for i := 0; i < 500; i++ {
-		rs = append(rs, recipientlist.Recipient{
-			Name:    fmt.Sprintf("Friend #%d", i),
-			Address: "test@gmail.com",
-			State:   recipientlist.DeliveryState(i) % 3,
-		})
-	}
+	p := tea.NewProgram(echobox.Model{}, tea.WithAltScreen())
 
-	p := tea.NewProgram(recipientlist.Model{
-		Recipients:    rs,
-		ControlsTimer: make(chan (*struct{}), 1),
-	}, tea.WithAltScreen())
+	go func() {
+		for i := 0; i < 100; i++ {
+			p.Send(echobox.EchoMsg{
+				Message: fmt.Sprintf("boo %s %d", time.Now(), i+1),
+				Style:   style,
+			})
+			time.Sleep(time.Millisecond * 20)
+			p.Send(scroll.ToBottom)
+		}
+	}()
+
 	if err := p.Start(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)
 	}
 }
+
+// func main() {
+// 	var rs []recipientlist.Recipient
+//
+// 	for i := 0; i < 500; i++ {
+// 		rs = append(rs, recipientlist.Recipient{
+// 			Name:    fmt.Sprintf("Friend #%d", i),
+// 			Address: "test@gmail.com",
+// 			State:   recipientlist.DeliveryState(i) % 3,
+// 		})
+// 	}
+//
+// 	p := tea.NewProgram(recipientlist.Model{
+// 		Recipients:    rs,
+// 		ControlsTimer: make(chan (*struct{}), 1),
+// 	}, tea.WithAltScreen())
+// 	if err := p.Start(); err != nil {
+// 		fmt.Printf("Alas, there's been an error: %v", err)
+// 		os.Exit(1)
+// 	}
+// }
 
 /*
 func main() {
