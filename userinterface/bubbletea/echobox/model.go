@@ -32,7 +32,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
-		m.lineLength = uint8(msg.Width - 1)
+		m.lineLength = uint8(msg.Width - 4)
+		if len(m.messages) > 0 {
+			m.lines = nil
+			m.messagesToLines(m.messages)
+			if l := len(m.lines); m.cursor > l {
+				m.cursor = l // shrunk buffer
+			}
+			// panic(m.lines)
+		}
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q", "esc":
@@ -63,12 +71,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return []EchoMsg{msg}
 		}
 	case []EchoMsg:
-		for _, msg := range msg {
-			// for _, line := range m.wordWrap(msg.Message) {
-			// 	m.lines = append(m.lines, msg.Style.Render(line+"???"))
-			// }
-			m.lines = append(m.lines, msg.Style.Render(msg.Message))
-		}
+		m.messages = append(m.messages, msg...)
+		m.messagesToLines(msg)
 		return m, nil
 	case ClearMsg:
 		m.lines = nil

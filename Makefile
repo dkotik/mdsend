@@ -1,6 +1,6 @@
 default:
 	@# go test -v ./locks/ -args --integration
-	go test -v ./markdown/
+	go test -v ./userinterface/bubbletea/...
 	@# go generate ./...
 	@# go test ./tests/ -run TestImport
 	@# go test ./tests/

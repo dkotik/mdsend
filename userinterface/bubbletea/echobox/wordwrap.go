@@ -1,23 +1,23 @@
 package echobox
 
 import (
-	"fmt"
 	"strings"
 	"unicode"
 )
 
 const noBreakSpace = 0xA0
 
-func (m *Model) wordWrap(s string) (result []string) {
+func WordWrap(s string, lineLength uint8) (result []string) {
 	var line, word strings.Builder
 	var cursor uint8
-	line.Grow(int(m.lineLength) + 10)
-	word.Grow(int(m.lineLength) + 10)
+	line.Grow(int(lineLength) + 10)
+	word.Grow(int(lineLength) + 10)
 
 	flush := func() {
 		line.WriteString(word.String())
 		result = append(result,
-			fmt.Sprintf("%*s", -m.lineLength, line.String()), // pad with spaces
+			// fmt.Sprintf("%*s", lineLength, line.String()), // pad with spaces
+			line.String(),
 		)
 		word.Reset()
 		line.Reset()
@@ -30,19 +30,28 @@ func (m *Model) wordWrap(s string) (result []string) {
 		} else {
 			if unicode.IsSpace(char) && char != noBreakSpace {
 				if cursor > 0 {
-					if uint8(line.Len())+cursor < m.lineLength {
+					if uint8(line.Len())+cursor <= lineLength {
 						line.WriteString(word.String()) // only flush the word
 						word.Reset()
-						cursor = 0
+						word.WriteRune(char)
+						cursor = 1
 					} else {
-						flush() // flush the whole line
+						result = append(result,
+							// fmt.Sprintf("%*s", lineLength, line.String()), // pad with spaces
+							line.String(),
+						)
+						line.Reset()
+						line.WriteString(strings.TrimSpace(word.String()))
+						line.WriteRune(char)
+						word.Reset()
+						cursor = 0
 					}
 					continue
 				}
 			}
 			word.WriteRune(char)
 			cursor++
-			if cursor == m.lineLength {
+			if cursor == lineLength {
 				flush()
 			}
 		}
