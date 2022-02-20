@@ -22,6 +22,7 @@ type Model struct {
 	messages   []EchoMsg
 	lines      []string
 	lineLength uint8
+	Momentum   *scroll.Momentum
 }
 
 func (m Model) Init() tea.Cmd {
@@ -32,33 +33,40 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
-		m.lineLength = uint8(msg.Width - 4)
+		m.lineLength = uint8(msg.Width - 1)
 		if len(m.messages) > 0 {
 			m.lines = nil
 			m.messagesToLines(m.messages)
-			if l := len(m.lines); m.cursor > l {
-				m.cursor = l // shrunk buffer
+			if l := len(m.lines) - m.height; m.cursor > l {
+				if l < 0 {
+					m.cursor = 0
+				} else {
+					m.cursor = l // shrunk buffer
+				}
 			}
-			// panic(m.lines)
 		}
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q", "esc":
 			return m, tea.Quit
 		case "up", "k":
-			if m.cursor > 0 {
-				m.cursor--
+			speed := m.Momentum.Up()
+			m.cursor += -speed * speed
+			if m.cursor < 0 {
+				m.cursor = 0
 			}
-			// m.cursor -= m.getMomentum()
-			// if m.cursor < 0 {
-			// 	m.cursor = 0
-			// }
 			// cmd := m.triggerControlsActivation()
 			return m, nil
 		case "down", "j":
-			if m.cursor < len(m.lines)-m.height {
-				m.cursor++
+			lines := len(m.lines)
+			if lines > m.height {
+				speed := m.Momentum.Down()
+				m.cursor += speed * speed
+				if max := lines - m.height; m.cursor > max {
+					m.cursor = max
+				}
 			}
+
 			// m.cursor += m.getMomentum()
 			// if m.cursor > m.cursorMaximum {
 			// 	m.cursor = m.cursorMaximum

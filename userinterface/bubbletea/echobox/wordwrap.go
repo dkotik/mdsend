@@ -7,59 +7,70 @@ import (
 
 const noBreakSpace = 0xA0
 
-func WordWrap(s string, lineLength uint8) (result []string) {
-	var line, word strings.Builder
-	var cursor uint8
-	line.Grow(int(lineLength) + 10)
-	word.Grow(int(lineLength) + 10)
+func WordWrap(s string, lineLimit uint8) (result []string) {
+	var line, word, space strings.Builder
+	var lineLength, wordLength, spaceLength uint8
+	line.Grow(int(lineLimit) + 10)
+	word.Grow(int(lineLimit) + 10)
+	space.Grow(int(lineLimit))
 
-	flush := func() {
-		line.WriteString(word.String())
-		result = append(result,
-			// fmt.Sprintf("%*s", lineLength, line.String()), // pad with spaces
-			line.String(),
-		)
+	flushAllButLastLine := func() {
+		if spaceLength > 0 { // deal with space
+			if lineLength+spaceLength+wordLength > lineLimit {
+				// space will be discarded
+				result = append(result, line.String())
+				line.Reset()
+				lineLength = 0
+			} else if lineLength > 0 { // keep space not at the front of a line
+				line.WriteString(space.String())
+				lineLength += spaceLength
+			}
+			space.Reset()
+			spaceLength = 0
+		}
+
+		for _, char := range word.String() {
+			line.WriteRune(char)
+			lineLength++
+			if lineLength == lineLimit {
+				result = append(result, line.String())
+				line.Reset()
+				lineLength = 0
+			}
+		}
 		word.Reset()
-		line.Reset()
-		cursor = 0
+		wordLength = 0
 	}
 
 	for _, char := range s {
-		if char == '\n' {
-			flush()
-		} else {
-			if unicode.IsSpace(char) && char != noBreakSpace {
-				if cursor > 0 {
-					if uint8(line.Len())+cursor <= lineLength {
-						line.WriteString(word.String()) // only flush the word
-						word.Reset()
-						word.WriteRune(char)
-						cursor = 1
-					} else {
-						result = append(result,
-							// fmt.Sprintf("%*s", lineLength, line.String()), // pad with spaces
-							line.String(),
-						)
-						line.Reset()
-						line.WriteString(strings.TrimSpace(word.String()))
-						line.WriteRune(char)
-						word.Reset()
-						cursor = 0
-					}
-					continue
+		if unicode.IsSpace(char) && char != noBreakSpace {
+			if char == '\n' {
+				flushAllButLastLine()
+				if lineLength > 0 { // and the last line as well
+					result = append(result, line.String())
+					line.Reset()
+					lineLength = 0
 				}
+				continue
+			} else if wordLength > 0 {
+				flushAllButLastLine()
 			}
-			word.WriteRune(char)
-			cursor++
-			if cursor == lineLength {
-				flush()
-			}
+			space.WriteRune(char)
+			spaceLength++
+			continue
+		}
+		word.WriteRune(char)
+		wordLength++
+		if wordLength > lineLimit { // force cut on super-long words
+			flushAllButLastLine()
 		}
 	}
 
-	if cursor > 0 {
-		flush() // write left-overs
+	flushAllButLastLine()
+	if lineLength > 0 {
+		result = append(result, line.String())
+		line.Reset()
+		lineLength = 0
 	}
-
 	return
 }

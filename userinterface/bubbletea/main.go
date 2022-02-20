@@ -16,7 +16,9 @@ func main() {
 		Foreground(lipgloss.Color("#aa2f1c"))
 		// Background(lipgloss.Color("#33c987"))
 
-	p := tea.NewProgram(echobox.Model{}, tea.WithAltScreen())
+	p := tea.NewProgram(echobox.Model{
+		Momentum: scroll.NewMomentum(3, time.Millisecond*10),
+	}, tea.WithAltScreen())
 
 	go func() {
 		for i := 0; i < 100; i++ {
@@ -24,7 +26,7 @@ func main() {
 				Message: fmt.Sprintf("boo %s %d", time.Now(), i+1),
 				Style:   style,
 			})
-			time.Sleep(time.Millisecond * 20)
+			time.Sleep(time.Millisecond * 10)
 			p.Send(scroll.ToBottom)
 		}
 	}()
