@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"mdsend/userinterface/bubbletea/echobox"
+	"mdsend/userinterface/bubbletea/recipientlist"
 	"mdsend/userinterface/bubbletea/scroll"
 	"os"
 	"time"
@@ -14,11 +15,29 @@ import (
 func main() {
 	style := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#aa2f1c"))
-		// Background(lipgloss.Color("#33c987"))
+	// Background(lipgloss.Color("#33c987"))
 
-	p := tea.NewProgram(echobox.Model{
-		Momentum: scroll.NewMomentum(3, time.Millisecond*10),
-	}, tea.WithAltScreen())
+	var rs []recipientlist.Recipient
+
+	for i := 0; i < 500; i++ {
+		rs = append(rs, recipientlist.Recipient{
+			Name:    fmt.Sprintf("Friend #%d", i),
+			Address: "test@gmail.com",
+			State:   recipientlist.DeliveryState(i) % 3,
+		})
+	}
+
+	p := tea.NewProgram(
+		Window{
+			echobox: &echobox.Model{
+				Momentum: scroll.NewMomentum(3, time.Millisecond*10),
+			},
+			recipientList: &recipientlist.Model{
+				Recipients:    rs,
+				ControlsTimer: make(chan (*struct{}), 1),
+				Momentum:      scroll.NewMomentum(5, time.Millisecond*10),
+			},
+		}, tea.WithAltScreen())
 
 	go func() {
 		for i := 0; i < 100; i++ {
@@ -26,7 +45,7 @@ func main() {
 				Message: fmt.Sprintf("boo %s %d", time.Now(), i+1),
 				Style:   style,
 			})
-			time.Sleep(time.Millisecond * 10)
+			time.Sleep(time.Millisecond * 2)
 			p.Send(scroll.ToBottom)
 		}
 	}()
@@ -36,27 +55,6 @@ func main() {
 		os.Exit(1)
 	}
 }
-
-// func main() {
-// 	var rs []recipientlist.Recipient
-//
-// 	for i := 0; i < 500; i++ {
-// 		rs = append(rs, recipientlist.Recipient{
-// 			Name:    fmt.Sprintf("Friend #%d", i),
-// 			Address: "test@gmail.com",
-// 			State:   recipientlist.DeliveryState(i) % 3,
-// 		})
-// 	}
-//
-// 	p := tea.NewProgram(recipientlist.Model{
-// 		Recipients:    rs,
-// 		ControlsTimer: make(chan (*struct{}), 1),
-// 	}, tea.WithAltScreen())
-// 	if err := p.Start(); err != nil {
-// 		fmt.Printf("Alas, there's been an error: %v", err)
-// 		os.Exit(1)
-// 	}
-// }
 
 /*
 func main() {

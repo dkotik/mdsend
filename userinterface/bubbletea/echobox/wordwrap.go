@@ -8,6 +8,10 @@ import (
 const noBreakSpace = 0xA0
 
 func WordWrap(s string, lineLimit uint8) (result []string) {
+	if lineLimit == 0 {
+		return nil // otherwise word cut will not work and the last line will bleed over
+	}
+
 	var line, word, space strings.Builder
 	var lineLength, wordLength, spaceLength uint8
 	line.Grow(int(lineLimit) + 10)
@@ -61,7 +65,7 @@ func WordWrap(s string, lineLimit uint8) (result []string) {
 		}
 		word.WriteRune(char)
 		wordLength++
-		if wordLength > lineLimit { // force cut on super-long words
+		if wordLength >= lineLimit { // force cut on super-long words
 			flushAllButLastLine()
 		}
 	}

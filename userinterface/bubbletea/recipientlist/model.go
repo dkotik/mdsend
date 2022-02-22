@@ -1,6 +1,7 @@
 package recipientlist
 
 import (
+	"mdsend/userinterface/bubbletea/scroll"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -21,15 +22,14 @@ const (
 )
 
 type Model struct {
-	cursor                int
-	cursorMaximum         int
-	scrollMomentum        int
-	scrollMomentumMaximum int
-	width                 int
-	height                int
-	Recipients            []Recipient
-	ControlsTimer         chan (*struct{})
-	showControls          bool
+	cursor        int
+	cursorMaximum int
+	width         int
+	height        int
+	Recipients    []Recipient
+	ControlsTimer chan (*struct{})
+	Momentum      *scroll.Momentum
+	showControls  bool
 }
 
 func (m *Model) triggerControlsActivation() tea.Cmd {
@@ -76,15 +76,6 @@ func (m Model) Init() tea.Cmd {
 	return cmd
 }
 
-func (m *Model) getMomentum() int {
-	if !m.showControls {
-		m.scrollMomentum = 1 // reset
-	} else if m.scrollMomentum < m.scrollMomentumMaximum {
-		m.scrollMomentum += m.scrollMomentumMaximum / 3
-	}
-	return m.scrollMomentum
-}
-
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -95,14 +86,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q", "esc":
 			return m, tea.Quit
 		case "up", "k":
-			m.cursor -= m.getMomentum()
+			speed := m.Momentum.Up()
+			m.cursor -= speed * speed
 			if m.cursor < 0 {
 				m.cursor = 0
 			}
 			cmd := m.triggerControlsActivation()
 			return m, cmd
 		case "down", "j":
-			m.cursor += m.getMomentum()
+			speed := m.Momentum.Down()
+			m.cursor += speed * speed
 			if m.cursor > m.cursorMaximum {
 				m.cursor = m.cursorMaximum
 			}

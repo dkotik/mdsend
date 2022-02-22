@@ -6,9 +6,6 @@ import (
 )
 
 func (m *Model) messagesToLines(messages []EchoMsg) {
-	if m.lineLength == 0 { // too early to render
-		return
-	}
 	l := int(m.lineLength)
 
 	for _, msg := range messages {
@@ -20,13 +17,14 @@ func (m *Model) messagesToLines(messages []EchoMsg) {
 	}
 }
 
-func (m Model) View() string {
+func (m *Model) Render() []string {
 	window := m.cursor + m.height
 	if window > len(m.lines) {
 		window = len(m.lines)
 	}
+	return m.lines[m.cursor:window]
+}
 
-	// return spew.Sdump(m.lines[m.cursor:window])
-
-	return strings.Join(m.lines[m.cursor:window], "\n")
+func (m Model) View() string {
+	return strings.Join(m.Render(), "\n")
 }

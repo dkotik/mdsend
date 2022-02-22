@@ -51,7 +51,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "up", "k":
 			speed := m.Momentum.Up()
-			m.cursor += -speed * speed
+			m.cursor -= speed * speed
 			if m.cursor < 0 {
 				m.cursor = 0
 			}

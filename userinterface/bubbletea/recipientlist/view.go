@@ -16,8 +16,8 @@ import (
 // 			Background(lipgloss.Color("#d64ce7"))
 // )
 
-func (m Model) View() string {
-	result := make([]string, m.height)
+func (m *Model) Render() (result []string) {
+	result = make([]string, m.height)
 	print := func(i int, s string) {
 		if len(s) > m.width {
 			result[i] = s[:m.width]
@@ -66,6 +66,9 @@ func (m Model) View() string {
 			}
 		}
 	}
+	return
+}
 
-	return strings.Join(result, "\n")
+func (m Model) View() string {
+	return strings.Join(m.Render(), "\n")
 }

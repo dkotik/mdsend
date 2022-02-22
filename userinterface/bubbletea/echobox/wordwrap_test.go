@@ -2,7 +2,21 @@ package echobox
 
 import (
 	"testing"
+
+	"github.com/davecgh/go-spew/spew"
 )
+
+func TestZeroLineLength(t *testing.T) {
+	result := WordWrap(`1234567890`, 0)
+	if len(result) > 0 {
+		t.Fatal("zero line length should produce an empty result", spew.Sdump(result))
+	}
+
+	result = WordWrap(`12 34 56 78 90`, 0)
+	if len(result) > 0 {
+		t.Fatal("zero line length should produce an empty result", spew.Sdump(result))
+	}
+}
 
 func TestWordWrap(t *testing.T) {
 	cases := []struct {
