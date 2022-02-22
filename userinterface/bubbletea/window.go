@@ -14,7 +14,7 @@ type Window struct {
 	showEchobox   bool
 	echobox       *echobox.Model
 	recipientList *recipientlist.Model
-	progress      *progress.Model
+	progress      progress.Model
 }
 
 func (w Window) Init() tea.Cmd {
@@ -27,6 +27,7 @@ func (w Window) Init() tea.Cmd {
 func (w Window) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		w.progress.Width = msg.Width
 		if msg.Width < 48 {
 			w.showEchobox = false
 			l, cmd := w.recipientList.Update(tea.WindowSizeMsg{
@@ -54,6 +55,10 @@ func (w Window) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		w.recipientList = &rl
 
 		return w, tea.Batch(cmd, cmd2)
+	case progress.FrameMsg: // animate progress bar
+		progressModel, cmd := w.progress.Update(msg)
+		w.progress = progressModel.(progress.Model)
+		return w, cmd
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q", "esc":
@@ -97,6 +102,8 @@ func (w Window) View() string {
 
 	if w.showEchobox {
 		left := w.echobox.Render()
+		// window := len(left)
+
 		for i := 0; i < len(left); i++ {
 			result = append(result, left[i]+right[i])
 		}
@@ -106,6 +113,6 @@ func (w Window) View() string {
 		}
 	}
 
-	result = append(result, "scrollbar")
+	result = append(result, w.progress.View())
 	return strings.Join(result, "\n")
 }

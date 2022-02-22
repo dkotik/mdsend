@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/charmbracelet/bubbles/progress"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -27,6 +28,13 @@ func main() {
 		})
 	}
 
+	progressBar := progress.New(
+		progress.WithDefaultGradient(),
+		progress.WithoutPercentage(),
+	)
+	progressBar.Empty = '█'
+	progressBar.EmptyColor = "#3a85aa"
+
 	p := tea.NewProgram(
 		Window{
 			echobox: &echobox.Model{
@@ -37,6 +45,7 @@ func main() {
 				ControlsTimer: make(chan (*struct{}), 1),
 				Momentum:      scroll.NewMomentum(5, time.Millisecond*10),
 			},
+			progress: progressBar,
 		}, tea.WithAltScreen())
 
 	go func() {

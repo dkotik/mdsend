@@ -1,4 +1,6 @@
-# Hackable Markdown to Email Bridge
+# Mdsend
+
+> Send markdown files as MIME-encoded electronic mail.
 
 Project status: ALPHA DRAFT
 

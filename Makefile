@@ -5,6 +5,8 @@ default:
 	@# go test ./tests/ -run TestImport
 	@# go test ./tests/
 	@# go run ./cmd/gui/ tests/data/testemail.md
+build:
+	goreleaser release --snapshot --rm-dist
 install:
 	cd ./cmd/gui && go build -trimpath -o ~/.local/bin/mdsend
 	chmod +x ~/.local/bin/mdsend
