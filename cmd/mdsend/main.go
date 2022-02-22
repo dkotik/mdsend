@@ -25,7 +25,7 @@ func main() {
 
 	CLI := &cobra.Command{ // Setup command line interface.
 		Use:     `mdsend`,
-		Version: `0.2.1 Alpha`,
+		Version: mdsend.Version + ` Alpha`,
 		Short:   `Sends markdown documents as templated emails.`,
 		Long:    `Sends markdown documents as templated emails.`,
 		Run: func(cmd *cobra.Command, args []string) {

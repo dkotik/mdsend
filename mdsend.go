@@ -2,8 +2,14 @@ package mdsend
 
 import (
 	"log"
+	"mdsend/distributors"
 	"mdsend/loaders"
+	"mdsend/loggers"
+	"mdsend/providers"
+	"mdsend/renderers"
 )
+
+const Version = "dev"
 
 // Options provide configuration to component execution.
 type Options struct {

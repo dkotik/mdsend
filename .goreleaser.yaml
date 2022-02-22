@@ -1,8 +1,7 @@
 before:
   hooks:
-    # You may remove this if you don't use go modules.
+    - sed -i 's/const Version = "dev"/const Version = "{{ .Tag }}"/g' ./mdsend.go
     - go mod tidy
-    # you may remove this if you don't need go generate
     - go generate ./...
 builds:
   - dir: ./userinterface/bubbletea
@@ -96,6 +95,9 @@ brews:
 
     # Packages your package depends on.
     dependencies: []
+
+    install: |
+      bin.install "mdsend"
 
     # So you can `brew test` your formula.
     # Default is empty.

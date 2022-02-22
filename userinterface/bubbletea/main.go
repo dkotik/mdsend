@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"mdsend"
 	"mdsend/userinterface/bubbletea/echobox"
 	"mdsend/userinterface/bubbletea/recipientlist"
 	"mdsend/userinterface/bubbletea/scroll"
@@ -60,6 +61,7 @@ func main() {
 	}()
 
 	if err := p.Start(); err != nil {
+		fmt.Printf("mdsend %s", mdsend.Version)
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)
 	}
