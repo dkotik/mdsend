@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"mdsend"
-	"mdsend/userinterface/bubbletea/echobox"
-	"mdsend/userinterface/bubbletea/recipientlist"
-	"mdsend/userinterface/bubbletea/scroll"
 	"os"
 	"time"
+
+	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/userinterface/bubbletea/echobox"
+	"github.com/dkotik/mdsend/userinterface/bubbletea/recipientlist"
+	"github.com/dkotik/mdsend/userinterface/bubbletea/scroll"
 
 	"github.com/charmbracelet/bubbles/progress"
 	tea "github.com/charmbracelet/bubbletea"

@@ -1,4 +1,4 @@
-package gui
+package gnome
 
 import (
 	"fmt"

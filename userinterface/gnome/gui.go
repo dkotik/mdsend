@@ -1,17 +1,11 @@
-package gui
+package gnome
 
 import (
-	"bytes"
-	"embed"
 	"fmt"
-	"io"
-	"log"
-	"os"
-	"path/filepath"
+
+	_ "embed" // for static assets
 
 	"github.com/dkotik/mdsend/loggers"
-
-	"github.com/dkotik/zassets"
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
@@ -19,8 +13,12 @@ import (
 
 var (
 	_ loggers.Logger = &GUI{}
-	//go:embed interface.glade style.css
-	assets embed.FS
+
+	//go:embed interface.glade
+	interfaceGlade []byte
+
+	//go:embed style.css
+	styleCSS []byte
 )
 
 // GUI presents a graphical user interface that satisfies the Logger interface.
@@ -111,24 +109,8 @@ func Load() (*GUI, error) {
 	screen, _ := gdk.ScreenGetDefault()
 	gtk.AddProviderForScreen(screen, style, gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
-	zassets.Walk(assets, `/`, func(p string, info os.FileInfo, err error) error {
-		f, err := assets.Open(p)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		buf := &bytes.Buffer{}
-		io.Copy(buf, f)
-		switch filepath.Ext(p) {
-		case `.glade`:
-			b.AddFromString(buf.String())
-		case `.css`:
-			style.LoadFromData(buf.String())
-		default:
-			log.Fatalf(`Unknown resource type %s.`, p)
-		}
-		return err
-	})
+	b.AddFromString(string(interfaceGlade))
+	style.LoadFromData(string(styleCSS))
 
 	obj, err := b.GetObject(`root`)
 	if err != nil {

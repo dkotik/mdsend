@@ -1,6 +1,6 @@
 module github.com/dkotik/mdsend
 
-go 1.17
+go 1.22
 
 // replace (
 // 	github.com/JohannesKaufmann/html-to-markdown => /home/fray/Documents/ember/vendor/github.com/JohannesKaufmann/html-to-markdown
@@ -16,7 +16,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/dkotik/zassets v0.0.1
 	// fyne.io/fyne v1.2.4
-	github.com/gotk3/gotk3 v0.4.0
+	github.com/gotk3/gotk3 v0.6.3
 	github.com/hashicorp/go-multierror v1.1.1
 	// github.com/gobuffalo/packr/v2 v2.6.0 // indirect
 	github.com/leaanthony/spinner v0.5.3

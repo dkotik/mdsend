@@ -1,9 +1,10 @@
 package main
 
 import (
-	"mdsend/userinterface/bubbletea/echobox"
-	"mdsend/userinterface/bubbletea/recipientlist"
 	"strings"
+
+	"github.com/dkotik/mdsend/userinterface/bubbletea/echobox"
+	"github.com/dkotik/mdsend/userinterface/bubbletea/recipientlist"
 
 	"github.com/charmbracelet/bubbles/progress"
 	tea "github.com/charmbracelet/bubbletea"
