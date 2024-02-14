@@ -38,6 +38,7 @@ type Message struct {
 	Keywords           string
 	To                 *[]Participant
 	CC                 *[]Participant
+	ListID             string
 	BCC                *[]Participant
 	UnsubscribeContact *Participant
 	UnsubscribeLink    *url.URL
@@ -49,7 +50,7 @@ type Message struct {
 // MIMEHeader provides MIME fields for the renderer.
 func (m *Message) MIMEHeader() textproto.MIMEHeader {
 	h := textproto.MIMEHeader{
-		"Mime-Version": {"1.0"},
+		"MIME-Version": {"1.0"},
 		"Subject":      {m.Subject},
 		"From":         {m.From},
 	}

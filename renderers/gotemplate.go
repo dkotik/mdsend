@@ -6,11 +6,13 @@ package renderers
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
 	"io"
 	"mime/multipart"
 	"net/textproto"
+	"net/url"
 	"strings"
 
 	"github.com/dkotik/mdsend/loaders"
@@ -68,17 +70,25 @@ func (r *GoTemplateMIMERenderer) Render(w io.Writer, m *loaders.Message, to stri
 
 	// https://mailtrap.io/blog/list-unsubscribe-header/
 	var unsubscribeLinks []string
+	if m.UnsubscribeLink != nil {
+		// m.UnsubscribeLink.Query().Set("address", to) // on copy operation
+		unsubscribeLinks = append(unsubscribeLinks,
+			fmt.Sprintf(`<%s?address=%s&list=%s>`,
+				m.UnsubscribeLink.String(),
+				url.QueryEscape(to),
+				url.QueryEscape(m.ListID)))
+	}
 	if m.UnsubscribeContact != nil {
 		unsubscribeLinks = append(unsubscribeLinks,
 			fmt.Sprintf(`<mailto: %s?subject=unsubscribe>`, m.UnsubscribeContact.Email))
 	}
-	if m.UnsubscribeLink != nil {
-		m.UnsubscribeLink.Query().Set("address", to)
-		unsubscribeLinks = append(unsubscribeLinks,
-			fmt.Sprintf(`<%s>`, m.UnsubscribeLink.String()))
-	}
 	if len(unsubscribeLinks) > 0 {
-		header.Set("List-Unsubscribe", strings.Join(", ", unsubscribeLinks))
+		if m.ListID == "" {
+			return errors.New("ListID is required for unsubscribing")
+		}
+		header.Set("List-ID", m.ListID)
+		header.Set("List-Unsubscribe", strings.Join(unsubscribeLinks, `, `))
+		header.Set("List-Unsubscribe-Post", "List-Unsubscribe=One-Click")
 	}
 
 	// render body with template values
