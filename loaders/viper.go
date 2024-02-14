@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"net/mail"
+	"net/url"
 	"path/filepath"
 
 	"github.com/spf13/viper"
@@ -56,6 +58,25 @@ func (l *ViperLoader) Load(source string, r io.Reader) (*Message, error) {
 	m.To = participantsFromInterface(dir, m.Data[`to`])
 	m.CC = participantsFromInterface(dir, m.Data[`cc`])
 	m.BCC = participantsFromInterface(dir, m.Data[`bcc`])
+
+	if val, ok := m.Data[`unsubscribeContact`].(string); ok {
+		a, err := mail.ParseAddress(val)
+		if err != nil {
+			return nil, fmt.Errorf("cannot parse unsubscribeContact: %w", err)
+		}
+		m.UnsubscribeContact = &Participant{
+			Name:    a.Name,
+			Address: a.Address,
+		}
+	}
+	if val, ok := m.Data[`unsubscribeLink`].(string); ok {
+		link, err := url.Parse(val)
+		if err != nil {
+			return nil, fmt.Errorf("cannot parse unsubscribeLink: %w", err)
+		}
+		m.UnsubscribeLink = link
+	}
+
 	// if val, ok := m.Data[`to`].(string); ok {
 	// 	*m.To = append(&m.To, Participant{Email: val})
 	// }

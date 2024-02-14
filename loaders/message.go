@@ -3,6 +3,7 @@ package loaders
 import (
 	"fmt"
 	"net/textproto"
+	"net/url"
 )
 
 // Participant is a person or agent in "to", "from", "cc", and "bcc" fields.
@@ -27,20 +28,22 @@ func (p Participant) String() string {
 
 // Message models an email message.
 type Message struct {
-	Source      string // file from which the message is generated
-	Current     *Participant
-	Date        string
-	Subject     string
-	From        string
-	ReplyTo     string
-	Comments    string
-	Keywords    string
-	To          *[]Participant
-	CC          *[]Participant
-	BCC         *[]Participant
-	Attachments []string
-	Body        []byte
-	Data        map[string]interface{}
+	Source             string // file from which the message is generated
+	Current            *Participant
+	Date               string
+	Subject            string
+	From               string
+	ReplyTo            string
+	Comments           string
+	Keywords           string
+	To                 *[]Participant
+	CC                 *[]Participant
+	BCC                *[]Participant
+	UnsubscribeContact *Participant
+	UnsubscribeLink    *url.URL
+	Attachments        []string
+	Body               []byte
+	Data               map[string]interface{}
 }
 
 // MIMEHeader provides MIME fields for the renderer.

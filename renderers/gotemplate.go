@@ -11,6 +11,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/textproto"
+	"strings"
 
 	"github.com/dkotik/mdsend/loaders"
 
@@ -64,6 +65,21 @@ func (r *GoTemplateMIMERenderer) Render(w io.Writer, m *loaders.Message, to stri
 	defer mime.Close()
 	header := m.MIMEHeader() // this can be optimized, since header does not change between emails being sent
 	header.Set("To", to)
+
+	// https://mailtrap.io/blog/list-unsubscribe-header/
+	var unsubscribeLinks []string
+	if m.UnsubscribeContact != nil {
+		unsubscribeLinks = append(unsubscribeLinks,
+			fmt.Sprintf(`<mailto: %s?subject=unsubscribe>`, m.UnsubscribeContact.Email))
+	}
+	if m.UnsubscribeLink != nil {
+		m.UnsubscribeLink.Query().Set("address", to)
+		unsubscribeLinks = append(unsubscribeLinks,
+			fmt.Sprintf(`<%s>`, m.UnsubscribeLink.String()))
+	}
+	if len(unsubscribeLinks) > 0 {
+		header.Set("List-Unsubscribe", strings.Join(", ", unsubscribeLinks))
+	}
 
 	// render body with template values
 	bf := bytes.NewBuffer(nil)
