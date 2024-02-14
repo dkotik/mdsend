@@ -6,12 +6,12 @@ import (
 	"os"
 	"strings"
 
-	"mdsend"
-	"mdsend/distributors"
-	"mdsend/loaders"
-	"mdsend/loggers"
-	"mdsend/providers"
-	"mdsend/renderers"
+	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/distributors"
+	"github.com/dkotik/mdsend/loaders"
+	"github.com/dkotik/mdsend/loggers"
+	"github.com/dkotik/mdsend/providers"
+	"github.com/dkotik/mdsend/renderers"
 
 	"github.com/spf13/cobra"
 )
@@ -54,7 +54,7 @@ func main() {
 				}
 				handle.Close()
 				if !o.YesOnPrompt {
-					previewMessage(message)
+					mdsend.PreviewMessage(message)
 					fmt.Print("Type \"yes\" (or \"test\") to confirm sending the message: ")
 					fmt.Scanln(&answer)
 					switch strings.ToLower(strings.TrimSpace(answer)) {

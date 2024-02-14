@@ -4,10 +4,10 @@ import (
 	"crypto/rand"
 	"log"
 
-	"mdsend/loaders"
-	"mdsend/loggers"
-	"mdsend/providers"
-	"mdsend/renderers"
+	"github.com/dkotik/mdsend/loaders"
+	"github.com/dkotik/mdsend/loggers"
+	"github.com/dkotik/mdsend/providers"
+	"github.com/dkotik/mdsend/renderers"
 )
 
 // // ErrSkip is invoked by locking mechanisms, when the message had already been delivered to specified address.

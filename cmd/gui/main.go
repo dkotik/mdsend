@@ -2,14 +2,15 @@ package main
 
 import (
 	"log"
-	"mdsend"
 	"os"
 
-	"mdsend/distributors"
-	"mdsend/gui"
-	"mdsend/loaders"
-	"mdsend/providers"
-	"mdsend/renderers"
+	"github.com/dkotik/mdsend"
+
+	"github.com/dkotik/mdsend/distributors"
+	"github.com/dkotik/mdsend/loaders"
+	"github.com/dkotik/mdsend/providers"
+	"github.com/dkotik/mdsend/renderers"
+	"github.com/dkotik/mdsend/userinterface/gnome"
 
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
@@ -54,7 +55,7 @@ func main() {
 				}
 
 				application.Connect("activate", func() {
-					win, err := gui.Load()
+					win, err := gnome.Load()
 					if err != nil {
 						log.Fatal("Unable to create window:", err)
 					}

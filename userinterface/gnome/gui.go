@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"mdsend/loggers"
 	"os"
 	"path/filepath"
+
+	"github.com/dkotik/mdsend/loggers"
 
 	"github.com/dkotik/zassets"
 	"github.com/gotk3/gotk3/gdk"

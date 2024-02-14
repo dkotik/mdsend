@@ -12,7 +12,7 @@ import (
 	"mime/multipart"
 	"net/textproto"
 
-	"mdsend/loaders"
+	"github.com/dkotik/mdsend/loaders"
 
 	blackfriday "github.com/russross/blackfriday/v2"
 )

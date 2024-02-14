@@ -1,6 +1,7 @@
 ## TODO
 
 - [ ] MailYak can help? https://pkg.go.dev/github.com/domodwyer/mailyak?utm_source=godoc#MailYak.MimeBuf
+- [ ] https://github.com/charmbracelet/glamour
 - [ ] implement unsubscribe API using encore functions over etcd for state management
   - [ ] does encore free also provide a database?
 - [ ] Use badger for locking https://dgraph.io/docs/badger/get-started/
@@ -49,3 +50,4 @@ return quoteEscaper.Replace(s)
 * alternative API: https://docs.sendwithses.com/ - add it as a driver to "providers"
 
 - support Cuelang! https://github.com/cuelang/cue
+- add to https://github.com/rothgar/awesome-tuis and bubbletea list of apps

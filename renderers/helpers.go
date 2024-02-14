@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"mdsend/loaders"
+	"github.com/dkotik/mdsend/loaders"
 )
 
 // Renderer generates HTML and alternative email bodies to be used by Provider.

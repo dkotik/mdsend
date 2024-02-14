@@ -3,7 +3,7 @@ package mdsend
 import (
 	"fmt"
 
-	"mdsend/loaders"
+	"github.com/dkotik/mdsend/loaders"
 )
 
 func previewRecepients(prefix string, r *[]loaders.Participant) {
@@ -21,7 +21,7 @@ func previewRecepients(prefix string, r *[]loaders.Participant) {
 	}
 }
 
-func previewMessage(m *loaders.Message) {
+func PreviewMessage(m *loaders.Message) {
 	fmt.Printf("%s", m.Body)
 	fmt.Printf(".----------------------------------------------\n")
 	fmt.Printf("| Subject (%s): %s", m.Date, m.Subject)

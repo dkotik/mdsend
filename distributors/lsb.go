@@ -13,10 +13,10 @@ import (
 
 	"github.com/OneOfOne/xxhash"
 
-	"mdsend/loaders"
-	"mdsend/loggers"
-	"mdsend/providers"
-	"mdsend/renderers"
+	"github.com/dkotik/mdsend/loaders"
+	"github.com/dkotik/mdsend/loggers"
+	"github.com/dkotik/mdsend/providers"
+	"github.com/dkotik/mdsend/renderers"
 )
 
 // LockingSynchronousBufferingDistributor sends mail from one thread using memory buffer and prevents double deliveries using a hash lock file.

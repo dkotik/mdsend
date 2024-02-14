@@ -1,8 +1,22 @@
 # Mdsend
 
+Project status: ALPHA DRAFT
+
 > Send markdown files as MIME-encoded electronic mail.
 
-Project status: ALPHA DRAFT
+## Installation
+
+- Go:
+  ```bash
+  go install github.com/dkotik/mdsend@latest
+  ```
+- Macintosh:
+  ```bash
+  brew tap dkotik/tap
+  brew install mdsend
+  ```
+
+## Example
 
 ```markdown
 ---

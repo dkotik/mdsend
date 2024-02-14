@@ -2,11 +2,12 @@ package mdsend
 
 import (
 	"log"
-	"mdsend/distributors"
-	"mdsend/loaders"
-	"mdsend/loggers"
-	"mdsend/providers"
-	"mdsend/renderers"
+
+	"github.com/dkotik/mdsend/distributors"
+	"github.com/dkotik/mdsend/loaders"
+	"github.com/dkotik/mdsend/loggers"
+	"github.com/dkotik/mdsend/providers"
+	"github.com/dkotik/mdsend/renderers"
 )
 
 const Version = "dev"
