@@ -72,11 +72,12 @@ func (r *GoTemplateMIMERenderer) Render(w io.Writer, m *loaders.Message, to stri
 	var unsubscribeLinks []string
 	if m.UnsubscribeLink != nil {
 		// m.UnsubscribeLink.Query().Set("address", to) // on copy operation
-		unsubscribeLinks = append(unsubscribeLinks,
-			fmt.Sprintf(`<%s?address=%s&list=%s>`,
-				m.UnsubscribeLink.String(),
-				url.QueryEscape(to),
-				url.QueryEscape(m.ListID)))
+		link := fmt.Sprintf(`%s?address=%s&list=%s`,
+			m.UnsubscribeLink.String(),
+			url.QueryEscape(to),
+			url.QueryEscape(m.ListID))
+		m.Data["injectedUnsubscribeLink"] = link
+		unsubscribeLinks = append(unsubscribeLinks, fmt.Sprintf(`<%s>`, link))
 	}
 	if m.UnsubscribeContact != nil {
 		unsubscribeLinks = append(unsubscribeLinks,
