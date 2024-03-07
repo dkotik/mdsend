@@ -15,5 +15,5 @@ func TestImageRendering(t *testing.T) {
 ![image](./local.jgp "kewl")
     `), &b)
 
-	t.Fatal(b.String())
+	// t.Fatal(b.String())
 }

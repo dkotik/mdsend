@@ -6,7 +6,7 @@ import (
 	"log"
 	"testing"
 
-	"mdsend/loaders"
+	"github.com/dkotik/mdsend/loaders"
 )
 
 const doc = `---

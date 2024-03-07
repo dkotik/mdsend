@@ -1,7 +1,7 @@
 package echobox
 
 import (
-	"mdsend/userinterface/bubbletea/scroll"
+	"github.com/dkotik/mdsend/userinterface/bubbletea/scroll"
 	"strings"
 )
 

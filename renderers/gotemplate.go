@@ -54,7 +54,7 @@ func (r *GoTemplateMIMERenderer) renderMarkdown(w io.Writer, m *loaders.Message)
 	if len(stack) > 0 {
 		t, err := template.ParseFiles(stack...)
 		if err != nil {
-			return fmt.Errorf(`could not fetch template: %w`, err.Error())
+			return fmt.Errorf(`could not fetch template: %w`, err)
 		}
 		return t.Execute(w, m)
 	}

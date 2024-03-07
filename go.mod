@@ -14,7 +14,6 @@ require (
 	github.com/charmbracelet/bubbletea v0.19.3
 	github.com/charmbracelet/lipgloss v0.4.0
 	github.com/davecgh/go-spew v1.1.1
-	github.com/dkotik/zassets v0.0.1
 	// fyne.io/fyne v1.2.4
 	github.com/gotk3/gotk3 v0.6.3
 	github.com/hashicorp/go-multierror v1.1.1
@@ -27,13 +26,11 @@ require (
 	github.com/spf13/viper v1.4.0
 	github.com/yuin/goldmark v1.4.5
 	github.com/yuin/goldmark-meta v1.0.0
-	go.etcd.io/bbolt v1.3.6
 	// gopkg.in/russross/blackfriday.v2 v2.0.0-00010101000000-000000000000
 	gopkg.in/yaml.v2 v2.3.0
 )
 
 require (
-	github.com/chai2010/webp v1.1.0 // indirect
 	github.com/charmbracelet/harmonica v0.1.0 // indirect
 	github.com/containerd/console v1.0.2 // indirect
 	github.com/fatih/color v1.7.0 // indirect
@@ -62,11 +59,6 @@ require (
 	github.com/spf13/cast v1.3.0 // indirect
 	github.com/spf13/jwalterweatherman v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/tdewolff/minify v2.3.6+incompatible // indirect
-	github.com/tdewolff/parse v2.3.4+incompatible // indirect
-	github.com/tdewolff/test v1.0.6 // indirect
-	github.com/wellington/go-libsass v0.9.2 // indirect
-	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
 	golang.org/x/term v0.0.0-20210422114643-f5beecf764ed // indirect
 	golang.org/x/text v0.3.4 // indirect
