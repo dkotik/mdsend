@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -30,7 +31,8 @@ func (l *Line) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (l *Line) View() string {
-	return l.Value
+	return time.Now().Format(time.RFC3339Nano)
+	// return l.Value
 }
 
 func main() {
