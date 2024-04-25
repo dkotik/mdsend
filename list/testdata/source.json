@@ -1,1 +1,18 @@
-[{"email":"first@mail.json","name":"first JSON"},{"email":"second@mail.json","name":"second JSON"},{"email":"third@mail.json","name":"third JSON"},{"email":"fourth@mail.json","name":"fourth JSON"}]
+[
+	{
+		"email": "first@mail.json",
+		"name": "first JSON"
+	},
+	{
+		"email": "second@mail.json",
+		"name": "second JSON"
+	},
+	{
+		"email": "third@mail.json",
+		"name": "third JSON"
+	},
+	{
+		"email": "fourth@mail.json",
+		"name": "fourth JSON"
+	}
+]

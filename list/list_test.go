@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-// --inverse-regex=testdata
-
 func TestCreateAddSave(t *testing.T) {
 	ctx := context.Background()
 	l, err := NewList(

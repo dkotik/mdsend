@@ -40,7 +40,10 @@ func (s sourceJSON) Save(_ context.Context, v []map[string]any) (err error) {
 	defer func() {
 		err = errors.Join(err, w.Close())
 	}()
-	return json.NewEncoder(w).Encode(v)
+	encoder := json.NewEncoder(w)
+	encoder.SetEscapeHTML(false)
+	encoder.SetIndent("", "\t")
+	return encoder.Encode(v)
 }
 
 type sourceYAML string
