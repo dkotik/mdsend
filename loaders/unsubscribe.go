@@ -11,7 +11,7 @@ func NewUnsubscribeLinkTemplate(URL string) (*template.Template, error) {
 		"urlQuery": url.QueryEscape,
 		"urlPath":  url.PathEscape,
 		"base64": func(in string) string {
-			return base64.RawStdEncoding.EncodeToString([]byte(in))
+			return base64.RawURLEncoding.EncodeToString([]byte(in))
 		},
 	}).Parse(URL)
 }
