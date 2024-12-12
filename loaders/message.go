@@ -1,9 +1,12 @@
 package loaders
 
 import (
+	"errors"
 	"fmt"
+	"net/mail"
 	"net/textproto"
-	"net/url"
+	"regexp"
+	"text/template"
 )
 
 // Participant is a person or agent in "to", "from", "cc", and "bcc" fields.
@@ -41,7 +44,7 @@ type Message struct {
 	ListID             string
 	BCC                *[]Participant
 	UnsubscribeContact *Participant
-	UnsubscribeLink    *url.URL
+	UnsubscribeLink    *template.Template
 	Attachments        []string
 	Body               []byte
 	Data               map[string]interface{}
@@ -56,8 +59,6 @@ func (m *Message) MIMEHeader() textproto.MIMEHeader {
 	}
 	if len(m.ReplyTo) > 0 {
 		h.Set("Reply-To", m.ReplyTo)
-		// } else {
-		// 	h.Set("Reply-To", m.From)
 	}
 	if len(m.Comments) > 0 {
 		h.Set("Comments", m.Comments)
@@ -66,4 +67,38 @@ func (m *Message) MIMEHeader() textproto.MIMEHeader {
 		h.Set("Keywords", m.Keywords)
 	}
 	return h
+}
+
+func (m *Message) SetListID(ID string) error {
+	if !regexp.MustCompile(`[^\<\>]+\s+\<[\w\.]+\>`).MatchString(ID) {
+		return fmt.Errorf("list ID does not match format `Description <subdomain.domain.com>`: %s", ID)
+	}
+	m.ListID = ID
+	return nil
+}
+
+func (m *Message) SetUnsubscribeLink(URL string) (err error) {
+	if m.ListID == "" {
+		return errors.New("ListID is required for the unsubscribe link")
+	}
+	m.UnsubscribeLink, err = NewUnsubscribeLinkTemplate(URL)
+	if err != nil {
+		return fmt.Errorf("cannot parse unsubscribe link %q: %w", URL, err)
+	}
+	return nil
+}
+
+func (m *Message) SetUnsubscribeContact(address string) error {
+	if m.ListID == "" {
+		return errors.New("ListID is required for the unsubscribe contact")
+	}
+	a, err := mail.ParseAddress(address)
+	if err != nil {
+		return fmt.Errorf("cannot parse unsubscribeContact %q: %w", address, err)
+	}
+	m.UnsubscribeContact = &Participant{
+		Name:  a.Name,
+		Email: a.Address,
+	}
+	return nil
 }

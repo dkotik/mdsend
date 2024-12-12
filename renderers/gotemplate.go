@@ -11,8 +11,8 @@ import (
 	"html/template"
 	"io"
 	"mime/multipart"
+	"net/mail"
 	"net/textproto"
-	"net/url"
 	"strings"
 
 	"github.com/dkotik/mdsend/loaders"
@@ -63,6 +63,13 @@ func (r *GoTemplateMIMERenderer) renderMarkdown(w io.Writer, m *loaders.Message)
 
 // Render returns MIME encoded buffer.
 func (r *GoTemplateMIMERenderer) Render(w io.Writer, m *loaders.Message, to string) error {
+	// TODO: address should be parsed in levels above
+	// this is a hack due to poor early interface design
+	// which must be re-designed
+	toParsed, err := mail.ParseAddress(to)
+	if err != nil {
+		return fmt.Errorf("unable to parse recepient address %q: %w", to, err)
+	}
 	mime := multipart.NewWriter(w)
 	defer mime.Close()
 	header := m.MIMEHeader() // this can be optimized, since header does not change between emails being sent
@@ -71,12 +78,19 @@ func (r *GoTemplateMIMERenderer) Render(w io.Writer, m *loaders.Message, to stri
 	// https://mailtrap.io/blog/list-unsubscribe-header/
 	var unsubscribeLinks []string
 	if m.UnsubscribeLink != nil {
-		// m.UnsubscribeLink.Query().Set("address", to) // on copy operation
-		link := fmt.Sprintf(`%s?address=%s&list=%s`,
-			m.UnsubscribeLink.String(),
-			url.QueryEscape(to),
-			url.QueryEscape(m.ListID))
-		m.Data["injectedUnsubscribeLink"] = link
+		// link := fmt.Sprintf(`%s?address=%s&list=%s`,
+		// 	m.UnsubscribeLink.String(),
+		// 	url.QueryEscape(toParsed.Address),
+		// 	url.QueryEscape(m.ListID))
+		link := &bytes.Buffer{}
+		if err = m.UnsubscribeLink.Execute(link, UnsubscribeLinkFields{
+			Name:    toParsed.Name,
+			Address: toParsed.Address,
+			ListID:  m.ListID,
+		}); err != nil {
+			return fmt.Errorf("failed to create unsubscribe link from template: %w", err)
+		}
+		m.Data["injectedUnsubscribeLink"] = link.String()
 		unsubscribeLinks = append(unsubscribeLinks, fmt.Sprintf(`<%s>`, link))
 	}
 	if m.UnsubscribeContact != nil {
@@ -93,9 +107,13 @@ func (r *GoTemplateMIMERenderer) Render(w io.Writer, m *loaders.Message, to stri
 	}
 
 	// render body with template values
-	bf := bytes.NewBuffer(nil)
-	err := template.Must(template.New(`body`).Parse(string(m.Body))).Execute(bf, m)
+	tmpl, err := template.New(`body`).Funcs(templateFunctions).Parse(string(m.Body))
 	if err != nil {
+		return err
+	}
+
+	bf := bytes.NewBuffer(nil)
+	if err := tmpl.Execute(bf, m); err != nil {
 		return err
 	}
 	r.body = bf.Bytes()

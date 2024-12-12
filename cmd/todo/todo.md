@@ -1,6 +1,7 @@
 ## TODO
 
 - [ ] MailYak can help? https://pkg.go.dev/github.com/domodwyer/mailyak?utm_source=godoc#MailYak.MimeBuf
+- [ ] https://www.caniemail.com/ - check what is template-appropriate
 - [ ] https://github.com/charmbracelet/glamour
 - [ ] implement unsubscribe API using encore functions over etcd for state management
   - [ ] does encore free also provide a database?
