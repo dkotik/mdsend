@@ -36,6 +36,7 @@ require (
 )
 
 require (
+	github.com/btcsuite/btcd/btcutil v1.1.6 // indirect
 	github.com/charmbracelet/harmonica v0.1.0 // indirect
 	github.com/containerd/console v1.0.2 // indirect
 	github.com/fatih/color v1.7.0 // indirect

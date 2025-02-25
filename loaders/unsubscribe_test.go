@@ -43,7 +43,7 @@ func TestUnsubscribeLinkRendering(t *testing.T) {
 	}
 
 	b.Reset()
-	tmpl, err = NewUnsubscribeLinkTemplate("https://remove.me/api/{{urlPath (base64 .Address) }}/{{ urlPath (base64 (reverse .ListID)) }}")
+	tmpl, err = NewUnsubscribeLinkTemplate("https://remove.me/api/{{urlPath (base58 .Address) }}/{{ urlPath (base64 (reverse .ListID)) }}")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,7 +53,7 @@ func TestUnsubscribeLinkRendering(t *testing.T) {
 	}); err != nil {
 		t.Fatal(err)
 	}
-	if b.String() != "https://remove.me/api/dGVzdEB0ZXN0LmNvbQ/Zmpkc2xma2RzcjQzOHJ1M3VmaW9kcw" {
+	if b.String() != "https://remove.me/api/AhJcBqMwMfXx4qZ5hn/Zmpkc2xma2RzcjQzOHJ1M3VmaW9kcw" {
 		t.Errorf("mismatched URL: expected %q but got %q", "https://remove.me/api/dGVzdEB0ZXN0LmNvbQ/Zmpkc2xma2RzcjQzOHJ1M3VmaW9kcw", b.String())
 	}
 }
