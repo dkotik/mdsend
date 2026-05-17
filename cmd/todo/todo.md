@@ -52,3 +52,4 @@ return quoteEscaper.Replace(s)
 
 - support Cuelang! https://github.com/cuelang/cue
 - add to https://github.com/rothgar/awesome-tuis and bubbletea list of apps
+- check out library <https://github.com/wneessen/go-mail> - all other Golang mail packages appear abandoned: https://bsky.app/profile/zekjur.bsky.social/post/3ldoffkmkoc2h
