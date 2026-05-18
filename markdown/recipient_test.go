@@ -10,7 +10,7 @@ func TestRecipientListFromYAML(t *testing.T) {
 		"fourth@testmail.com",
 	}
 	cursor := 0
-	for recipient, err := range eachRecipientFromFileYAML("testdata/recipients.yaml") {
+	for recipient, err := range eachRecipientFromFileYAML("../internal/testdata/recipients.yaml") {
 		t.Log(recipient)
 		if err != nil {
 			t.Fatal(err)
@@ -37,7 +37,7 @@ func TestRecipientList(t *testing.T) {
 	cursor := 0
 	lastCursor := len(expected)
 
-	m, err := NewMessage("testdata/pass/a.md")
+	m, err := NewMessage("../internal/testdata/pass/a.md")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -9,11 +9,11 @@ import (
 )
 
 func TestMessageLoading(t *testing.T) {
-	m, err := NewMessage("testdata/pass/a.md")
+	m, err := NewMessage("../internal/testdata/pass/a.md")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.HasSuffix(m.Path, "/markdown/testdata/pass/a.md") {
+	if !strings.HasSuffix(m.Path, "/internal/testdata/pass/a.md") {
 		t.Fatalf("message path does not match: %q vs \"testdata/a.md\"", m.Path)
 	}
 	if m.Frontmatter == nil {
@@ -22,7 +22,7 @@ func TestMessageLoading(t *testing.T) {
 	if m.Content == "" {
 		t.Fatal("content did not load")
 	}
-	if m.ID != "5ySmznjkyhB" {
+	if m.ID != "8xqmfACezsM" {
 		t.Fatal("idempotent message ID does not match:", m.ID)
 	}
 

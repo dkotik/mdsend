@@ -19,6 +19,7 @@ import (
 type Message struct {
 	ID          string
 	Path        string
+	Directory   string
 	Attachments map[string]string
 	Frontmatter map[string]any
 	Content     string
@@ -55,7 +56,7 @@ func NewMessage(p string) (m Message, err error) {
 	}
 
 	m.Attachments = make(map[string]string)
-	directory := filepath.Dir(m.Path)
+	m.Directory = filepath.Dir(m.Path)
 	addAttachment := func(original string) {
 		p := strings.TrimSpace(original)
 		if p == "" {
@@ -63,7 +64,7 @@ func NewMessage(p string) (m Message, err error) {
 		}
 		p = filepath.Clean(p)
 		if !filepath.IsAbs(p) {
-			p = filepath.Join(directory, p)
+			p = filepath.Join(m.Directory, p)
 		}
 		m.Attachments[original] = p
 	}

@@ -42,11 +42,13 @@ EmailSend(file.md, templating engine, provider engine)
 
 ## Development Roadmap
 
+- [ ] Anticipate circular imports for recipient lists.
 - [ ] Drop `yaml.v2` dependency.
 - [ ] Bump `github.com/pelletier/go-toml` to v2.
 - [ ] Text-part writer should minify html! minified html will have <img src=url> without quotes! (change inline detector)
 - [ ] Should write a better markdown renderer that recognizes single-line youtube and image paragraphs, centers them.
 - [ ] Email validation: <https://github.com/reacherhq/check-if-email-exists>.
+- [ ] Beautify the default template. Add `dark.html` one.
 
 ## Tools
 

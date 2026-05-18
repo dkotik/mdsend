@@ -16,24 +16,22 @@ const RecipientFilePrefix = "file://"
 
 func (m Message) EachRecipient() iter.Seq2[map[string]any, error] {
 	return func(yield func(map[string]any, error) bool) {
-		directory := filepath.Dir(m.Path)
-
 		// to
-		for recipient, err := range eachRecipient(m.Frontmatter[ToKey], directory) {
+		for recipient, err := range eachRecipient(m.Frontmatter[ToKey], m.Directory) {
 			if !yield(recipient, err) {
 				return
 			}
 		}
 
 		// cc
-		for recipient, err := range eachRecipient(m.Frontmatter[CarbonCopyKey], directory) {
+		for recipient, err := range eachRecipient(m.Frontmatter[CarbonCopyKey], m.Directory) {
 			if !yield(recipient, err) {
 				return
 			}
 		}
 
 		// bcc
-		for recipient, err := range eachRecipient(m.Frontmatter[BlindCopyKey], directory) {
+		for recipient, err := range eachRecipient(m.Frontmatter[BlindCopyKey], m.Directory) {
 			if !yield(recipient, err) {
 				return
 			}
