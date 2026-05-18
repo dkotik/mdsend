@@ -8,6 +8,17 @@ import (
 )
 
 const (
+	IdempotentIdentifierKey = "id"
+	FromKey                 = "from"
+	ToKey                   = "to"
+	CarbonCopyKey           = "cc"
+	BlindCopyKey            = "bcc"
+	SubjectKey              = "subject"
+	AttachmentsKey          = "attachments"
+	TemplatesKey            = "templates"
+	NameKey                 = "name"
+	EmailKey                = "email"
+
 	lineBreak      rune = '\n'
 	carriageReturn rune = '\r'
 	delimeterYAML  rune = '-'
@@ -41,8 +52,8 @@ func Cut(source []byte) (frontmatter, content []byte, delimeter rune, err error)
 	}
 
 	var (
-		next           rune
-		delimeterCount int
+		next                  rune
+		openingDelimeterCount int
 	)
 	for { // drain opening front-matter marker
 		next, count, err = r.ReadRune()
@@ -56,7 +67,7 @@ func Cut(source []byte) (frontmatter, content []byte, delimeter rune, err error)
 			if cursor < 3 { // not enough delimeters
 				return nil, source, delimeter, nil
 			}
-			delimeterCount = cursor
+			openingDelimeterCount = cursor
 			break
 		}
 		cursor = cursor + count
@@ -86,9 +97,10 @@ func Cut(source []byte) (frontmatter, content []byte, delimeter rune, err error)
 	frontmatter = source[cursor-count:]
 	content = frontmatter
 	cursor = count
-	matchingDelimeters := 0
+	closingDelimeterCount := 0
+	extraWhiteSpace := 0
 	if next == delimeter {
-		matchingDelimeters = 1
+		closingDelimeterCount = 1
 	} else {
 		newLine = false
 	}
@@ -105,22 +117,27 @@ func Cut(source []byte) (frontmatter, content []byte, delimeter rune, err error)
 
 		if newLine {
 			if next == delimeter {
-				matchingDelimeters++
-				if delimeterCount == matchingDelimeters {
-					frontmatter = frontmatter[:cursor-delimeterCount]
+				closingDelimeterCount++
+				if openingDelimeterCount == closingDelimeterCount {
+					frontmatter = frontmatter[:cursor-openingDelimeterCount-extraWhiteSpace]
 					break // closing candidate found
 				}
 				continue
 			}
-			if next == carriageReturn && matchingDelimeters == 0 {
+			if next == carriageReturn && closingDelimeterCount == 0 {
 				continue // ignore carriage returns after new lines
 			}
 			newLine = false
 		}
-		if next == lineBreak {
-			newLine = true
+		if unicode.IsSpace(next) {
+			if next == lineBreak {
+				newLine = true
+			}
+			extraWhiteSpace += count
+		} else {
+			extraWhiteSpace = 0
 		}
-		matchingDelimeters = 0
+		closingDelimeterCount = 0
 	}
 
 	newLine = false

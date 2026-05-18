@@ -19,38 +19,33 @@ frontmatter
 ---
 content
 					`),
-			Frontmatter: []byte(`frontmatter
-`),
+			Frontmatter: []byte(`frontmatter`),
 			Content: []byte(`content
 					`),
 			Delimeter: '-',
 		},
 		{
-			Source: []byte(`
----
+			Source: []byte(`---
 frontmatter
 
 ---
 content
 
 			`),
-			Frontmatter: []byte(`frontmatter
-
-`),
+			Frontmatter: []byte(`frontmatter`),
 			Content: []byte(`content
 
 			`),
 			Delimeter: '-',
 		},
 		{
-			Source: []byte(`
-+++
+			Source: []byte(`+++
+
 frontmatter
 +++
 content
 					`),
-			Frontmatter: []byte(`frontmatter
-`),
+			Frontmatter: []byte(`frontmatter`),
 			Content: []byte(`content
 					`),
 			Delimeter: '+',
