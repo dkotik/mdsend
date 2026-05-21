@@ -36,22 +36,6 @@ func Send(message *loaders.Message, o *Options) error {
 	defer o.Logger.Close()
 	defer o.Distributor.Close()
 
-	// for i := 0; i < 1000; i++ {
-	// 	switch rand.Intn(5) {
-	// 	case 0:
-	// 		logger.LogSkip(`skip %d here we go`, i)
-	// 	case 1:
-	// 		logger.LogWarn(`warn %d here we go`, i)
-	// 	case 2:
-	// 		logger.LogInfo(`info %d here we go`, i)
-	// 	case 3:
-	// 		logger.LogTest(`test %d here we go`, i)
-	// 	default:
-	// 		logger.LogSent(`sent %d here we go`, i)
-	// 	}
-	// 	time.Sleep(time.Second / 10)
-	// }
-
 	err := o.Distributor.Send(message, o.Renderer, o.Provider, o.Dryrun)
 	if err != nil {
 		o.Logger.LogFail(err.Error() + ".")

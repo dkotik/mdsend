@@ -1,4 +1,7 @@
-package mdsend
+/*
+Package mime encodes electronic mail parts for delivery.
+*/
+package mime
 
 import (
 	"encoding/base64"
@@ -8,10 +11,13 @@ import (
 	"sort"
 )
 
+// LineLengthLimit is the maximum length of a line
+// for MIME encoding.
+//
 // RFC 5322 2.1.1 limits to 78, excluding CRLF. mime/quotedprintable sets this to 76.
-const maxMIMELineLen = 76
+const LineLengthLimit = 76
 
-func MIMEHeaderTo(w io.Writer, header textproto.MIMEHeader) (err error) {
+func WriteHeader(w io.Writer, header textproto.MIMEHeader) (err error) {
 	// sourced from go/src/mime/multipart/writer.go
 	keys := make([]string, 0, len(header))
 	for k := range header {
@@ -31,25 +37,26 @@ func MIMEHeaderTo(w io.Writer, header textproto.MIMEHeader) (err error) {
 	return nil
 }
 
-func MIMEBase64To(w io.Writer, r io.Reader) (err error) {
-	encoder := base64.NewEncoder(base64.StdEncoding, &MIMELineWrapper{w: w})
-	_, err = io.Copy(encoder, r)
-	return err
+// NewEncoderBase64 encodes data to standard Base64 encoding
+// while keeping each line under [LineLengthLimit].
+// Encoder must be closed to work correctly.
+func NewEncoderBase64(w io.Writer) io.WriteCloser {
+	return base64.NewEncoder(base64.StdEncoding, &lineWrapper{w: w})
 }
 
-// MIMELineWrapper writes everything to io.Writer chunked by maxMIMELineLen.
-type MIMELineWrapper struct {
+// lineWrapper writes everything to io.Writer chunked by [LineLengthLimit].
+type lineWrapper struct {
 	w     io.Writer
 	wrote int
 }
 
-func (w *MIMELineWrapper) Write(p []byte) (int, error) {
-	leftover := w.wrote % maxMIMELineLen
-	lineSize := maxMIMELineLen - leftover
+func (w *lineWrapper) Write(p []byte) (int, error) {
+	leftover := w.wrote % LineLengthLimit
+	lineSize := LineLengthLimit - leftover
 	for i := 0; i < len(p); i += lineSize {
 		// Reset linesize
-		if i%maxMIMELineLen != 0 && lineSize < maxMIMELineLen {
-			lineSize = maxMIMELineLen
+		if i%LineLengthLimit != 0 && lineSize < LineLengthLimit {
+			lineSize = LineLengthLimit
 		}
 		// Calculate the end of the chunk offset
 		end := i + lineSize
