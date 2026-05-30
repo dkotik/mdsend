@@ -3,6 +3,7 @@ package mdsend
 import (
 	"errors"
 	"net"
+	"net/mail"
 	"regexp"
 	"strings"
 )
@@ -36,4 +37,28 @@ func ValidateEmail(emailAddress string) error {
 		return errors.Join(ErrEmailAddressDomainInvalid, err)
 	}
 	return nil
+}
+
+func newAddressFromMap(m map[string]any) (result mail.Address, err error) {
+	switch nameRaw := m[FieldNameName].(type) {
+	case nil:
+	case string:
+		result.Name = strings.TrimSpace(nameRaw)
+	default:
+		return result, errors.New("invalid name format")
+	}
+
+	switch emailRaw := m[FieldNameName].(type) {
+	case nil:
+		return result, errors.New("no electronic email address specified")
+	case string:
+		result.Address = strings.TrimSpace(emailRaw)
+		if err = ValidateEmail(result.Address); err != nil {
+			return result, err
+		}
+	default:
+		return result, errors.New("invalid email format")
+	}
+
+	return result, nil
 }

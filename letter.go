@@ -1,0 +1,116 @@
+package mdsend
+
+import (
+	"errors"
+	"fmt"
+	"net/mail"
+	"strings"
+	"time"
+)
+
+type LetterError uint
+
+const (
+	ErrNoSubject LetterError = iota + 1
+	ErrNoFromAddress
+	ErrNoContent
+
+	FieldNameSubject   = "subject"
+	FieldNameFrom      = "from"
+	FieldNameName      = "name"
+	FieldNameEmail     = "email"
+	FieldNameSendAfter = "sendAfter"
+)
+
+func (l LetterError) Error() string {
+	switch l {
+	case ErrNoSubject:
+		return "there is no subject in frontmatter"
+	case ErrNoFromAddress:
+		return "there is no from address in frontmatter"
+	case ErrNoContent:
+		return "there is no content"
+	default:
+		return "unknown error"
+	}
+}
+
+type Letter struct {
+	ID          string
+	Frontmatter map[string]any
+	Content     string
+	CreatedAt   time.Time
+	SentAt      time.Time
+	// RecipientCount int
+	// QueuedAt       time.Time
+	// SendAfter      time.Time
+	// ExpireAfter    time.Duration
+}
+
+func (l Letter) GetSubject() (string, error) {
+	switch subject := l.Frontmatter[FieldNameSubject].(type) {
+	case int, uint, int64, uint64, uint16, int16, float32, float64:
+		numeric := fmt.Sprintf("%v", subject)
+		if len(numeric) == 0 {
+			return "", ErrNoSubject
+		}
+		return numeric, nil
+	case string:
+		subject = strings.TrimSpace(subject)
+		if len(subject) == 0 {
+			return "", ErrNoSubject
+		}
+		return subject, nil
+	default:
+		return "", ErrNoSubject
+	}
+}
+
+func (l Letter) GetFrom() (mail.Address, error) {
+	switch from := l.Frontmatter[FieldNameSubject].(type) {
+	case map[string]any:
+		return newAddressFromMap(from)
+	case string:
+		if strings.TrimSpace(from) == "" {
+			return mail.Address{}, ErrNoFromAddress
+		}
+		address, err := mail.ParseAddress(from)
+		if err != nil {
+			return mail.Address{}, err
+		}
+		return *address, nil
+	default:
+		return mail.Address{}, ErrNoFromAddress
+	}
+}
+
+func (l Letter) GetSendAfter() (time.Time, error) {
+	switch sendAfter := l.Frontmatter[FieldNameSendAfter].(type) {
+	case nil:
+		return time.Time{}, nil
+	case string:
+		t, err := time.Parse(time.RFC3339, sendAfter)
+		if err != nil {
+			return time.Time{}, err
+		}
+		return t, nil
+	default:
+		return time.Time{}, fmt.Errorf("invalid send after format: %T", sendAfter)
+	}
+}
+
+func (l Letter) Validate() (err error) {
+	if l.ID == "" {
+		return errors.New("letter has no ID")
+	}
+	if strings.TrimSpace(l.Content) == "" {
+		return ErrNoContent
+	}
+	if _, err = l.GetSubject(); err != nil {
+		return err
+	}
+	if _, err = l.GetFrom(); err != nil {
+		return err
+	}
+	return nil
+}

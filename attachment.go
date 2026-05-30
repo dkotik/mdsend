@@ -89,6 +89,7 @@ func sniffLoadCompressAttachment(source io.ReadSeeker) (string, []byte, error) {
 }
 
 type Attachment struct {
+	LetterID                 string
 	Name                     string
 	Source                   string
 	Hash                     uint64 // for XXHash2

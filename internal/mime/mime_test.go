@@ -9,6 +9,12 @@ import (
 	"testing"
 )
 
+func TestMessageStructure(t *testing.T) {
+	// mime.TypeByExtension(ext string)
+	// mime.ParseMediaType(v string)
+	// r := multipart.NewReader(r io.Reader, boundary string)
+}
+
 func TestFileEncoding(t *testing.T) {
 	cat, err := os.ReadFile("../testdata/cat.jpg")
 	if err != nil {

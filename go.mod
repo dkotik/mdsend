@@ -1,6 +1,6 @@
 module github.com/dkotik/mdsend
 
-go 1.23.0
+go 1.24.0
 
 // replace (
 // 	github.com/JohannesKaufmann/html-to-markdown => /home/fray/Documents/ember/vendor/github.com/JohannesKaufmann/html-to-markdown

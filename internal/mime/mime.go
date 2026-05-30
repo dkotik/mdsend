@@ -11,11 +11,18 @@ import (
 	"sort"
 )
 
-// LineLengthLimit is the maximum length of a line
-// for MIME encoding.
-//
-// RFC 5322 2.1.1 limits to 78, excluding CRLF. mime/quotedprintable sets this to 76.
-const LineLengthLimit = 76
+const (
+	// LineLengthLimit is the maximum length of a line
+	// for MIME encoding.
+	//
+	// RFC 5322 2.1.1 limits to 78, excluding CRLF. mime/quotedprintable sets this to 76.
+	LineLengthLimit = 76
+
+	ContentTypeImageJPEG = "image/jpeg"
+	ContentTypeImagePNG  = "image/png"
+	ContentTypeImageGIF  = "image/gif"
+	// ContentTypeImageWEBP = ""
+)
 
 func WriteHeader(w io.Writer, header textproto.MIMEHeader) (err error) {
 	// sourced from go/src/mime/multipart/writer.go

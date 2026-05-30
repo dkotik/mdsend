@@ -6,6 +6,7 @@ import (
 	"net/textproto"
 	"testing"
 
+	"github.com/dkotik/mdsend/internal"
 	"github.com/sebdah/goldie/v2"
 )
 
@@ -26,11 +27,27 @@ func TestBareMessageEncoding(t *testing.T) {
 func TestMessageEncodingWithAttachments(t *testing.T) {
 	b := &bytes.Buffer{}
 	if err := (Message{
-		Entropy:     rand.NewChaCha8([32]byte{}),
-		Header:      textproto.MIMEHeader{},
-		Text:        "text",
-		HTML:        "<b>text</b>",
-		Attachments: []Attachment{},
+		Entropy: rand.NewChaCha8([32]byte{}),
+		Header:  textproto.MIMEHeader{},
+		Text:    "text",
+		HTML:    "<b>text</b>",
+		Attachments: []Attachment{
+			{
+				Name:        "cat.jpg",
+				ContentType: ContentTypeImageJPEG,
+				Content:     internal.Cat,
+			},
+			{
+				Name:        "panda.jpg",
+				ContentType: ContentTypeImageJPEG,
+				Content:     internal.Panda,
+			},
+			{
+				Name:        "chamillion.jpg",
+				ContentType: ContentTypeImageJPEG,
+				Content:     internal.Chamillion,
+			},
+		},
 	}).Encode(b); err != nil {
 		t.Fatal(err)
 	}
@@ -40,11 +57,29 @@ func TestMessageEncodingWithAttachments(t *testing.T) {
 func TestMessageEncodingWithEmbeddedAttachments(t *testing.T) {
 	b := &bytes.Buffer{}
 	if err := (Message{
-		Entropy:     rand.NewChaCha8([32]byte{}),
-		Header:      textproto.MIMEHeader{},
-		Text:        "text",
-		HTML:        "<b>text</b>",
-		Attachments: []Attachment{},
+		Entropy: rand.NewChaCha8([32]byte{}),
+		Header:  textproto.MIMEHeader{},
+		Text:    "text",
+		HTML:    "<b>text</b> <img src=\"cid:cat\" alt=\"cat\" />",
+		Attachments: []Attachment{
+			{
+				Name:        "panda.jpg",
+				ContentType: ContentTypeImageJPEG,
+				Content:     internal.Panda,
+			},
+			{
+				Name:        "chamillion.jpg",
+				ContentType: ContentTypeImageJPEG,
+				Content:     internal.Chamillion,
+			},
+		},
+		EmbeddedAttachments: []EmbeddedAttachment{
+			{
+				Name:        "cat.jpg",
+				ContentType: ContentTypeImageJPEG,
+				Content:     internal.Cat,
+			},
+		},
 	}).Encode(b); err != nil {
 		t.Fatal(err)
 	}
