@@ -94,6 +94,9 @@ type Attachment struct {
 	Source                   string
 	Hash                     uint64 // for XXHash2
 	mimeEncodedBase64Content []byte
+
+	ContentType string
+	Content     []byte
 }
 
 func (a *Attachment) WriteTo(w io.Writer) (int64, error) {

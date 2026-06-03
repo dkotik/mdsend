@@ -1,6 +1,6 @@
 module github.com/dkotik/mdsend
 
-go 1.24.0
+go 1.25.0
 
 // replace (
 // 	github.com/JohannesKaufmann/html-to-markdown => /home/fray/Documents/ember/vendor/github.com/JohannesKaufmann/html-to-markdown
@@ -32,7 +32,7 @@ require (
 
 require (
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
-	golang.org/x/text v0.14.0
+	golang.org/x/text v0.37.0
 )
 
 require (
@@ -73,6 +73,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
+	golang.org/x/image v0.41.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/term v0.0.0-20210422114643-f5beecf764ed // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect

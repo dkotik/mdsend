@@ -15,6 +15,7 @@ type queue struct {
 	stmtInsertLetter   string
 	stmtRetrieveLetter string
 	stmtDeleteLetter   string
+	stmtListLetters    string
 }
 
 // New creates an SQLite3 queue at the location.
@@ -42,6 +43,7 @@ func New(conn *sqlite.Conn, prefix string) (_ mdsend.Queue, err error) {
 		stmtInsertLetter:   `INSERT INTO ` + lettersTable + `(id, frontmatter, content) VALUES(?,?,?)`,
 		stmtRetrieveLetter: `SELECT frontmatter, content FROM ` + lettersTable + ` WHERE id=?`,
 		stmtDeleteLetter:   `DELETE FROM ` + lettersTable + ` WHERE id=?`,
+		stmtListLetters:    `SELECT id, frontmatter, content FROM ` + lettersTable,
 	}, nil
 }
 

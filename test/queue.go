@@ -1,6 +1,7 @@
 package test
 
 import (
+	"iter"
 	"testing"
 
 	"github.com/dkotik/mdsend"
@@ -25,6 +26,12 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 			if err = q.DeleteLetter(ctx, l1.ID); err != nil {
 				t.Fatal("unable to delete the first letter:", err)
 			}
+			for l1, err = range q.ListLetters(ctx) {
+				if err != nil {
+					t.Fatal("unable to collect a list of letters")
+				}
+				t.Fatal("There is still a letter left over:", l1)
+			}
 		})
 		lcomp, err := q.RetrieveLetter(ctx, l1.ID)
 		if err != nil {
@@ -45,5 +52,29 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 			t.Fatal("unable to retrieve second letter:", err)
 		}
 		t.Run("retrieved second letter matches", LettersAreEqual(l2, lcomp))
+
+		// test letter listing
+		ok := false
+		next, stop := iter.Pull2(q.ListLetters(ctx))
+		if next == nil {
+			t.Fatal("no letters found")
+		}
+		lcomp, err, ok = next()
+		if !ok {
+			t.Fatal("no letters found, when the first letter was expected")
+		}
+		if err != nil {
+			t.Fatal("unable to retrieve the first letter:", err)
+		}
+		t.Run("retrieved first letter matches", LettersAreEqual(l1, lcomp))
+		lcomp, err, ok = next()
+		if !ok {
+			t.Fatal("no letters found, when the second letter was expected")
+		}
+		if err != nil {
+			t.Fatal("unable to retrieve the second letter:", err)
+		}
+		t.Run("retrieved second letter matches", LettersAreEqual(l2, lcomp))
+		stop()
 	}
 }

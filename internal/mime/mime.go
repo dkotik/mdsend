@@ -19,9 +19,10 @@ const (
 	LineLengthLimit = 76
 
 	ContentTypeImageJPEG = "image/jpeg"
+	ContentTypeImageBMP  = "image/bmp"
 	ContentTypeImagePNG  = "image/png"
 	ContentTypeImageGIF  = "image/gif"
-	// ContentTypeImageWEBP = ""
+	ContentTypeImageWEBP = "image/webp"
 )
 
 func WriteHeader(w io.Writer, header textproto.MIMEHeader) (err error) {

@@ -14,12 +14,6 @@ const (
 	ErrNoSubject LetterError = iota + 1
 	ErrNoFromAddress
 	ErrNoContent
-
-	FieldNameSubject   = "subject"
-	FieldNameFrom      = "from"
-	FieldNameName      = "name"
-	FieldNameEmail     = "email"
-	FieldNameSendAfter = "sendAfter"
 )
 
 func (l LetterError) Error() string {
@@ -40,9 +34,9 @@ type Letter struct {
 	Frontmatter map[string]any
 	Content     string
 	CreatedAt   time.Time
+	QueuedAt    time.Time
 	SentAt      time.Time
 	// RecipientCount int
-	// QueuedAt       time.Time
 	// SendAfter      time.Time
 	// ExpireAfter    time.Duration
 }
