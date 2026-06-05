@@ -54,3 +54,7 @@ EmailSend(file.md, templating engine, provider engine)
 
 - <https://github.com/AfterShip/email-verifier>
 - Use <https://www.mail-tester.com/> to check the deliverability of your mail.
+
+## Similar Projects
+
+- <https://github.com/charmbracelet/pop>

@@ -11,6 +11,7 @@ const (
 	FieldNameFrom            = "from"
 	FieldNameName            = "name"
 	FieldNameEmail           = "email"
+	FieldNameAttachments     = "attachments"
 	FieldNameSendAfter       = "send_after"
 	FieldNameMediaContraints = "media_constraints"
 	FieldNameMediaQuality    = "quality"

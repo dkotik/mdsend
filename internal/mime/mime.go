@@ -5,10 +5,7 @@ package mime
 
 import (
 	"encoding/base64"
-	"fmt"
 	"io"
-	"net/textproto"
-	"sort"
 )
 
 const (
@@ -18,32 +15,23 @@ const (
 	// RFC 5322 2.1.1 limits to 78, excluding CRLF. mime/quotedprintable sets this to 76.
 	LineLengthLimit = 76
 
+	// Mime package BEncoder refers to RFC 2047, section 2 to set
+	// maximum word length to 75 characters. from which the length
+	// of the prefix and suffix are subtracted to get the limit.
+	// One less is to prevent line wrapping in the middle of a multi-byte
+	// UTF character rune.
+	WordLengthLimit = LineLengthLimit - 1 - len("=?UTF-8?b?") - len("?=")
+
+	BEncodingPrefix = "=?UTF-8?b?"
+	BEncodingSuffix = "?="
+	CRNL            = "\r\n"
+
 	ContentTypeImageJPEG = "image/jpeg"
 	ContentTypeImageBMP  = "image/bmp"
 	ContentTypeImagePNG  = "image/png"
 	ContentTypeImageGIF  = "image/gif"
 	ContentTypeImageWEBP = "image/webp"
 )
-
-func WriteHeader(w io.Writer, header textproto.MIMEHeader) (err error) {
-	// sourced from go/src/mime/multipart/writer.go
-	keys := make([]string, 0, len(header))
-	for k := range header {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	for _, k := range keys {
-		for _, v := range header[k] {
-			if _, err = fmt.Fprintf(w, "%s: %s\r\n", k, v); err != nil {
-				return err
-			}
-		}
-	}
-	if _, err = fmt.Fprintf(w, "\r\n"); err != nil {
-		return err
-	}
-	return nil
-}
 
 // NewEncoderBase64 encodes data to standard Base64 encoding
 // while keeping each line under [LineLengthLimit].

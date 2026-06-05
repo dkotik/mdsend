@@ -1,28 +1,12 @@
 package test
 
 import (
+	"reflect"
 	"testing"
 	"time"
 
 	"github.com/dkotik/mdsend"
 )
-
-func MapsAreEqual(a, b map[string]any) func(*testing.T) {
-	return func(t *testing.T) {
-		if len(a) != len(b) {
-			t.Log("A:", a)
-			t.Log("B:", b)
-			t.Fatal("maps do not contain the same number of elements")
-		}
-		for k, v1 := range a {
-			if v2, ok := b[k]; !ok || v1 != v2 {
-				t.Log("A:", v1)
-				t.Log("B:", v2)
-				t.Fatal("key value is different:", k)
-			}
-		}
-	}
-}
 
 func LettersAreEqual(a, b mdsend.Letter) func(*testing.T) {
 	return func(t *testing.T) {
@@ -31,10 +15,13 @@ func LettersAreEqual(a, b mdsend.Letter) func(*testing.T) {
 			t.Log("B:", b.ID)
 			t.Fatal("IDs do not match")
 		}
-		t.Run("frontmatter is the same", MapsAreEqual(
-			a.Frontmatter,
-			b.Frontmatter,
-		))
+		t.Run("frontmatter is the same", func(t *testing.T) {
+			if !reflect.DeepEqual(a.Frontmatter, b.Frontmatter) {
+				t.Logf("A: %+v", a.Frontmatter)
+				t.Logf("B: %+v", b.Frontmatter)
+				t.Fatal("frontmatter does not match")
+			}
+		})
 		if a.Content != b.Content {
 			t.Log("A:", a.Content)
 			t.Log("B:", b.Content)
@@ -82,10 +69,34 @@ func DispatchesAreEqual(a, b mdsend.Dispatch) func(*testing.T) {
 			t.Log("B:", b.LetterID)
 			t.Fatal("letter IDs do not match")
 		}
-		t.Run("recipients are the same", MapsAreEqual(
-			a.Recipient,
-			b.Recipient,
-		))
+		t.Run("recipients are the same", func(t *testing.T) {
+			if a.Recipient.String() != b.Recipient.String() {
+				t.Log("A:", a.Recipient.String())
+				t.Log("B:", b.Recipient.String())
+				t.Fatal("recipients do not match")
+			}
+		})
+		t.Run("headers are the same", func(t *testing.T) {
+			if !reflect.DeepEqual(a.Headers, b.Headers) {
+				t.Log("A:", a.Headers)
+				t.Log("B:", b.Headers)
+				t.Fatal("headers do not match")
+			}
+		})
+		t.Run("text is the same", func(t *testing.T) {
+			if a.Text != b.Text {
+				t.Log("A:", a.Text)
+				t.Log("B:", b.Text)
+				t.Fatal("text does not match")
+			}
+		})
+		t.Run("html is the same", func(t *testing.T) {
+			if a.HTML != b.HTML {
+				t.Log("A:", a.HTML)
+				t.Log("B:", b.HTML)
+				t.Fatal("html does not match")
+			}
+		})
 		if !a.SentAt.Equal(b.SentAt) {
 			t.Log("A:", a.SentAt.Format(time.RFC3339))
 			t.Log("B:", b.SentAt.Format(time.RFC3339))

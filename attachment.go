@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/btcsuite/btcd/btcutil/base58"
 	"github.com/cespare/xxhash/v2"
 )
 
@@ -58,7 +59,7 @@ func NewAttachment(p string) (*Attachment, error) {
 	return &Attachment{
 		Name:                     fname,
 		Source:                   p,
-		Hash:                     h.Sum64(),
+		Hash:                     base58.Encode(h.Sum(nil)),
 		mimeEncodedBase64Content: final.Bytes(),
 	}, nil
 }
@@ -89,16 +90,32 @@ func sniffLoadCompressAttachment(source io.ReadSeeker) (string, []byte, error) {
 }
 
 type Attachment struct {
-	LetterID                 string
-	Name                     string
-	Source                   string
-	Hash                     uint64 // for XXHash2
+	LetterID string
+	Name     string
+	Source   string
+	// Hash                     uint64 // for XXHash2
+	Hash                     string
 	mimeEncodedBase64Content []byte
 
 	ContentType string
 	Content     []byte
 }
 
+func (a Attachment) WithUpdatedHash() Attachment {
+	hash := xxhash.New()
+	var err error
+	if _, err = io.Copy(
+		hash,
+		bytes.NewReader(a.Content),
+	); err != nil {
+		panic(err)
+	}
+	a.Hash = base58.Encode(hash.Sum(nil))
+	// a.Hash = hash.Sum64()
+	return a
+}
+
+// deprecate
 func (a *Attachment) WriteTo(w io.Writer) (int64, error) {
 	return io.Copy(w, bytes.NewReader(a.mimeEncodedBase64Content))
 }
