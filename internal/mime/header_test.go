@@ -39,6 +39,7 @@ func TestNewHeaders(t *testing.T) {
 			t.Errorf("WriteHeaders() = %v", err)
 		}
 	}
+	// t.Fatal("test WriteAddressHeader")
 	goldie.New(t).Assert(t, "headers", b.Bytes())
 
 	r := textproto.NewReader(bufio.NewReader(b))

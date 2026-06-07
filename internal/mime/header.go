@@ -104,6 +104,7 @@ close:
 
 var maxBase64Len = base64.StdEncoding.DecodedLen(WordLengthLimit)
 
+// TODO: remove <n int> from WriteHeader signature
 func WriteHeader(w io.Writer, name, value string) (n int, err error) {
 	if !needsEncoding(value) {
 		return writeSimpleHeader(w, name, value)
@@ -166,13 +167,6 @@ func WriteHeader(w io.Writer, name, value string) (n int, err error) {
 		return n, io.ErrShortWrite
 	}
 	return n, nil
-}
-
-func WriteAddressHeader(w io.Writer, name, value string) (n int, err error) {
-	if !needsEncoding(value) {
-		return writeSimpleHeader(w, name, value)
-	}
-	return writeSimpleHeader(w, name, value) // TODO: complete
 }
 
 // func (h Header) WriteTo(w io.Writer) (n int64, err error) {
