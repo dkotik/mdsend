@@ -68,7 +68,7 @@ func isAllPrintable(s string) bool {
 	return true
 }
 
-func EncodeName(name string) string {
+func encodeName(name string) string {
 	if isAllPrintable(name) {
 		return quoteString(name)
 	}
@@ -81,173 +81,83 @@ func EncodeName(name string) string {
 	return b.String()
 }
 
+// WriteAddressHeader writes a list of MIME-mail encoded address header to the given writer.
+// It respects [LineLengthLimit] by wrapping long lines.
+// If no addresses are provided, it does nothing.
+//
+// TODO: if the name is too long, it will not be wrapped.
+// TODO: if the email address is too long, it will not be wrapped.
 func WriteAddressHeader(w io.Writer, name string, addresses ...mail.Address) (err error) {
 	if len(addresses) == 0 {
 		return nil
 	}
-	n, err := w.Write([]byte(name + ": "))
+	n, err := w.Write([]byte(name))
 	if err != nil {
 		return err
 	}
-	if n-2 != len(name) {
+	if n != len(name) {
 		return io.ErrShortWrite
 	}
+	if _, err = w.Write([]byte(":")); err != nil {
+		return err
+	}
 
-	remaining := LineLengthLimit - n
-	name = addresses[0].Name
-	namePreceedsAddress := name != ""
-	if namePreceedsAddress {
-		name = EncodeName(name)
-		if len(name) > remaining {
-			n, err = w.Write([]byte(CRNL + " "))
+	remaining := LineLengthLimit - n - 1 // for the colon
+	cutIfNeededThenWrite := func(word string) (err error) {
+		length := len(word)
+		if remaining > length+1 { // +1 for the prefixing space
+			_, err = w.Write([]byte(" "))
 			if err != nil {
 				return err
 			}
-			if n != 3 {
-				return io.ErrShortWrite
-			}
-			remaining = LineLengthLimit - n
-		}
-		n, err = w.Write([]byte(name))
-		if err != nil {
-			return err
-		}
-		if n != len(name) {
-			return io.ErrShortWrite
-		}
-		remaining -= n
-	}
-
-	if len(addresses) > 1 {
-		remaining = remaining - 2 // one for first comma and space
-	}
-	length := len(addresses[0].Address)
-	if remaining < length-3 { // three for space < >
-		n, err = w.Write([]byte(CRNL + " "))
-		if err != nil {
-			return err
-		}
-		if n != 3 {
-			return io.ErrShortWrite
-		}
-		remaining = LineLengthLimit - n
-	}
-	if namePreceedsAddress {
-		n, err = w.Write([]byte(" <"))
-		if err != nil {
-			return err
-		}
-		if n != 2 {
-			return io.ErrShortWrite
-		}
-		remaining -= 2 // space and angle bracket
-	}
-	n, err = w.Write([]byte(addresses[0].Address))
-	if err != nil {
-		return err
-	}
-	if n != length {
-		return io.ErrShortWrite
-	}
-	if namePreceedsAddress {
-		_, err = w.Write([]byte(">"))
-		if err != nil {
-			return err
-		}
-		remaining-- // for the angle bracket
-	}
-	remaining -= length
-
-	for _, address := range addresses[1:] {
-		n, err = w.Write([]byte(", "))
-		if err != nil {
-			return err
-		}
-		if n != 2 {
-			return io.ErrShortWrite
-		}
-		remaining = remaining - 2 // for the comma space
-		namePreceedsAddress = address.Name != ""
-		if !namePreceedsAddress {
-			length = len(address.Address)
-			if remaining < length {
-				n, err = w.Write([]byte(CRNL + " "))
-				if err != nil {
-					return err
-				}
-				if n != 3 {
-					return io.ErrShortWrite
-				}
-				remaining = LineLengthLimit - n
-			}
-			n, err = w.Write([]byte(address.Address))
+			n, err := w.Write([]byte(word))
 			if err != nil {
 				return err
 			}
 			if n != length {
 				return io.ErrShortWrite
 			}
-			remaining -= length
-			continue
+			remaining = remaining - n - 1 // for the space
+			return err
 		}
-
-		name = EncodeName(address.Name)
-		if len(name) > remaining {
-			n, err = w.Write([]byte(CRNL + " "))
-			if err != nil {
-				return err
-			}
-			if n != 3 {
-				return io.ErrShortWrite
-			}
-			remaining = LineLengthLimit - n
-		}
-		n, err = w.Write([]byte(name))
+		n, err := w.Write([]byte(CRNL + " "))
 		if err != nil {
 			return err
 		}
-		if n != len(name) {
+		if n != 3 {
 			return io.ErrShortWrite
 		}
-		remaining -= n
-
-		length = len(address.Address)
-		if remaining < length-4 { // three for space < > and comma between addresses
-			n, err = w.Write([]byte(CRNL + " "))
-			if err != nil {
-				return err
-			}
-			if n != 3 {
-				return io.ErrShortWrite
-			}
-			remaining = LineLengthLimit - n
-		}
-		if namePreceedsAddress {
-			n, err = w.Write([]byte(" <"))
-			if err != nil {
-				return err
-			}
-			if n != 2 {
-				return io.ErrShortWrite
-			}
-			remaining -= 2 // for the spance and angle bracket
-		}
-		n, err = w.Write([]byte(address.Address))
+		n, err = w.Write([]byte(word))
 		if err != nil {
 			return err
 		}
 		if n != length {
 			return io.ErrShortWrite
 		}
-		remaining -= length
-		if namePreceedsAddress {
-			_, err = w.Write([]byte(">"))
-			if err != nil {
+		remaining = LineLengthLimit - n - 1 // for the space
+		return nil
+	}
+
+	isNamePresent := false
+	finalIndex := len(addresses) - 1
+	for n, address := range addresses {
+		isNamePresent = address.Name != ""
+		if !isNamePresent {
+			if err = cutIfNeededThenWrite(address.Address + ","); err != nil {
 				return err
 			}
-			remaining -= 1 // for the angle bracket
+			continue
+		}
+		if err = cutIfNeededThenWrite(encodeName(address.Name)); err != nil {
+			return err
+		}
+		if n == finalIndex {
+			return cutIfNeededThenWrite("<" + address.Address + ">")
+		}
+		if err = cutIfNeededThenWrite("<" + address.Address + ">,"); err != nil {
+			return err
 		}
 	}
 
-	return err
+	return nil
 }
