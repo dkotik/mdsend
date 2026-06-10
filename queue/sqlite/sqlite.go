@@ -3,6 +3,7 @@ package sqlite
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/dkotik/mdsend"
 	"zombiezen.com/go/sqlite"
@@ -30,7 +31,9 @@ func New(conn *sqlite.Conn, prefix string) (_ mdsend.Queue, err error) {
 		CREATE TABLE IF NOT EXISTS `+lettersTable+` (
 			id text PRIMARY KEY,
 			frontmatter text,
-			content text
+			content text,
+			created_at text,
+			sent_at text
 		);
 		`,
 	); err != nil {
@@ -40,10 +43,10 @@ func New(conn *sqlite.Conn, prefix string) (_ mdsend.Queue, err error) {
 	return queue{
 		DB: conn,
 
-		stmtInsertLetter:   `INSERT INTO ` + lettersTable + `(id, frontmatter, content) VALUES(?,?,?)`,
-		stmtRetrieveLetter: `SELECT frontmatter, content FROM ` + lettersTable + ` WHERE id=?`,
+		stmtInsertLetter:   `INSERT INTO ` + lettersTable + `(id, frontmatter, content, created_at, sent_at) VALUES(?,?,?,?,?)`,
+		stmtRetrieveLetter: `SELECT frontmatter, content, created_at, sent_at FROM ` + lettersTable + ` WHERE id=?`,
 		stmtDeleteLetter:   `DELETE FROM ` + lettersTable + ` WHERE id=?`,
-		stmtListLetters:    `SELECT id, frontmatter, content FROM ` + lettersTable,
+		stmtListLetters:    `SELECT id, frontmatter, content, created_at, sent_at FROM ` + lettersTable,
 	}, nil
 }
 
@@ -52,4 +55,12 @@ func escapeIdentifier(name string) string {
 	// Double quotes are escaped by doubling them in SQL identifiers
 	escaped := strings.ReplaceAll(name, `"`, `""`)
 	return fmt.Sprintf(`"%s"`, escaped)
+}
+
+func encodeTime(t time.Time) string {
+	return t.Format(time.RFC3339)
+}
+
+func decodeTime(s string) (time.Time, error) {
+	return time.Parse(time.RFC3339, s)
 }

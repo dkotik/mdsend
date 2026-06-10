@@ -26,6 +26,8 @@ func (q queue) CreateLetter(
 			l.ID,
 			frontmatter,
 			l.Content,
+			encodeTime(l.CreatedAt),
+			encodeTime(l.SentAt),
 		},
 	}); err != nil {
 		return err
@@ -41,6 +43,12 @@ func (q queue) RetrieveLetter(ctx context.Context, ID string) (result mdsend.Let
 				return fmt.Errorf("unable to decode frontmatter: %w", err)
 			}
 			result.Content = stmt.ColumnText(1)
+			if result.CreatedAt, err = decodeTime(stmt.ColumnText(2)); err != nil {
+				return err
+			}
+			if result.SentAt, err = decodeTime(stmt.ColumnText(3)); err != nil {
+				return err
+			}
 			return nil
 		},
 	}); err != nil {
@@ -80,6 +88,16 @@ func (q queue) ListLetters(ctx context.Context) iter.Seq2[mdsend.Letter, error] 
 				return
 			}
 			l.Content = stmt.ColumnText(2)
+			l.CreatedAt, err = decodeTime(stmt.ColumnText(3))
+			if err != nil {
+				yield(mdsend.Letter{}, err)
+				return
+			}
+			l.SentAt, err = decodeTime(stmt.ColumnText(4))
+			if err != nil {
+				yield(mdsend.Letter{}, err)
+				return
+			}
 			if !yield(l, nil) {
 				return
 			}

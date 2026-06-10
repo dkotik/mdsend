@@ -27,12 +27,12 @@ func LettersAreEqual(a, b mdsend.Letter) func(*testing.T) {
 			t.Log("B:", b.Content)
 			t.Fatal("content does not match")
 		}
-		if !a.CreatedAt.Equal(b.CreatedAt) {
+		if !a.CreatedAt.Truncate(time.Second).Equal(b.CreatedAt.Truncate(time.Second)) {
 			t.Log("A:", a.CreatedAt.Format(time.RFC3339))
 			t.Log("B:", b.CreatedAt.Format(time.RFC3339))
 			t.Fatal("created at time does not match")
 		}
-		if !a.SentAt.Equal(b.SentAt) {
+		if !a.SentAt.Truncate(time.Second).Equal(b.SentAt.Truncate(time.Second)) {
 			t.Log("A:", a.SentAt.Format(time.RFC3339))
 			t.Log("B:", b.SentAt.Format(time.RFC3339))
 			t.Fatal("sent at time does not match")

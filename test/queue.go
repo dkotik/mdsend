@@ -3,16 +3,31 @@ package test
 import (
 	"iter"
 	"testing"
+	"time"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/internal"
 )
 
 func Queue(q mdsend.Queue) func(*testing.T) {
 	l1 := mdsend.Letter{
 		ID: "firstLetter",
+		Frontmatter: map[string]any{
+			"subject": "first letter",
+		},
+		Content:   "first letter",
+		CreatedAt: internal.MockTime,
+		SentAt:    internal.MockTime.Add(time.Hour * 70),
 	}
+
 	l2 := mdsend.Letter{
 		ID: "secondLetter",
+		Frontmatter: map[string]any{
+			"subject": "second letter",
+		},
+		Content:   "second letter",
+		CreatedAt: internal.MockTime.Add(time.Hour * 50),
+		SentAt:    internal.MockTime.Add(time.Hour * 170),
 	}
 	return func(t *testing.T) {
 		var (
