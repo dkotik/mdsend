@@ -13,10 +13,17 @@ import (
 type queue struct {
 	DB *sqlite.Conn
 
-	stmtInsertLetter   string
-	stmtRetrieveLetter string
-	stmtDeleteLetter   string
-	stmtListLetters    string
+	stmtInsertLetter            *sqlite.Stmt
+	stmtInsertAttachment        *sqlite.Stmt
+	stmtRetrieveLetter          *sqlite.Stmt
+	stmtDeleteLetter            *sqlite.Stmt
+	stmtDeleteLetterAttachments *sqlite.Stmt
+	stmtDeleteLetterDispatches  *sqlite.Stmt
+	stmtListLettersForward      *sqlite.Stmt
+	stmtListLettersBackward     *sqlite.Stmt
+	stmtListAttachments         *sqlite.Stmt
+	stmtListDispatches          *sqlite.Stmt
+	stmtCompleteDispatch        *sqlite.Stmt
 }
 
 // New creates an SQLite3 queue at the location.
@@ -25,29 +32,110 @@ func New(conn *sqlite.Conn, prefix string) (_ mdsend.Queue, err error) {
 		prefix = "mdsend_"
 	}
 	lettersTable := escapeIdentifier(prefix + "letters")
-	if err = sqlitex.ExecScript(
-		conn,
-		`
-		CREATE TABLE IF NOT EXISTS `+lettersTable+` (
-			id text PRIMARY KEY,
-			frontmatter text,
-			content text,
-			created_at text,
-			sent_at text
-		);
-		`,
-	); err != nil {
-		return nil, fmt.Errorf("unable to create tables: %w", err)
+	attachmentsTable := escapeIdentifier(prefix + "attachments")
+	dispatchesTable := escapeIdentifier(prefix + "dispatches")
+
+	createLettersTable := true
+	createAttachmentsTable := true
+	createDispatchesTable := true
+
+	if err = sqlitex.ExecuteScript(conn, `
+		PRAGMA foreign_keys = ON;
+
+		SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '`+prefix+`%';
+	`, &sqlitex.ExecOptions{
+		ResultFunc: func(stmt *sqlite.Stmt) error {
+			switch stmt.ColumnText(0) {
+			case lettersTable:
+				createLettersTable = false
+			case attachmentsTable:
+				createAttachmentsTable = false
+			case dispatchesTable:
+				createDispatchesTable = false
+			}
+			return nil
+		},
+	}); err != nil {
+		return nil, fmt.Errorf("unable to list tables: %w", err)
 	}
 
-	return queue{
-		DB: conn,
+	if createLettersTable || createAttachmentsTable || createDispatchesTable {
+		if err = sqlitex.ExecScript(
+			conn,
+			`
+		CREATE TABLE IF NOT EXISTS `+lettersTable+` (
+			id text PRIMARY KEY,
+			frontmatter text NOT NULL,
+			content text NOT NULL,
+			created_at text NOT NULL,
+			sent_at text NOT NULL
+		) STRICT;
 
-		stmtInsertLetter:   `INSERT INTO ` + lettersTable + `(id, frontmatter, content, created_at, sent_at) VALUES(?,?,?,?,?)`,
-		stmtRetrieveLetter: `SELECT frontmatter, content, created_at, sent_at FROM ` + lettersTable + ` WHERE id=?`,
-		stmtDeleteLetter:   `DELETE FROM ` + lettersTable + ` WHERE id=?`,
-		stmtListLetters:    `SELECT id, frontmatter, content, created_at, sent_at FROM ` + lettersTable,
-	}, nil
+		CREATE INDEX IF NOT EXISTS index_name
+			ON `+lettersTable+` (id);
+
+		CREATE TABLE IF NOT EXISTS `+attachmentsTable+` (
+			id text PRIMARY KEY,
+			letter_id text NOT NULL,
+			name text NOT NULL,
+			content_hash text NOT NULL,
+			content_type text NOT NULL,
+			content blob NOT NULL,
+
+			FOREIGN KEY (letter_id) REFERENCES `+lettersTable+`(id)
+	   		ON DELETE CASCADE
+	   		ON UPDATE CASCADE
+		) STRICT;
+
+		CREATE TABLE IF NOT EXISTS `+dispatchesTable+` (
+			id text PRIMARY KEY,
+			letter_id text NOT NULL REFERENCES `+lettersTable+`(id) ON DELETE CASCADE
+		) STRICT;
+		`,
+		); err != nil {
+			return nil, fmt.Errorf("unable to create tables: %w", err)
+		}
+	}
+	q := queue{
+		DB: conn,
+	}
+
+	if q.stmtInsertLetter, err = conn.Prepare(`INSERT INTO ` + lettersTable + `(id, frontmatter, content, created_at, sent_at) VALUES(?,?,?,?,?)`); err != nil {
+		return nil, fmt.Errorf("unable to prepare insert letter statement: %w", err)
+	}
+	if q.stmtInsertAttachment, err = q.DB.Prepare(`INSERT INTO ` + attachmentsTable + ` (id, letter_id, name, content_hash, content_type, content) VALUES (?, ?, ?, ?, ?, ?)`); err != nil {
+		return nil, fmt.Errorf("unable to prepare insert attachment statement: %w", err)
+	}
+	if q.stmtRetrieveLetter, err = conn.Prepare(`SELECT frontmatter, content, created_at, sent_at FROM ` + lettersTable + ` WHERE id=?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare retrieve letter statement: %w", err)
+	}
+	if q.stmtDeleteLetter, err = conn.Prepare(`DELETE FROM ` + lettersTable + ` WHERE id=?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare delete letter statement: %w", err)
+	}
+	if q.stmtDeleteLetterAttachments, err = conn.Prepare(`DELETE FROM ` + attachmentsTable + ` WHERE letter_id=?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare delete letter attachments statement: %w", err)
+	}
+	if q.stmtDeleteLetterDispatches, err = conn.Prepare(`DELETE FROM ` + dispatchesTable + ` WHERE letter_id=?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare delete letter dispatches statement: %w", err)
+	}
+
+	if q.stmtListLettersForward, err = conn.Prepare(`SELECT id, frontmatter, content, created_at, sent_at FROM ` + lettersTable + ` WHERE id>? LIMIT ?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare list letters statement: %w", err)
+	}
+	if q.stmtListLettersBackward, err = conn.Prepare(`SELECT id, frontmatter, content, created_at, sent_at FROM ` + lettersTable + ` WHERE id<? ORDER BY id DESC LIMIT ?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare list letters statement: %w", err)
+	}
+	if q.stmtListAttachments, err = conn.Prepare(`SELECT name, content_hash, content_type, content FROM ` + attachmentsTable + ` WHERE letter_id=?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare list attachments statement: %w", err)
+	}
+	if q.stmtListDispatches, err = conn.Prepare(`SELECT id, letter_id FROM ` + dispatchesTable + ` WHERE letter_id=?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare list dispatches statement: %w", err)
+	}
+	if q.stmtCompleteDispatch, err = conn.Prepare(`UPDATE ` + dispatchesTable + ` SET letter_id=NULL WHERE id=?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare complete dispatch statement: %w", err)
+	}
+
+	return q, nil
 }
 
 // escapeIdentifier safely quotes an SQLite table or column name.
