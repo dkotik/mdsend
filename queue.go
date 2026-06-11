@@ -30,9 +30,12 @@ type ChildCursor struct {
 }
 
 type Queue interface {
-	CreateLetter(context.Context, Letter, []Attachment, []Dispatch) error
+	CreateLetter(context.Context, Letter) error
 	RetrieveLetter(context.Context, string) (Letter, error)
 	DeleteLetter(context.Context, string) error
+
+	CreateAttachment(context.Context, Attachment) error
+	CreateDispatch(context.Context, Dispatch) error
 	CompleteDispatch(context.Context, string) error
 
 	ListLetters(context.Context, Cursor) iter.Seq2[Letter, error]

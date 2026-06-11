@@ -12,8 +12,6 @@ import (
 func (q queue) CreateLetter(
 	ctx context.Context,
 	l mdsend.Letter,
-	attachments []mdsend.Attachment,
-	dispatches []mdsend.Dispatch,
 ) (err error) {
 	q.DB.SetInterrupt(ctx.Done())
 	defer q.DB.SetInterrupt(context.Background().Done())
@@ -33,18 +31,6 @@ func (q queue) CreateLetter(
 	_, err = q.stmtInsertLetter.Step()
 	if err != nil {
 		return err
-	}
-
-	for _, d := range dispatches {
-		if err = q.CreateDispatch(ctx, d); err != nil {
-			return err
-		}
-	}
-
-	for _, a := range attachments {
-		if err = q.CreateAttachment(ctx, a); err != nil {
-			return err
-		}
 	}
 	return err
 }

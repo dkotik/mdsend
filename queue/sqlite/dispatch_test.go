@@ -33,17 +33,6 @@ func TestDispatchQueries(t *testing.T) {
 	if err = q.CreateLetter(ctx, mdsend.Letter{
 		ID:      letterID,
 		Content: content,
-	}, nil, nil); err != nil {
-		t.Fatal(err)
-	}
-
-	if err = q.CreateDispatch(ctx, mdsend.Dispatch{
-		LetterID: letterID,
-		From:     mail.Address{},
-		To:       mail.Address{},
-		Subject:  "",
-		Text:     "",
-		HTML:     "",
 	}); err != nil {
 		t.Fatal(err)
 	}
@@ -51,10 +40,27 @@ func TestDispatchQueries(t *testing.T) {
 	if err = q.CreateDispatch(ctx, mdsend.Dispatch{
 		LetterID: letterID,
 		From:     mail.Address{},
-		To:       mail.Address{},
-		Subject:  "",
-		Text:     "",
-		HTML:     "",
+		To: mail.Address{
+			Name:    "First Last",
+			Address: "first.last@example.com",
+		},
+		Subject: "",
+		Text:    "",
+		HTML:    "",
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	if err = q.CreateDispatch(ctx, mdsend.Dispatch{
+		LetterID: letterID,
+		From:     mail.Address{},
+		To: mail.Address{
+			Name:    "Second",
+			Address: "second@example.com",
+		},
+		Subject: "",
+		Text:    "",
+		HTML:    "",
 	}); err != nil {
 		t.Fatal(err)
 	}

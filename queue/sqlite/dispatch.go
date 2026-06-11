@@ -11,6 +11,8 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/oklog/ulid/v2"
+	lib "modernc.org/sqlite/lib"
+	"zombiezen.com/go/sqlite"
 )
 
 func (q queue) CreateDispatch(
@@ -36,7 +38,14 @@ func (q queue) CreateDispatch(
 	q.stmtInsertDispatch.BindText(9, d.Text)
 	q.stmtInsertDispatch.BindText(10, d.HTML)
 	_, err = q.stmtInsertDispatch.Step()
-	return err
+	switch code := sqlite.ErrCode(err); code {
+	case lib.SQLITE_OK:
+		return nil
+	case lib.SQLITE_CONSTRAINT_UNIQUE:
+		return mdsend.ErrDuplicateDispatch
+	default:
+		return err
+	}
 }
 
 func (q queue) ListDispatches(ctx context.Context, cursor mdsend.ChildCursor) iter.Seq2[mdsend.Dispatch, error] {

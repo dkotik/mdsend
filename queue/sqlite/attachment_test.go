@@ -31,7 +31,7 @@ func TestAttachmentQueries(t *testing.T) {
 
 	if err = q.CreateLetter(ctx, mdsend.Letter{
 		ID: letterID,
-	}, nil, nil); err != nil {
+	}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -39,7 +39,7 @@ func TestAttachmentQueries(t *testing.T) {
 		LetterID:    letterID,
 		Name:        "first",
 		Source:      "",
-		Hash:        "",
+		Hash:        "first",
 		ContentType: "test",
 		Content:     content,
 	}); err != nil {
@@ -50,7 +50,7 @@ func TestAttachmentQueries(t *testing.T) {
 		LetterID:    letterID,
 		Name:        "second",
 		Source:      "",
-		Hash:        "",
+		Hash:        "second",
 		ContentType: "test",
 		Content:     content,
 	}); err != nil {

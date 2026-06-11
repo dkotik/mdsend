@@ -1,17 +1,17 @@
 # Mdsend
 
-Project status: ALPHA DRAFT
+Project status: ALPHA.
 
 > Send markdown files as MIME-encoded electronic mail.
 
 ## Installation
 
 - Go:
-  ```bash
+  ```sh
   go install github.com/dkotik/mdsend@latest
   ```
-- Macintosh:
-  ```bash
+- MacOS:
+  ```sh
   brew tap dkotik/tap
   brew install mdsend
   ```
@@ -21,6 +21,7 @@ Project status: ALPHA DRAFT
 ```markdown
 ---
 subject: "Test Email"
+from: "Test Account <test@gmail.com>"
 to: "Test Account <test@gmail.com>"
 to: "./localfile.yaml|toml|json|csv|txt"
 ---
@@ -30,15 +31,16 @@ to: "./localfile.yaml|toml|json|csv|txt"
 Message body.
 ```
 
-Easily hackable.
-
 EmailSend(file.md, templating engine, provider engine)
 
 ## Delivery Locking
 
 ## Distributors
 
-- https://purelymail.com/
+- [x] Mailgun
+- [ ] Resend
+- [ ] Loops
+- [ ] https://purelymail.com/
 
 ## Development Roadmap
 

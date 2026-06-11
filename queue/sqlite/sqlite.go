@@ -86,7 +86,8 @@ func New(conn *sqlite.Conn, prefix string) (_ mdsend.Queue, err error) {
 
 			FOREIGN KEY (letter_id) REFERENCES `+lettersTable+`(id)
 	   		ON DELETE CASCADE
-	   		ON UPDATE CASCADE
+	   		ON UPDATE CASCADE,
+			UNIQUE (letter_id, content_hash)
 		) STRICT;
 
 		CREATE TABLE IF NOT EXISTS `+dispatchesTable+` (
@@ -100,7 +101,9 @@ func New(conn *sqlite.Conn, prefix string) (_ mdsend.Queue, err error) {
 			subject text NOT NULL,
 			message_text text NOT NULL,
 			message_html text NOT NULL,
-			sent_at text
+			sent_at text,
+
+			UNIQUE (letter_id, to_email)
 		) STRICT;
 		`,
 		); err != nil {

@@ -9,6 +9,8 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/oklog/ulid/v2"
+	lib "modernc.org/sqlite/lib"
+	"zombiezen.com/go/sqlite"
 )
 
 func (q queue) CreateAttachment(
@@ -26,7 +28,14 @@ func (q queue) CreateAttachment(
 	q.stmtInsertAttachment.BindText(5, a.ContentType)
 	q.stmtInsertAttachment.BindBytes(6, a.Content)
 	_, err = q.stmtInsertAttachment.Step()
-	return err
+	switch code := sqlite.ErrCode(err); code {
+	case lib.SQLITE_OK:
+		return nil
+	case lib.SQLITE_CONSTRAINT_UNIQUE:
+		return mdsend.ErrDuplicateAttachment
+	default:
+		return err
+	}
 }
 
 func (q queue) ListAttachments(ctx context.Context, letterID string) iter.Seq2[mdsend.Attachment, error] {

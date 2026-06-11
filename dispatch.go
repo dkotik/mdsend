@@ -11,12 +11,22 @@ import (
 	"time"
 )
 
-type Message interface {
-	To() []string
-	CC() []string
-	BCC() []string
-	Subject() string
-	MIMEBody() io.ReadCloser
+type DispatchError uint8
+
+const (
+	ErrInvalidDispatch DispatchError = iota
+	ErrDuplicateDispatch
+)
+
+func (err DispatchError) Error() string {
+	switch err {
+	case ErrInvalidDispatch:
+		return "invalid dispatch"
+	case ErrDuplicateDispatch:
+		return "duplicate dispatch"
+	default:
+		return ""
+	}
 }
 
 type Header struct {
@@ -55,6 +65,7 @@ func MergeHeaders(ms ...map[string]any) (result []Header) {
 	return
 }
 
+// Dispatch is an intent to delivery a copy of a letter to a particular recipient.
 type Dispatch struct {
 	ID       string
 	LetterID string
@@ -69,4 +80,13 @@ type Dispatch struct {
 
 type Sender interface {
 	Send(context.Context, Dispatch) error
+}
+
+// DEPRECATED: use Dispatch instead
+type Message interface {
+	To() []string
+	CC() []string
+	BCC() []string
+	Subject() string
+	MIMEBody() io.ReadCloser
 }

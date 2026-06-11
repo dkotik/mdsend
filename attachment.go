@@ -13,7 +13,23 @@ import (
 	"github.com/cespare/xxhash/v2"
 )
 
-var attachments = make(map[uint64]*Attachment)
+type AttachmentError uint8
+
+const (
+	ErrInvalidAttachment AttachmentError = iota
+	ErrDuplicateAttachment
+)
+
+func (err AttachmentError) Error() string {
+	switch err {
+	case ErrInvalidAttachment:
+		return "invalid attachment"
+	case ErrDuplicateAttachment:
+		return "duplicate attachment"
+	default:
+		return ""
+	}
+}
 
 func NewAttachment(p string) (*Attachment, error) {
 	r, err := os.Open(p)
@@ -119,3 +135,5 @@ func (a Attachment) WithUpdatedHash() Attachment {
 func (a *Attachment) WriteTo(w io.Writer) (int64, error) {
 	return io.Copy(w, bytes.NewReader(a.mimeEncodedBase64Content))
 }
+
+var attachments = make(map[uint64]*Attachment)

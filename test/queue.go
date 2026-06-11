@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"iter"
+	"net/mail"
 	"reflect"
 	"testing"
 	"time"
@@ -35,30 +36,53 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 	dispatches := []mdsend.Dispatch{
 		{
 			LetterID: l1.ID,
-			Subject:  "",
-			Text:     "",
-			HTML:     "",
+			From:     mail.Address{},
+			To: mail.Address{
+				Name:    "First Last",
+				Address: "first.last@example.com",
+			},
+			Subject: "subject1",
+			Text:    "first text",
+			HTML:    "first HTML",
 		},
 		{
 			LetterID: l1.ID,
-			Subject:  "",
-			Text:     "",
-			HTML:     "",
+			From:     mail.Address{},
+			To: mail.Address{
+				Name:    "Second",
+				Address: "second@example.com",
+			},
+			Subject: "subject2",
+			Text:    "second text",
+			HTML:    "second HTML",
 		},
 	}
 
 	attachments := []mdsend.Attachment{
-		{LetterID: l1.ID, Content: []byte("attachment content1")},
-		{LetterID: l1.ID, Content: []byte("attachment content2")},
+		{LetterID: l1.ID, Content: []byte("attachment content1"), Hash: "attachment content1"},
+		{LetterID: l1.ID, Content: []byte("attachment content2"), Hash: "attachment content2"},
 	}
 	return func(t *testing.T) {
 		var (
 			ctx = t.Context()
 			err error
 		)
-		if err = q.CreateLetter(ctx, l1, attachments, dispatches); err != nil {
+		if err = q.CreateLetter(ctx, l1); err != nil {
 			t.Fatal("unable to create the first letter:", err)
 		}
+
+		for _, a := range attachments {
+			if err = q.CreateAttachment(ctx, a); err != nil {
+				t.Fatal("unable to create attachment:", err)
+			}
+		}
+
+		for _, d := range dispatches {
+			if err = q.CreateDispatch(ctx, d); err != nil {
+				t.Fatal("unable to create dispatch:", err)
+			}
+		}
+
 		defer func() {
 			if err = q.DeleteLetter(ctx, l1.ID); err != nil {
 				t.Fatal("unable to delete the first letter:", err)
@@ -124,7 +148,7 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 			}
 		}
 
-		if err = q.CreateLetter(ctx, l2, nil, nil); err != nil {
+		if err = q.CreateLetter(ctx, l2); err != nil {
 			t.Fatal("unable to create the second letter:", err)
 		}
 		defer func() {
@@ -172,5 +196,7 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 		}
 		t.Run("retrieved second letter matches", LettersAreEqual(l2, lcomp))
 		stop()
+
+		t.Run("queue recognizes duplicates", QueueRecognizesDuplicates(q))
 	}
 }
