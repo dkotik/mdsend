@@ -69,10 +69,17 @@ func DispatchesAreEqual(a, b mdsend.Dispatch) func(*testing.T) {
 			t.Log("B:", b.LetterID)
 			t.Fatal("letter IDs do not match")
 		}
+		t.Run("senders are the same", func(t *testing.T) {
+			if a.From.String() != b.From.String() {
+				t.Log("A:", a.From.String())
+				t.Log("B:", b.From.String())
+				t.Fatal("senders do not match")
+			}
+		})
 		t.Run("recipients are the same", func(t *testing.T) {
-			if a.Recipient.String() != b.Recipient.String() {
-				t.Log("A:", a.Recipient.String())
-				t.Log("B:", b.Recipient.String())
+			if a.To.String() != b.To.String() {
+				t.Log("A:", a.To.String())
+				t.Log("B:", b.To.String())
 				t.Fatal("recipients do not match")
 			}
 		})
@@ -83,6 +90,11 @@ func DispatchesAreEqual(a, b mdsend.Dispatch) func(*testing.T) {
 				t.Fatal("headers do not match")
 			}
 		})
+		if a.Subject != b.Subject {
+			t.Log("A:", a.Subject)
+			t.Log("B:", b.Subject)
+			t.Fatal("subjects do not match")
+		}
 		t.Run("text is the same", func(t *testing.T) {
 			if a.Text != b.Text {
 				t.Log("A:", a.Text)

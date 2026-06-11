@@ -34,12 +34,18 @@ func (q queue) CreateLetter(
 	if err != nil {
 		return err
 	}
+
+	for _, d := range dispatches {
+		if err = q.CreateDispatch(ctx, d); err != nil {
+			return err
+		}
+	}
+
 	for _, a := range attachments {
 		if err = q.CreateAttachment(ctx, a); err != nil {
 			return err
 		}
 	}
-
 	return err
 }
 
@@ -142,16 +148,17 @@ func (q queue) ListLetters(ctx context.Context, cursor mdsend.Cursor) iter.Seq2[
 			stmt = q.stmtListLettersBackward
 		}
 		err := stmt.Reset()
+		if err != nil {
+			yield(letter, err)
+			return
+		}
+
 		if cursor.ItemID == "" {
 			stmt.BindText(1, "0")
 		} else {
 			stmt.BindText(1, cursor.ItemID)
 		}
 		stmt.BindInt64(2, limit)
-		if err != nil {
-			yield(letter, err)
-			return
-		}
 		for {
 			ok, err := stmt.Step()
 			if err != nil {

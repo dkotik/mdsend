@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"iter"
 	"reflect"
 	"testing"
@@ -31,6 +32,21 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 		SentAt:    internal.MockTime.Add(time.Hour * 170),
 	}
 
+	dispatches := []mdsend.Dispatch{
+		{
+			LetterID: l1.ID,
+			Subject:  "",
+			Text:     "",
+			HTML:     "",
+		},
+		{
+			LetterID: l1.ID,
+			Subject:  "",
+			Text:     "",
+			HTML:     "",
+		},
+	}
+
 	attachments := []mdsend.Attachment{
 		{LetterID: l1.ID, Content: []byte("attachment content1")},
 		{LetterID: l1.ID, Content: []byte("attachment content2")},
@@ -40,7 +56,7 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 			ctx = t.Context()
 			err error
 		)
-		if err = q.CreateLetter(ctx, l1, attachments, nil); err != nil {
+		if err = q.CreateLetter(ctx, l1, attachments, dispatches); err != nil {
 			t.Fatal("unable to create the first letter:", err)
 		}
 		defer func() {
@@ -53,6 +69,16 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 				}
 				t.Fatal("There is still a letter left over:", l1)
 			}
+
+			t.Run("there are no dispatches left over", IteratorIsEmpty(q.ListDispatches(ctx, mdsend.ChildCursor{
+				ParentID: l1.ID,
+				Cursor: mdsend.Cursor{
+					ItemID: "",
+					Batch:  5,
+				},
+			})))
+
+			t.Run("there are no attachments left over", IteratorIsEmpty(q.ListAttachments(ctx, l1.ID)))
 		}()
 
 		lcomp, err := q.RetrieveLetter(ctx, l1.ID)
@@ -74,6 +100,30 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 			t.Fatal("attachment lists do not match")
 		}
 
+		l1dispatches := make([]mdsend.Dispatch, 0, 1)
+		for l1dispatch, err := range q.ListDispatches(ctx, mdsend.ChildCursor{
+			ParentID: l1.ID,
+			Cursor: mdsend.Cursor{
+				ItemID: "",
+				Batch:  1,
+			},
+		}) {
+			if err != nil {
+				t.Fatal("unable to list dispatches for first letter:", err)
+			}
+			l1dispatches = append(l1dispatches, l1dispatch)
+		}
+		if len(l1dispatches) != len(dispatches) {
+			t.Fatal("dispatch count mismatch: expected", len(dispatches), "got", len(l1dispatches))
+		}
+		for i, d := range l1dispatches {
+			d.ID = dispatches[i].ID // copy the ID from the expected dispatch
+			t.Run(fmt.Sprintf("dispatch #%d is the same", i+1), DispatchesAreEqual(d, dispatches[i]))
+			if err = q.CompleteDispatch(ctx, d.ID); err != nil {
+				t.Fatalf("unable to complete dispatch %d: %v", i+1, err)
+			}
+		}
+
 		if err = q.CreateLetter(ctx, l2, nil, nil); err != nil {
 			t.Fatal("unable to create the second letter:", err)
 		}
@@ -81,6 +131,16 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 			if err = q.DeleteLetter(ctx, l2.ID); err != nil {
 				t.Fatal("unable to delete the second letter:", err)
 			}
+
+			t.Run("there are no dispatches left over", IteratorIsEmpty(q.ListDispatches(ctx, mdsend.ChildCursor{
+				ParentID: l2.ID,
+				Cursor: mdsend.Cursor{
+					ItemID: "",
+					Batch:  5,
+				},
+			})))
+
+			t.Run("there are no attachments left over", IteratorIsEmpty(q.ListAttachments(ctx, l2.ID)))
 		}()
 
 		lcomp, err = q.RetrieveLetter(ctx, l2.ID)

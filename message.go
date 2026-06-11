@@ -56,13 +56,15 @@ func MergeHeaders(ms ...map[string]any) (result []Header) {
 }
 
 type Dispatch struct {
-	ID        string
-	LetterID  string
-	Headers   []Header
-	Recipient mail.Address
-	Text      string
-	HTML      string
-	SentAt    time.Time
+	ID       string
+	LetterID string
+	Headers  []Header
+	From     mail.Address
+	To       mail.Address
+	Subject  string
+	Text     string
+	HTML     string
+	SentAt   time.Time
 }
 
 type Sender interface {

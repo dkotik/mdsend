@@ -27,14 +27,15 @@ func TestAttachmentQueries(t *testing.T) {
 	q := qq.(queue)
 	letterID := "testLetter"
 	content := []byte("test content")
+	ctx := t.Context()
 
-	if err = q.CreateLetter(t.Context(), mdsend.Letter{
+	if err = q.CreateLetter(ctx, mdsend.Letter{
 		ID: letterID,
 	}, nil, nil); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = q.CreateAttachment(t.Context(), mdsend.Attachment{
+	if err = q.CreateAttachment(ctx, mdsend.Attachment{
 		LetterID:    letterID,
 		Name:        "first",
 		Source:      "",
@@ -45,7 +46,7 @@ func TestAttachmentQueries(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err = q.CreateAttachment(t.Context(), mdsend.Attachment{
+	if err = q.CreateAttachment(ctx, mdsend.Attachment{
 		LetterID:    letterID,
 		Name:        "second",
 		Source:      "",
@@ -57,7 +58,7 @@ func TestAttachmentQueries(t *testing.T) {
 	}
 
 	attachments := make([]mdsend.Attachment, 0, 2)
-	for a, err := range q.ListAttachments(t.Context(), letterID) {
+	for a, err := range q.ListAttachments(ctx, letterID) {
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -73,10 +74,10 @@ func TestAttachmentQueries(t *testing.T) {
 		t.Fatal("expected 2 attachments, got", len(attachments))
 	}
 
-	if err = q.DeleteLetter(t.Context(), letterID); err != nil {
+	if err = q.DeleteLetter(ctx, letterID); err != nil {
 		t.Fatal(err)
 	}
-	for a, err := range q.ListAttachments(t.Context(), letterID) {
+	for a, err := range q.ListAttachments(ctx, letterID) {
 		if err != nil {
 			t.Fatal(err)
 		}

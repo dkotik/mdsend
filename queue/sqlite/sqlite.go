@@ -14,6 +14,7 @@ type queue struct {
 	DB *sqlite.Conn
 
 	stmtInsertLetter            *sqlite.Stmt
+	stmtInsertDispatch          *sqlite.Stmt
 	stmtInsertAttachment        *sqlite.Stmt
 	stmtRetrieveLetter          *sqlite.Stmt
 	stmtDeleteLetter            *sqlite.Stmt
@@ -22,7 +23,8 @@ type queue struct {
 	stmtListLettersForward      *sqlite.Stmt
 	stmtListLettersBackward     *sqlite.Stmt
 	stmtListAttachments         *sqlite.Stmt
-	stmtListDispatches          *sqlite.Stmt
+	stmtListDispatchesForward   *sqlite.Stmt
+	stmtListDispatchesBackward  *sqlite.Stmt
 	stmtCompleteDispatch        *sqlite.Stmt
 }
 
@@ -89,7 +91,16 @@ func New(conn *sqlite.Conn, prefix string) (_ mdsend.Queue, err error) {
 
 		CREATE TABLE IF NOT EXISTS `+dispatchesTable+` (
 			id text PRIMARY KEY,
-			letter_id text NOT NULL REFERENCES `+lettersTable+`(id) ON DELETE CASCADE
+			letter_id text NOT NULL REFERENCES `+lettersTable+`(id) ON DELETE CASCADE,
+			headers text NOT NULL,
+			from_name text NOT NULL,
+			from_email text NOT NULL,
+			to_name text NOT NULL,
+			to_email text NOT NULL,
+			subject text NOT NULL,
+			message_text text NOT NULL,
+			message_html text NOT NULL,
+			sent_at text
 		) STRICT;
 		`,
 		); err != nil {
@@ -102,6 +113,9 @@ func New(conn *sqlite.Conn, prefix string) (_ mdsend.Queue, err error) {
 
 	if q.stmtInsertLetter, err = conn.Prepare(`INSERT INTO ` + lettersTable + `(id, frontmatter, content, created_at, sent_at) VALUES(?,?,?,?,?)`); err != nil {
 		return nil, fmt.Errorf("unable to prepare insert letter statement: %w", err)
+	}
+	if q.stmtInsertDispatch, err = conn.Prepare(`INSERT INTO ` + dispatchesTable + ` (id, letter_id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`); err != nil {
+		return nil, fmt.Errorf("unable to prepare insert dispatch statement: %w", err)
 	}
 	if q.stmtInsertAttachment, err = q.DB.Prepare(`INSERT INTO ` + attachmentsTable + ` (id, letter_id, name, content_hash, content_type, content) VALUES (?, ?, ?, ?, ?, ?)`); err != nil {
 		return nil, fmt.Errorf("unable to prepare insert attachment statement: %w", err)
@@ -128,10 +142,13 @@ func New(conn *sqlite.Conn, prefix string) (_ mdsend.Queue, err error) {
 	if q.stmtListAttachments, err = conn.Prepare(`SELECT name, content_hash, content_type, content FROM ` + attachmentsTable + ` WHERE letter_id=?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list attachments statement: %w", err)
 	}
-	if q.stmtListDispatches, err = conn.Prepare(`SELECT id, letter_id FROM ` + dispatchesTable + ` WHERE letter_id=?`); err != nil {
+	if q.stmtListDispatchesForward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, sent_at FROM ` + dispatchesTable + ` WHERE letter_id=? AND id>? LIMIT ?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list dispatches statement: %w", err)
 	}
-	if q.stmtCompleteDispatch, err = conn.Prepare(`UPDATE ` + dispatchesTable + ` SET letter_id=NULL WHERE id=?`); err != nil {
+	if q.stmtListDispatchesBackward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, sent_at FROM ` + dispatchesTable + ` WHERE letter_id=? AND id<? ORDER BY id DESC LIMIT ?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare list dispatches statement: %w", err)
+	}
+	if q.stmtCompleteDispatch, err = conn.Prepare(`UPDATE ` + dispatchesTable + ` SET sent_at=? WHERE id=?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare complete dispatch statement: %w", err)
 	}
 
