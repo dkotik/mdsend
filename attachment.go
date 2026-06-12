@@ -113,6 +113,11 @@ type Attachment struct {
 	Hash                     string
 	mimeEncodedBase64Content []byte
 
+	// ContentID is the ID of the inline attachment to use in the message.
+	// It must conform to RFC 2392 format, including the angle brackets:
+	// <hash@domain.com>. Leave empty for standalone attachments that
+	// are not referenced by other parts of the message.
+	ContentID   string
 	ContentType string
 	Content     []byte
 }

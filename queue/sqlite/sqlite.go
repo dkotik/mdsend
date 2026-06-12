@@ -81,6 +81,7 @@ func New(conn *sqlite.Conn, prefix string) (_ mdsend.Queue, err error) {
 			letter_id text NOT NULL,
 			name text NOT NULL,
 			content_hash text NOT NULL,
+			content_id text,
 			content_type text NOT NULL,
 			content blob NOT NULL,
 
@@ -120,7 +121,7 @@ func New(conn *sqlite.Conn, prefix string) (_ mdsend.Queue, err error) {
 	if q.stmtInsertDispatch, err = conn.Prepare(`INSERT INTO ` + dispatchesTable + ` (id, letter_id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`); err != nil {
 		return nil, fmt.Errorf("unable to prepare insert dispatch statement: %w", err)
 	}
-	if q.stmtInsertAttachment, err = q.DB.Prepare(`INSERT INTO ` + attachmentsTable + ` (id, letter_id, name, content_hash, content_type, content) VALUES (?, ?, ?, ?, ?, ?)`); err != nil {
+	if q.stmtInsertAttachment, err = q.DB.Prepare(`INSERT INTO ` + attachmentsTable + ` (id, letter_id, name, content_hash, content_id, content_type, content) VALUES (?, ?, ?, ?, ?, ?, ?)`); err != nil {
 		return nil, fmt.Errorf("unable to prepare insert attachment statement: %w", err)
 	}
 	if q.stmtRetrieveLetter, err = conn.Prepare(`SELECT frontmatter, content, created_at, sent_at FROM ` + lettersTable + ` WHERE id=?`); err != nil {
@@ -142,7 +143,7 @@ func New(conn *sqlite.Conn, prefix string) (_ mdsend.Queue, err error) {
 	if q.stmtListLettersBackward, err = conn.Prepare(`SELECT id, frontmatter, content, created_at, sent_at FROM ` + lettersTable + ` WHERE id<? ORDER BY id DESC LIMIT ?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list letters statement: %w", err)
 	}
-	if q.stmtListAttachments, err = conn.Prepare(`SELECT name, content_hash, content_type, content FROM ` + attachmentsTable + ` WHERE letter_id=?`); err != nil {
+	if q.stmtListAttachments, err = conn.Prepare(`SELECT name, content_hash, content_id, content_type, content FROM ` + attachmentsTable + ` WHERE letter_id=?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list attachments statement: %w", err)
 	}
 	if q.stmtListDispatchesForward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, sent_at FROM ` + dispatchesTable + ` WHERE letter_id=? AND id>? LIMIT ?`); err != nil {

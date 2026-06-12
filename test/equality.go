@@ -1,6 +1,7 @@
 package test
 
 import (
+	"bytes"
 	"reflect"
 	"testing"
 	"time"
@@ -52,8 +53,21 @@ func AttachmentsAreEqual(a, b mdsend.Attachment) func(*testing.T) {
 			t.Log("B:", b.LetterID)
 			t.Fatal("letter IDs do not match")
 		}
-		// TODO: content type
-		// TODO: content itself
+		if a.ContentID != b.ContentID {
+			t.Log("A:", a.ContentID)
+			t.Log("B:", b.ContentID)
+			t.Fatal("content IDs do not match")
+		}
+		if a.ContentType != b.ContentType {
+			t.Log("A:", a.ContentType)
+			t.Log("B:", b.ContentType)
+			t.Fatal("content types do not match")
+		}
+		if !bytes.Equal(a.Content, b.Content) {
+			t.Log("A:", a.Content)
+			t.Log("B:", b.Content)
+			t.Fatal("content does not match")
+		}
 	}
 }
 

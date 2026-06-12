@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"iter"
 	"net/mail"
-	"reflect"
 	"testing"
 	"time"
 
@@ -59,8 +58,17 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 	}
 
 	attachments := []mdsend.Attachment{
-		{LetterID: l1.ID, Content: []byte("attachment content1"), Hash: "attachment content1"},
-		{LetterID: l1.ID, Content: []byte("attachment content2"), Hash: "attachment content2"},
+		{
+			LetterID: l1.ID,
+			Content:  []byte("attachment content1"),
+			Hash:     "attachment content1",
+		},
+		{
+			LetterID:  l1.ID,
+			ContentID: "<inline@domain.com>",
+			Content:   []byte("attachment content2"),
+			Hash:      "attachment content2",
+		},
 	}
 	return func(t *testing.T) {
 		var (
@@ -118,10 +126,14 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 			}
 			l1attachments = append(l1attachments, l1attachment)
 		}
-		if !reflect.DeepEqual(l1attachments, attachments) {
-			// t.Log("expected attachments:", attachments)
-			// t.Log("actual attachments:", l1attachments)
-			t.Fatal("attachment lists do not match")
+		if len(l1attachments) != len(attachments) {
+			t.Fatal("attachment count mismatch: expected", len(attachments), "got", len(l1attachments))
+		}
+		for i, a := range l1attachments {
+			t.Run(
+				fmt.Sprint("attachment %d", i+1),
+				AttachmentsAreEqual(a, attachments[i]),
+			)
 		}
 
 		l1dispatches := make([]mdsend.Dispatch, 0, 1)

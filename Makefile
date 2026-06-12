@@ -1,6 +1,10 @@
+-include .env
+# export
+
 default:
 	@clear
 	@echo ":::::::::::::::::::::::::::::::::::::::::"
+	@cd sender && go test ./...
 	@cd queue && go test ./...
 	@echo "::::::::::::::::::::::::::::::::::::"
 	@# go test -v ./locks/ -args --integration

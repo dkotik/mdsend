@@ -1,6 +1,7 @@
 package mdsend
 
 import (
+	"context"
 	"log"
 
 	"github.com/dkotik/mdsend/distributors"
@@ -11,6 +12,10 @@ import (
 )
 
 const Version = "dev"
+
+type Sender interface {
+	Send(context.Context, Dispatch) (string, error)
+}
 
 // Options provide configuration to component execution.
 type Options struct {

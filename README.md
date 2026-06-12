@@ -51,6 +51,7 @@ EmailSend(file.md, templating engine, provider engine)
 - [ ] Should write a better markdown renderer that recognizes single-line youtube and image paragraphs, centers them.
 - [ ] Email validation: <https://github.com/reacherhq/check-if-email-exists>.
 - [ ] Beautify the default template. Add `dark.html` one.
+- [ ] Drop Hashcorp multierr.
 
 ## Tools
 

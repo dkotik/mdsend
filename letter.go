@@ -12,6 +12,7 @@ type LetterError uint
 
 const (
 	ErrNoSubject LetterError = iota + 1
+	ErrNoQueue
 	ErrNoFromAddress
 	ErrNoContent
 )
@@ -39,6 +40,19 @@ type Letter struct {
 	// RecipientCount int
 	// SendAfter      time.Time
 	// ExpireAfter    time.Duration
+}
+
+func (l Letter) GetQueue() (string, error) {
+	switch queue := l.Frontmatter[FieldNameQueue].(type) {
+	case string:
+		queue = strings.TrimSpace(queue)
+		if len(queue) == 0 {
+			return "", ErrNoQueue
+		}
+		return queue, nil
+	default:
+		return "", ErrNoQueue
+	}
 }
 
 func (l Letter) GetSubject() (string, error) {

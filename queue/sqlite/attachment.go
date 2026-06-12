@@ -25,8 +25,9 @@ func (q queue) CreateAttachment(
 	q.stmtInsertAttachment.BindText(2, a.LetterID)
 	q.stmtInsertAttachment.BindText(3, a.Name)
 	q.stmtInsertAttachment.BindText(4, a.Hash)
-	q.stmtInsertAttachment.BindText(5, a.ContentType)
-	q.stmtInsertAttachment.BindBytes(6, a.Content)
+	q.stmtInsertAttachment.BindText(5, a.ContentID)
+	q.stmtInsertAttachment.BindText(6, a.ContentType)
+	q.stmtInsertAttachment.BindBytes(7, a.Content)
 	_, err = q.stmtInsertAttachment.Step()
 	switch code := sqlite.ErrCode(err); code {
 	case lib.SQLITE_OK:
@@ -60,7 +61,7 @@ func (q queue) ListAttachments(ctx context.Context, letterID string) iter.Seq2[m
 				break
 			}
 			b := &bytes.Buffer{}
-			if _, err := io.Copy(b, stmt.ColumnReader(3)); err != nil {
+			if _, err := io.Copy(b, stmt.ColumnReader(4)); err != nil {
 				yield(mdsend.Attachment{}, err)
 				return
 			}
@@ -68,7 +69,8 @@ func (q queue) ListAttachments(ctx context.Context, letterID string) iter.Seq2[m
 				LetterID:    letterID,
 				Name:        stmt.ColumnText(0),
 				Hash:        stmt.ColumnText(1),
-				ContentType: stmt.ColumnText(2),
+				ContentID:   stmt.ColumnText(2),
+				ContentType: stmt.ColumnText(3),
 				Content:     b.Bytes(),
 			}, err) {
 				return

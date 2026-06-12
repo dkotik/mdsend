@@ -1,7 +1,6 @@
 package mdsend
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"net/mail"
@@ -76,10 +75,6 @@ type Dispatch struct {
 	Text     string
 	HTML     string
 	SentAt   time.Time
-}
-
-type Sender interface {
-	Send(context.Context, Dispatch) error
 }
 
 // DEPRECATED: use Dispatch instead

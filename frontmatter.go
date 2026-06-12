@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	FieldNameQueue           = "queue"
 	FieldNameSubject         = "subject"
 	FieldNameFrom            = "from"
 	FieldNameName            = "name"
