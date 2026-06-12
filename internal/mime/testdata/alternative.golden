@@ -2,17 +2,16 @@ From: "Sender" <sender@example.com>
 To: "Recipient" <recipient@example.com>
 Subject: =?UTF-8?b?8J+YgSBUZXN0IFN1YmplY3Q=?=
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="lloeYLjBi)Riw3.d6lAvlNNTU9Z
- g8_:ZaTSgaPlh,:(E+X0f3I+WozrGNeSKK:,ix()e=R"; charset="utf-8"
-
---lloeYLjBi)Riw3.d6lAvlNNTU9Zg8_:ZaTSgaPlh,:(E+X0f3I+WozrGNeSKK:,ix()e=R
+Content-Type: multipart/alternative;
+ boundary="wFzrX.rLQOieTfhBfpT_Zr,O,6v9n:C2:YSfHN3g4bW7wMv2G?ksQIO3S3"
+--wFzrX.rLQOieTfhBfpT_Zr,O,6v9n:C2:YSfHN3g4bW7wMv2G?ksQIO3S3
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 text
---lloeYLjBi)Riw3.d6lAvlNNTU9Zg8_:ZaTSgaPlh,:(E+X0f3I+WozrGNeSKK:,ix()e=R
+--wFzrX.rLQOieTfhBfpT_Zr,O,6v9n:C2:YSfHN3g4bW7wMv2G?ksQIO3S3
 Content-Type: text/html; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 <b>text</b>
---lloeYLjBi)Riw3.d6lAvlNNTU9Zg8_:ZaTSgaPlh,:(E+X0f3I+WozrGNeSKK:,ix()e=R--
+--wFzrX.rLQOieTfhBfpT_Zr,O,6v9n:C2:YSfHN3g4bW7wMv2G?ksQIO3S3--

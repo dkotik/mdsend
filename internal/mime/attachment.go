@@ -1,9 +1,37 @@
 package mime
 
 import (
+	"context"
 	"fmt"
 	"io"
+	"iter"
+
+	"github.com/dkotik/mdsend"
 )
+
+var _ AttachmentRepository = (mdsend.Queue)(nil)
+
+type AttachmentRepository interface {
+	ListAttachments(ctx context.Context, letterID string) iter.Seq2[mdsend.Attachment, error]
+}
+
+type mockAttachmentRepository struct {
+	attachments []mdsend.Attachment
+}
+
+func newMockAttachmentRepository(attachments ...mdsend.Attachment) AttachmentRepository {
+	return mockAttachmentRepository{attachments: attachments}
+}
+
+func (m mockAttachmentRepository) ListAttachments(ctx context.Context, letterID string) iter.Seq2[mdsend.Attachment, error] {
+	return func(yield func(mdsend.Attachment, error) bool) {
+		for _, a := range m.attachments {
+			if !yield(a, nil) {
+				return
+			}
+		}
+	}
+}
 
 type cachedAttachment struct {
 	Name        string

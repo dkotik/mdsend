@@ -2,18 +2,17 @@ From: "Sender" <sender@example.com>
 To: "Recipient" <recipient@example.com>
 Subject: Test Subject
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="be-=btD5/=_NgO9=_D5vOpz2Q_et=Vohf
- wsUFilo6H48lprQ5jsIY3Q8:6x9i/'O6SWNds"; charset=\"utf-8\"
-
---be-=btD5/=_NgO9=_D5vOpz2Q_et=VohfwsUFilo6H48lprQ5jsIY3Q8:6x9i/'O6SWNds
+Content-Type: multipart/mixed;
+ boundary="Kxy?h7.ENQ:TPW5uMOlHIiUo4iief/WB_LAFmpaS8N60'SIsgU7-8'tFVi"
+--Kxy?h7.ENQ:TPW5uMOlHIiUo4iief/WB_LAFmpaS8N60'SIsgU7-8'tFVi
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 text
---be-=btD5/=_NgO9=_D5vOpz2Q_et=VohfwsUFilo6H48lprQ5jsIY3Q8:6x9i/'O6SWNds
+--Kxy?h7.ENQ:TPW5uMOlHIiUo4iief/WB_LAFmpaS8N60'SIsgU7-8'tFVi
 Content-Type: text/plain
 Content-Disposition: attachment; filename="log.txt"
 Content-Transfer-Encoding: base64
 
 cGxh
---be-=btD5/=_NgO9=_D5vOpz2Q_et=VohfwsUFilo6H48lprQ5jsIY3Q8:6x9i/'O6SWNds--
+--Kxy?h7.ENQ:TPW5uMOlHIiUo4iief/WB_LAFmpaS8N60'SIsgU7-8'tFVi--

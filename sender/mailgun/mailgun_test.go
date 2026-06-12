@@ -8,6 +8,8 @@ import (
 	"github.com/dkotik/mdsend"
 )
 
+const testLetterID = "test-letter-id"
+
 func TestMailgunSender(t *testing.T) {
 	mg, err := New(Configuration{
 		TestMode: true,

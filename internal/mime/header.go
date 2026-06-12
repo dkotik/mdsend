@@ -172,58 +172,6 @@ func WriteHeader(w io.Writer, name, value string) (n int, err error) {
 	return n, nil
 }
 
-// func (h Header) WriteTo(w io.Writer) (n int64, err error) {
-// 	b := bufio.NewWriter(w)
-// 	i, err := b.WriteString(h.Name)
-// 	n = int64(i)
-// 	if err != nil {
-// 		return n, err
-// 	}
-// 	if err = b.WriteByte(':'); err != nil {
-// 		return n, err
-// 	}
-// 	if err = b.WriteByte(' '); err != nil {
-// 		return n + 1, err
-// 	}
-// 	n += 4 // TODO: why 4 instead of 2?
-// 	if needsEncoding(h.Value) {
-// 		// panic("UTF8 encoding not supported")
-// 		i, err := b.WriteString(mime.BEncoding.Encode("utf-8", h.Value))
-// 		n += int64(i)
-// 		if err != nil {
-// 			return n, err
-// 		}
-// 		return n, b.Flush()
-// 	}
-// 	lastIndex := len(h.Value) - 1
-// 	for i, c := range h.Value {
-// 		if n%LineLengthLimit == 0 && i < lastIndex {
-// 			// Write the CRLF and the continuation space
-// 			if err = b.WriteByte('\r'); err != nil {
-// 				return n, err
-// 			}
-// 			if err = b.WriteByte('\n'); err != nil {
-// 				return n + 1, err
-// 			}
-// 			if err = b.WriteByte(' '); err != nil {
-// 				return n + 2, err
-// 			}
-// 			n += 3
-// 		}
-// 		if err = b.WriteByte(byte(c)); err != nil {
-// 			return n, err
-// 		}
-// 		n++
-// 	}
-// 	if err = b.WriteByte('\r'); err != nil {
-// 		return n, err
-// 	}
-// 	if err = b.WriteByte('\n'); err != nil {
-// 		return n + 1, err
-// 	}
-// 	return n + 2, b.Flush()
-// }
-
 func WriteTimeHeader(w io.Writer, name string, t time.Time) (int, error) {
 	// mime.Header{Name: HeaderDate, Value: t.Format(time.RFC1123Z)}
 	return WriteHeader(w, name, t.Format(time.RFC1123Z))
@@ -258,32 +206,41 @@ func writeHeader(w io.Writer, header textproto.MIMEHeader) (err error) {
 	return err
 }
 
-// func WriteHeaders(w io.Writer, hs ...Header) (err error) {
-// 	// if _, err = fmt.Fprint(w, HeaderMIMEVersion+": 1.0\r\n"); err != nil {
-// 	// 	return err
-// 	// }
-
-// 	_, err = fmt.Fprintf(w, "\r\n")
-// 	return err
-// }
-
-// // DEPRECATED: use WriteHeaders instead
-// func WriteHeader(w io.Writer, header textproto.MIMEHeader) (err error) {
-// 	// sourced from go/src/mime/multipart/writer.go
-// 	keys := make([]string, 0, len(header))
-// 	for k := range header {
-// 		keys = append(keys, k)
+// func (w Writer) WriteAlternativeBoundaryHeader(out io.Writer) (err error) {
+// 	if _, err = out.Write([]byte(HeaderContentType + `: multipart/alternative;` + CRNL + `boundary="`)); err != nil {
+// 		return err
 // 	}
-// 	sort.Strings(keys)
-// 	for _, k := range keys {
-// 		for _, v := range header[k] {
-// 			if _, err = fmt.Fprintf(w, "%s: %s\r\n", k, v); err != nil {
-// 				return err
-// 			}
-// 		}
+// 	if _, err = out.Write([]byte(w.mixedBoundary)); err != nil {
+// 		return err
 // 	}
-// 	if _, err = fmt.Fprintf(w, "\r\n"); err != nil {
+// 	if _, err = out.Write([]byte(`"` + CRNL)); err != nil {
 // 		return err
 // 	}
 // 	return nil
 // }
+
+func (w Writer) WriteMixedBoundaryHeader(out io.Writer) (err error) {
+	if _, err = out.Write([]byte(HeaderContentType + `: multipart/mixed;` + CRNL + ` boundary="`)); err != nil {
+		return err
+	}
+	if _, err = out.Write([]byte(w.mixedBoundary)); err != nil {
+		return err
+	}
+	if _, err = out.Write([]byte(`"` + CRNL)); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (w Writer) WriteRelatedBoundaryHeader(out io.Writer) (err error) {
+	if _, err = out.Write([]byte(HeaderContentType + `: multipart/related;` + CRNL + ` boundary="`)); err != nil {
+		return err
+	}
+	if _, err = out.Write([]byte(w.mixedBoundary)); err != nil {
+		return err
+	}
+	if _, err = out.Write([]byte(`"` + CRNL)); err != nil {
+		return err
+	}
+	return nil
+}

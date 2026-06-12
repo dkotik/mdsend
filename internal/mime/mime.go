@@ -17,8 +17,10 @@ const (
 	LineLengthLimit = 76
 
 	// BoundaryLengthLimit is the maximum length of a boundary string
-	// for MIME encoding according to RFC 1341.
-	BoundaryLengthLimit = 70
+	// for MIME encoding according to RFC 1341. Boundary can never
+	// wrap to the next line, as space characters are not allowed in boundaries.
+	// Therefore, the maximum length must be reduced by the length of the parameter name.
+	BoundaryLengthLimit = 70 - len(` boundary=""`)
 
 	// Mime package BEncoder refers to RFC 2047, section 2 to set
 	// maximum word length to 75 characters. from which the length

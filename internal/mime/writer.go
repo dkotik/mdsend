@@ -6,15 +6,11 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-	"iter"
 	"math/rand/v2"
+	"time"
 
 	"github.com/dkotik/mdsend"
 )
-
-type AttachmentRepository interface {
-	ListAttachments(ctx context.Context, letterID string) iter.Seq2[mdsend.Attachment, error]
-}
 
 type Writer struct {
 	w                        io.Writer
@@ -22,17 +18,25 @@ type Writer struct {
 	cachedAttachments        map[string][]cachedAttachment
 	cachedAttachmentContents map[string][]byte
 
-	Entropy *rand.Rand
+	mixedBoundary string
+	textBoundary  string
 }
 
 func NewWriter(w io.Writer, attachments AttachmentRepository, entropy *rand.Rand) Writer {
-
+	if entropy == nil {
+		now := uint64(time.Now().UnixNano())
+		entropy = rand.New(rand.NewPCG(now/8, now))
+	}
+	if attachments == nil {
+		attachments = newMockAttachmentRepository()
+	}
 	return Writer{
 		w:                        w,
 		attachments:              attachments,
 		cachedAttachments:        make(map[string][]cachedAttachment),
 		cachedAttachmentContents: make(map[string][]byte),
-		Entropy:                  entropy,
+		mixedBoundary:            NewBoundary(entropy),
+		textBoundary:             NewBoundary(entropy),
 	}
 }
 
@@ -81,19 +85,17 @@ func (w Writer) Write(ctx context.Context, m mdsend.Dispatch) (err error) {
 		if len(attachments) == 0 {
 			return writeText(w.w, m.Text)
 		}
-		boundary := NewBoundary(w.Entropy)
-		if _, err = WriteHeader(w.w, HeaderContentType, `multipart/mixed; boundary="`+boundary+`"; charset=\"utf-8\"`); err != nil {
+		if err = w.WriteMixedBoundaryHeader(w.w); err != nil {
 			return err
 		}
-		_, err = fmt.Fprintf(w.w, CRNL+"--%s\r\n", boundary)
-		if err != nil {
+		if _, err = fmt.Fprintf(w.w, "--%s\r\n", w.mixedBoundary); err != nil {
 			return err
 		}
 		if err = writeText(w.w, m.Text); err != nil {
 			return err
 		}
 		for _, attachment := range attachments {
-			_, err = fmt.Fprintf(w.w, "\r\n--%s\r\n", boundary)
+			_, err = fmt.Fprintf(w.w, "\r\n--%s\r\n", w.mixedBoundary)
 			if err != nil {
 				return err
 			}
@@ -108,49 +110,38 @@ func (w Writer) Write(ctx context.Context, m mdsend.Dispatch) (err error) {
 				return err
 			}
 		}
-		_, err = fmt.Fprintf(w.w, "\r\n--%s--\r\n", boundary)
+		_, err = fmt.Fprintf(w.w, "\r\n--%s--\r\n", w.mixedBoundary)
 		return err
 	}
 
 	if len(attachments) == 0 {
-		return writeAlternative(w.w, m.Text, m.HTML, NewBoundary(w.Entropy))
+		return writeAlternative(w.w, m.Text, m.HTML, w.textBoundary)
 	}
 
 	inlineReferences := FindInlineReferences(m.HTML)
 
-	if _, err = io.WriteString(w.w, CRNL); err != nil {
-		return err
-	}
-
-	// for _, attachment := range attachments {
-	// 	cid := inlineReferences.MatchContentID(attachment.Hash)
-	// 	if cid == "" {
-	// 		if err = w.writeAttachment(attachment); err != nil {
-	// 			return err
-	// 		}
-	// 	} else if err = w.writeInlineAttachment(attachment, cid); err != nil {
-	// 		return err
-	// 	}
+	// if _, err = io.WriteString(w.w, CRNL); err != nil {
+	// 	return err
 	// }
-	boundary := NewBoundary(w.Entropy)
+
 	if inlineReferences.Count() == 0 {
-		if _, err = WriteHeader(w.w, HeaderContentType, fmt.Sprintf("multipart/mixed; boundary=\"%s\"; charset=\"utf-8\"", boundary)); err != nil {
+		if err = w.WriteMixedBoundaryHeader(w.w); err != nil {
 			return err
 		}
 	} else {
-		if _, err = WriteHeader(w.w, HeaderContentType, fmt.Sprintf("multipart/related; boundary=\"%s\"; charset=\"utf-8\"", boundary)); err != nil {
+		if err = w.WriteRelatedBoundaryHeader(w.w); err != nil {
 			return err
 		}
 	}
-	_, err = fmt.Fprintf(w.w, CRNL+"--%s\r\n", boundary)
+	_, err = fmt.Fprintf(w.w, CRNL+"--%s\r\n", w.mixedBoundary)
 	if err != nil {
 		return err
 	}
-	if err = writeAlternative(w.w, m.Text, m.HTML, NewBoundary(w.Entropy)); err != nil {
+	if err = writeAlternative(w.w, m.Text, m.HTML, w.textBoundary); err != nil {
 		return err
 	}
 	for _, attachment := range attachments {
-		_, err = fmt.Fprintf(w.w, "\r\n--%s\r\n", boundary)
+		_, err = fmt.Fprintf(w.w, "\r\n--%s\r\n", w.mixedBoundary)
 		if err != nil {
 			return err
 		}
@@ -172,6 +163,6 @@ func (w Writer) Write(ctx context.Context, m mdsend.Dispatch) (err error) {
 			return err
 		}
 	}
-	_, err = fmt.Fprintf(w.w, "\r\n--%s--\r\n", boundary)
+	_, err = fmt.Fprintf(w.w, "\r\n--%s--\r\n", w.mixedBoundary)
 	return err
 }

@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	EnvironmentKey    = "MG_API_KEY"
-	EnvironmentDomain = "MG_DOMAIN"
+	EnvironmentKey     = "MG_API_KEY"
+	EnvironmentDomain  = "MG_DOMAIN"
+	EnvironmentEmailTo = "MG_EMAIL_TO"
 )
 
 var (
@@ -21,6 +22,7 @@ var (
 )
 
 type Configuration struct {
+	Queue    mdsend.Queue
 	APIKey   string
 	Domain   string
 	TestMode bool
@@ -28,6 +30,9 @@ type Configuration struct {
 
 // New creates a Mailgun sending agent.
 func New(config Configuration) (mdsend.Sender, error) {
+	if config.Queue == nil {
+		return nil, errors.New("message queue is required for attachments: nil")
+	}
 	config.APIKey = strings.TrimSpace(config.APIKey)
 	if config.APIKey == "" {
 		config.APIKey = strings.TrimSpace(os.Getenv(EnvironmentKey))
@@ -52,21 +57,23 @@ func New(config Configuration) (mdsend.Sender, error) {
 	}
 	return mailgunSender{
 		MailgunImpl: mailgun.NewMailgun(config.Domain, config.APIKey),
+		Queue:       config.Queue,
 	}, nil
 }
 
 type mailgunSender struct {
 	*mailgun.MailgunImpl
+	Queue mdsend.Queue
 }
 
 // Send queues one message to one recipient.
 func (s mailgunSender) Send(ctx context.Context, d mdsend.Dispatch) (_ string, err error) {
-	// message.EnableTestMode()
-	// message := s.NewMIMEMessage(d.MIME, d.To)
-	// message.EnableNativeSend() // this one fails to deliver mail
-
 	// first returned value is human readable status, second is message ID
-	_, id, err := s.MailgunImpl.Send(ctx, s.prepareMessage(d))
+	msg, err := s.prepareMessage(ctx, d)
+	if err != nil {
+		return "", err
+	}
+	_, id, err := s.MailgunImpl.Send(ctx, msg)
 	return id, err
 }
 
@@ -83,7 +90,10 @@ type mailgunTestSender struct {
 }
 
 func (s mailgunTestSender) Send(ctx context.Context, d mdsend.Dispatch) (_ string, err error) {
-	message := s.prepareMessage(d)
+	message, err := s.prepareMessage(ctx, d)
+	if err != nil {
+		return "", err
+	}
 	message.EnableTestMode()
 	_, id, err := s.MailgunImpl.Send(ctx, message)
 	return id, err

@@ -21,10 +21,16 @@ func writeText(w io.Writer, text string) (err error) {
 }
 
 func writeAlternative(w io.Writer, text, html, boundary string) (err error) {
-	if _, err = WriteHeader(w, HeaderContentType, fmt.Sprintf("multipart/alternative; boundary=\"%s\"; charset=\"utf-8\"", boundary)); err != nil {
+	if _, err = w.Write([]byte(HeaderContentType + `: multipart/alternative;` + CRNL + ` boundary="`)); err != nil {
 		return err
 	}
-	_, err = fmt.Fprintf(w, "\r\n--%s\r\n", boundary)
+	if _, err = w.Write([]byte(boundary)); err != nil {
+		return err
+	}
+	if _, err = w.Write([]byte(`"` + CRNL)); err != nil {
+		return err
+	}
+	_, err = fmt.Fprintf(w, "--%s\r\n", boundary)
 	if err != nil {
 		return err
 	}
