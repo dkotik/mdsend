@@ -37,6 +37,7 @@ type Queue interface {
 	CreateAttachment(context.Context, Attachment) error
 	CreateDispatch(context.Context, Dispatch) error
 	CompleteDispatch(context.Context, string) error
+	// RetrieveAttachmentContents(context.Context, string) ([]byte, error)
 
 	ListLetters(context.Context, Cursor) iter.Seq2[Letter, error]
 	ListDispatches(context.Context, ChildCursor) iter.Seq2[Dispatch, error]

@@ -6,6 +6,7 @@ package mime
 import (
 	"encoding/base64"
 	"io"
+	"math/rand/v2"
 )
 
 const (
@@ -14,6 +15,10 @@ const (
 	//
 	// RFC 5322 2.1.1 limits to 78, excluding CRLF. mime/quotedprintable sets this to 76.
 	LineLengthLimit = 76
+
+	// BoundaryLengthLimit is the maximum length of a boundary string
+	// for MIME encoding according to RFC 1341.
+	BoundaryLengthLimit = 70
 
 	// Mime package BEncoder refers to RFC 2047, section 2 to set
 	// maximum word length to 75 characters. from which the length
@@ -81,4 +86,17 @@ func (w *lineWrapper) Write(p []byte) (int, error) {
 	}
 
 	return len(p), nil
+}
+
+const (
+	boundaryCharset       = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'()+_,-./:=?"
+	boundaryCharsetLength = len(boundaryCharset)
+)
+
+func NewBoundary(r *rand.Rand) string {
+	b := make([]byte, BoundaryLengthLimit)
+	for i := range b {
+		b[i] = boundaryCharset[r.IntN(boundaryCharsetLength)]
+	}
+	return string(b)
 }

@@ -19,6 +19,9 @@ const (
 	HeaderContentID               = "Content-ID"
 	HeaderContentDescription      = "Content-Description"
 	HeaderContentDisposition      = "Content-Disposition"
+	HeaderFrom                    = "From"
+	HeaderTo                      = "To"
+	HeaderSubject                 = "Subject"
 	HeaderDate                    = "Date"
 )
 
@@ -91,7 +94,7 @@ func writeSimpleHeader(w io.Writer, name, value string) (n int, err error) {
 	}
 
 close:
-	i, err = w.Write([]byte("\r\n"))
+	i, err = w.Write([]byte(CRNL))
 	n += i
 	if err != nil {
 		return n, err

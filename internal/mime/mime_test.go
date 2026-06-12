@@ -9,6 +9,31 @@ import (
 	"testing"
 )
 
+func TestValidBoundaryGeneration(t *testing.T) {
+	for range 100 {
+		boundary := NewBoundary(entropy)
+		// rfc2046#section-5.1.1
+		if len(boundary) < 1 || len(boundary) > 70 {
+			t.Fatal("mime: invalid boundary length")
+		}
+		end := len(boundary) - 1
+		for i, b := range boundary {
+			if 'A' <= b && b <= 'Z' || 'a' <= b && b <= 'z' || '0' <= b && b <= '9' {
+				continue
+			}
+			switch b {
+			case '\'', '(', ')', '+', '_', ',', '-', '.', '/', ':', '=', '?':
+				continue
+			case ' ':
+				if i != end {
+					continue
+				}
+			}
+			t.Fatal("mime: invalid boundary character")
+		}
+	}
+}
+
 func TestMessageStructure(t *testing.T) {
 	// mime.TypeByExtension(ext string)
 	// mime.ParseMediaType(v string)

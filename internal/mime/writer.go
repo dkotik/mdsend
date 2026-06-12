@@ -2,214 +2,176 @@ package mime
 
 import (
 	"bytes"
-	"crypto/rand"
-	"errors"
+	"context"
+	"encoding/base64"
 	"fmt"
 	"io"
-	"maps"
-	"net/textproto"
-	"slices"
-	"strings"
+	"iter"
+	"math/rand/v2"
+
+	"github.com/dkotik/mdsend"
 )
 
-// forked from standard library for easier testing
-
-// A MultipartWriter generates multipart messages.
-type MultipartWriter struct {
-	w        io.Writer
-	boundary string
-	lastpart *part
+type AttachmentRepository interface {
+	ListAttachments(ctx context.Context, letterID string) iter.Seq2[mdsend.Attachment, error]
 }
 
-// NewMultipartWriter returns a new multipart [MultipartWriter] with a random boundary,
-// writing to w.
-func NewMultipartWriter(w io.Writer, boundary string) *MultipartWriter {
-	if boundary == "" {
-		boundary = randomBoundary()
-	}
-	return &MultipartWriter{
-		w:        w,
-		boundary: boundary,
+type Writer struct {
+	w                        io.Writer
+	attachments              AttachmentRepository
+	cachedAttachments        map[string][]cachedAttachment
+	cachedAttachmentContents map[string][]byte
+
+	Entropy *rand.Rand
+}
+
+func NewWriter(w io.Writer, attachments AttachmentRepository, entropy *rand.Rand) Writer {
+
+	return Writer{
+		w:                        w,
+		attachments:              attachments,
+		cachedAttachments:        make(map[string][]cachedAttachment),
+		cachedAttachmentContents: make(map[string][]byte),
+		Entropy:                  entropy,
 	}
 }
 
-// Boundary returns the [MultipartWriter]'s boundary.
-func (w *MultipartWriter) Boundary() string {
-	return w.boundary
-}
-
-// SetBoundary overrides the [MultipartWriter]'s default randomly-generated
-// boundary separator with an explicit value.
-//
-// SetBoundary must be called before any parts are created, may only
-// contain certain ASCII characters, and must be non-empty and
-// at most 70 bytes long.
-func (w *MultipartWriter) SetBoundary(boundary string) error {
-	if w.lastpart != nil {
-		return errors.New("mime: SetBoundary called after write")
-	}
-	// rfc2046#section-5.1.1
-	if len(boundary) < 1 || len(boundary) > 70 {
-		return errors.New("mime: invalid boundary length")
-	}
-	end := len(boundary) - 1
-	for i, b := range boundary {
-		if 'A' <= b && b <= 'Z' || 'a' <= b && b <= 'z' || '0' <= b && b <= '9' {
-			continue
+func (w Writer) Write(ctx context.Context, m mdsend.Dispatch) (err error) {
+	attachments, ok := w.cachedAttachments[m.LetterID]
+	if !ok {
+		for attachment, err := range w.attachments.ListAttachments(ctx, m.LetterID) {
+			if err != nil {
+				return fmt.Errorf("attachment retrieval error: %w", err)
+			}
+			attachments = append(attachments, cachedAttachment{
+				Name:        attachment.Name,
+				Hash:        attachment.Hash,
+				ContentType: attachment.ContentType,
+			})
+			b := bytes.NewBuffer(make([]byte, 0, base64.StdEncoding.EncodedLen(len(attachment.Content))+len(CRNL)))
+			_, _ = io.WriteString(b, CRNL)
+			encoder := base64.NewEncoder(base64.StdEncoding, &lineWrapper{w: b})
+			if _, err = io.Copy(encoder, bytes.NewReader(attachment.Content)); err != nil {
+				return err
+			}
+			w.cachedAttachmentContents[attachment.Hash] = b.Bytes()
 		}
-		switch b {
-		case '\'', '(', ')', '+', '_', ',', '-', '.', '/', ':', '=', '?':
-			continue
-		case ' ':
-			if i != end {
-				continue
+		w.cachedAttachments[m.LetterID] = attachments
+	}
+
+	if err = WriteAddressHeader(w.w, HeaderFrom, m.From); err != nil {
+		return err
+	}
+	if err = WriteAddressHeader(w.w, HeaderTo, m.To); err != nil {
+		return err
+	}
+	if _, err = WriteHeader(w.w, HeaderSubject, m.Subject); err != nil {
+		return err
+	}
+	for _, header := range m.Headers {
+		if _, err = WriteHeader(w.w, header.Name, header.Value); err != nil {
+			return err
+		}
+	}
+	if _, err = io.WriteString(w.w, HeaderMIMEVersion+": 1.0"+CRNL); err != nil {
+		return err
+	}
+
+	if m.HTML == "" {
+		if len(attachments) == 0 {
+			return writeText(w.w, m.Text)
+		}
+		boundary := NewBoundary(w.Entropy)
+		if _, err = WriteHeader(w.w, HeaderContentType, `multipart/mixed; boundary="`+boundary+`"; charset=\"utf-8\"`); err != nil {
+			return err
+		}
+		_, err = fmt.Fprintf(w.w, CRNL+"--%s\r\n", boundary)
+		if err != nil {
+			return err
+		}
+		if err = writeText(w.w, m.Text); err != nil {
+			return err
+		}
+		for _, attachment := range attachments {
+			_, err = fmt.Fprintf(w.w, "\r\n--%s\r\n", boundary)
+			if err != nil {
+				return err
+			}
+			if err = attachment.WriteHeader(w.w); err != nil {
+				return err
+			}
+			data, ok := w.cachedAttachmentContents[attachment.Hash]
+			if !ok {
+				return fmt.Errorf("attachment content not found: %s", attachment.Hash)
+			}
+			if _, err = io.Copy(w.w, bytes.NewReader(data)); err != nil {
+				return err
 			}
 		}
-		return errors.New("mime: invalid boundary character")
+		_, err = fmt.Fprintf(w.w, "\r\n--%s--\r\n", boundary)
+		return err
 	}
-	w.boundary = boundary
-	return nil
-}
 
-// FormDataContentType returns the Content-Type for an HTTP
-// multipart/form-data with this [MultipartWriter]'s Boundary.
-func (w *MultipartWriter) FormDataContentType() string {
-	b := w.boundary
-	// We must quote the boundary if it contains any of the
-	// tspecials characters defined by RFC 2045, or space.
-	if strings.ContainsAny(b, `()<>@,;:\"/[]?= `) {
-		b = `"` + b + `"`
+	if len(attachments) == 0 {
+		return writeAlternative(w.w, m.Text, m.HTML, NewBoundary(w.Entropy))
 	}
-	return "multipart/form-data; boundary=" + b
-}
 
-func randomBoundary() string {
-	var buf [30]byte
-	_, err := io.ReadFull(rand.Reader, buf[:])
-	if err != nil {
-		panic(err)
+	inlineReferences := FindInlineReferences(m.HTML)
+
+	if _, err = io.WriteString(w.w, CRNL); err != nil {
+		return err
 	}
-	return fmt.Sprintf("%x", buf[:])
-}
 
-// CreatePart creates a new multipart section with the provided
-// header. The body of the part should be written to the returned
-// [MultipartWriter]. After calling CreatePart, any previous part may no longer
-// be written to.
-func (w *MultipartWriter) CreatePart(header textproto.MIMEHeader) (io.Writer, error) {
-	if w.lastpart != nil {
-		if err := w.lastpart.close(); err != nil {
-			return nil, err
+	// for _, attachment := range attachments {
+	// 	cid := inlineReferences.MatchContentID(attachment.Hash)
+	// 	if cid == "" {
+	// 		if err = w.writeAttachment(attachment); err != nil {
+	// 			return err
+	// 		}
+	// 	} else if err = w.writeInlineAttachment(attachment, cid); err != nil {
+	// 		return err
+	// 	}
+	// }
+	boundary := NewBoundary(w.Entropy)
+	if inlineReferences.Count() == 0 {
+		if _, err = WriteHeader(w.w, HeaderContentType, fmt.Sprintf("multipart/mixed; boundary=\"%s\"; charset=\"utf-8\"", boundary)); err != nil {
+			return err
 		}
-	}
-	var b bytes.Buffer
-	if w.lastpart != nil {
-		fmt.Fprintf(&b, "\r\n--%s\r\n", w.boundary)
 	} else {
-		fmt.Fprintf(&b, "--%s\r\n", w.boundary)
-	}
-
-	for _, k := range slices.Sorted(maps.Keys(header)) {
-		for _, v := range header[k] {
-			fmt.Fprintf(&b, "%s: %s\r\n", k, v)
+		if _, err = WriteHeader(w.w, HeaderContentType, fmt.Sprintf("multipart/related; boundary=\"%s\"; charset=\"utf-8\"", boundary)); err != nil {
+			return err
 		}
 	}
-	fmt.Fprintf(&b, "\r\n")
-	_, err := io.Copy(w.w, &b)
-	if err != nil {
-		return nil, err
-	}
-	p := &part{
-		mw: w,
-	}
-	w.lastpart = p
-	return p, nil
-}
-
-var quoteEscaper = strings.NewReplacer("\\", "\\\\", `"`, "\\\"", "\r", "%0D", "\n", "%0A")
-
-// escapeQuotes escapes special characters in field parameter values.
-//
-// For historical reasons, this uses \ escaping for " and \ characters,
-// and percent encoding for CR and LF.
-//
-// The WhatWG specification for form data encoding suggests that we should
-// use percent encoding for " (%22), and should not escape \.
-// https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#multipart/form-data-encoding-algorithm
-//
-// Empirically, as of the time this comment was written, it is necessary
-// to escape \ characters or else Chrome (and possibly other browsers) will
-// interpet the unescaped \ as an escape.
-func escapeQuotes(s string) string {
-	return quoteEscaper.Replace(s)
-}
-
-// CreateFormFile is a convenience wrapper around [MultipartWriter.CreatePart]. It creates
-// a new form-data header with the provided field name and file name.
-func (w *MultipartWriter) CreateFormFile(fieldname, filename string) (io.Writer, error) {
-	h := make(textproto.MIMEHeader)
-	h.Set("Content-Disposition", FileContentDisposition(fieldname, filename))
-	h.Set("Content-Type", "application/octet-stream")
-	return w.CreatePart(h)
-}
-
-// CreateFormField calls [MultipartWriter.CreatePart] with a header using the
-// given field name.
-func (w *MultipartWriter) CreateFormField(fieldname string) (io.Writer, error) {
-	h := make(textproto.MIMEHeader)
-	h.Set("Content-Disposition",
-		fmt.Sprintf(`form-data; name="%s"`, escapeQuotes(fieldname)))
-	return w.CreatePart(h)
-}
-
-// FileContentDisposition returns the value of a Content-Disposition header
-// with the provided field name and file name.
-func FileContentDisposition(fieldname, filename string) string {
-	return fmt.Sprintf(`form-data; name="%s"; filename="%s"`,
-		escapeQuotes(fieldname), escapeQuotes(filename))
-}
-
-// WriteField calls [MultipartWriter.CreateFormField] and then writes the given value.
-func (w *MultipartWriter) WriteField(fieldname, value string) error {
-	p, err := w.CreateFormField(fieldname)
+	_, err = fmt.Fprintf(w.w, CRNL+"--%s\r\n", boundary)
 	if err != nil {
 		return err
 	}
-	_, err = p.Write([]byte(value))
-	return err
-}
-
-// Close finishes the multipart message and writes the trailing
-// boundary end line to the output.
-func (w *MultipartWriter) Close() error {
-	if w.lastpart != nil {
-		if err := w.lastpart.close(); err != nil {
+	if err = writeAlternative(w.w, m.Text, m.HTML, NewBoundary(w.Entropy)); err != nil {
+		return err
+	}
+	for _, attachment := range attachments {
+		_, err = fmt.Fprintf(w.w, "\r\n--%s\r\n", boundary)
+		if err != nil {
 			return err
 		}
-		w.lastpart = nil
+		cid := inlineReferences.MatchContentID(attachment.Hash)
+		if cid == "" {
+			if err = attachment.WriteHeader(w.w); err != nil {
+				return err
+			}
+		} else {
+			if err = attachment.WriteInlineHeader(w.w, cid); err != nil {
+				return err
+			}
+		}
+		data, ok := w.cachedAttachmentContents[attachment.Hash]
+		if !ok {
+			return fmt.Errorf("attachment content not found: %s", attachment.Hash)
+		}
+		if _, err = io.Copy(w.w, bytes.NewReader(data)); err != nil {
+			return err
+		}
 	}
-	_, err := fmt.Fprintf(w.w, "\r\n--%s--\r\n", w.boundary)
+	_, err = fmt.Fprintf(w.w, "\r\n--%s--\r\n", boundary)
 	return err
-}
-
-type part struct {
-	mw     *MultipartWriter
-	closed bool
-	we     error // last error that occurred writing
-}
-
-func (p *part) close() error {
-	p.closed = true
-	return p.we
-}
-
-func (p *part) Write(d []byte) (n int, err error) {
-	if p.closed {
-		return 0, errors.New("multipart: can't write to finished part")
-	}
-	n, err = p.mw.w.Write(d)
-	if err != nil {
-		p.we = err
-	}
-	return
 }

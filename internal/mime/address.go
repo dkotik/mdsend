@@ -152,12 +152,23 @@ func WriteAddressHeader(w io.Writer, name string, addresses ...mail.Address) (er
 			return err
 		}
 		if n == finalIndex {
-			return cutIfNeededThenWrite("<" + address.Address + ">")
+			if err = cutIfNeededThenWrite("<" + address.Address + ">"); err != nil {
+				return err
+			}
+			break
 		}
 		if err = cutIfNeededThenWrite("<" + address.Address + ">,"); err != nil {
 			return err
 		}
 	}
 
+	i, err := w.Write([]byte(CRNL))
+	n += i
+	if err != nil {
+		return err
+	}
+	if i != 2 {
+		return io.ErrShortWrite
+	}
 	return nil
 }

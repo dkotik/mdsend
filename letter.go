@@ -75,7 +75,7 @@ func (l Letter) GetSubject() (string, error) {
 }
 
 func (l Letter) GetFrom() (mail.Address, error) {
-	switch from := l.Frontmatter[FieldNameSubject].(type) {
+	switch from := l.Frontmatter[FieldNameFrom].(type) {
 	case map[string]any:
 		return newAddressFromMap(from)
 	case string:
