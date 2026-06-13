@@ -1,0 +1,10 @@
+- https://mailtrap.io/
+- SendGrid
+- Amazon SES
+- Postmark
+- Brevo
+- SendGrid
+- Mailchimp
+- Resend
+- HubSpot
+- https://emaillabs.io/en/product/

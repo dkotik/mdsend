@@ -88,7 +88,7 @@ func (w Writer) Write(ctx context.Context, m mdsend.Dispatch) (err error) {
 		if err = w.WriteMixedBoundaryHeader(w.w); err != nil {
 			return err
 		}
-		if _, err = fmt.Fprintf(w.w, "--%s\r\n", w.mixedBoundary); err != nil {
+		if _, err = fmt.Fprintf(w.w, "\r\n--%s\r\n", w.mixedBoundary); err != nil {
 			return err
 		}
 		if err = writeText(w.w, m.Text); err != nil {

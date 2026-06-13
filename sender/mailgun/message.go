@@ -27,8 +27,8 @@ func (s mailgunSender) prepareMessage(
 	// 	d.To.String(),
 	// )
 	// message.SetHtml(d.HTML)
-	for _, h := range d.Headers {
-		message.AddHeader(h.Name, h.Value)
-	}
+	// for _, h := range d.Headers {
+	// 	message.AddHeader(h.Name, h.Value)
+	// }
 	return message, nil
 }

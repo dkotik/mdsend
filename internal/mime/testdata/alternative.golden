@@ -3,15 +3,16 @@ To: "Recipient" <recipient@example.com>
 Subject: =?UTF-8?b?8J+YgSBUZXN0IFN1YmplY3Q=?=
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
- boundary="wFzrX.rLQOieTfhBfpT_Zr,O,6v9n:C2:YSfHN3g4bW7wMv2G?ksQIO3S3"
---wFzrX.rLQOieTfhBfpT_Zr,O,6v9n:C2:YSfHN3g4bW7wMv2G?ksQIO3S3
+ boundary="ZqFqEy=U+UWi5GF2XhBe9iAP4U6(gV'NL:X?F+WX=px0.Yc1METS?1BqO_VczCSi"
+
+--ZqFqEy=U+UWi5GF2XhBe9iAP4U6(gV'NL:X?F+WX=px0.Yc1METS?1BqO_VczCSi
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 text
---wFzrX.rLQOieTfhBfpT_Zr,O,6v9n:C2:YSfHN3g4bW7wMv2G?ksQIO3S3
+--ZqFqEy=U+UWi5GF2XhBe9iAP4U6(gV'NL:X?F+WX=px0.Yc1METS?1BqO_VczCSi
 Content-Type: text/html; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 <b>text</b>
---wFzrX.rLQOieTfhBfpT_Zr,O,6v9n:C2:YSfHN3g4bW7wMv2G?ksQIO3S3--
+--ZqFqEy=U+UWi5GF2XhBe9iAP4U6(gV'NL:X?F+WX=px0.Yc1METS?1BqO_VczCSi--

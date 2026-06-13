@@ -3,16 +3,17 @@ To: "Recipient" <recipient@example.com>
 Subject: Test Subject
 MIME-Version: 1.0
 Content-Type: multipart/mixed;
- boundary="Kxy?h7.ENQ:TPW5uMOlHIiUo4iief/WB_LAFmpaS8N60'SIsgU7-8'tFVi"
---Kxy?h7.ENQ:TPW5uMOlHIiUo4iief/WB_LAFmpaS8N60'SIsgU7-8'tFVi
+ boundary="nF)SCtkuHBUZO54vMxgK9YM5WE-QZjqdU=)AscTY4aIpiJYo_u17hNyJv(5h3y-:"
+
+--nF)SCtkuHBUZO54vMxgK9YM5WE-QZjqdU=)AscTY4aIpiJYo_u17hNyJv(5h3y-:
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 text
---Kxy?h7.ENQ:TPW5uMOlHIiUo4iief/WB_LAFmpaS8N60'SIsgU7-8'tFVi
+--nF)SCtkuHBUZO54vMxgK9YM5WE-QZjqdU=)AscTY4aIpiJYo_u17hNyJv(5h3y-:
 Content-Type: text/plain
 Content-Disposition: attachment; filename="log.txt"
 Content-Transfer-Encoding: base64
 
 cGxh
---Kxy?h7.ENQ:TPW5uMOlHIiUo4iief/WB_LAFmpaS8N60'SIsgU7-8'tFVi--
+--nF)SCtkuHBUZO54vMxgK9YM5WE-QZjqdU=)AscTY4aIpiJYo_u17hNyJv(5h3y-:--

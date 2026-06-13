@@ -27,7 +27,7 @@ func writeAlternative(w io.Writer, text, html, boundary string) (err error) {
 	if _, err = w.Write([]byte(boundary)); err != nil {
 		return err
 	}
-	if _, err = w.Write([]byte(`"` + CRNL)); err != nil {
+	if _, err = w.Write([]byte(`"` + CRNL + CRNL)); err != nil {
 		return err
 	}
 	_, err = fmt.Fprintf(w, "--%s\r\n", boundary)
