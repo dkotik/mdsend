@@ -1,6 +1,7 @@
 package mailgun
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"os"
@@ -53,17 +54,20 @@ func New(config Configuration) (mdsend.Sender, error) {
 	if config.TestMode {
 		return mailgunSender{
 			MailgunImpl: mailgun.NewMailgun(config.Domain, config.APIKey),
+			Buffer:      bytes.NewBuffer(nil),
 		}.TestMode(), nil
 	}
 	return mailgunSender{
 		MailgunImpl: mailgun.NewMailgun(config.Domain, config.APIKey),
 		Queue:       config.Queue,
+		Buffer:      bytes.NewBuffer(nil),
 	}, nil
 }
 
 type mailgunSender struct {
 	*mailgun.MailgunImpl
-	Queue mdsend.Queue
+	Queue  mdsend.Queue
+	Buffer *bytes.Buffer
 }
 
 // Send queues one message to one recipient.
@@ -91,6 +95,7 @@ type mailgunTestSender struct {
 
 func (s mailgunTestSender) Send(ctx context.Context, d mdsend.Dispatch) (_ string, err error) {
 	message, err := s.prepareMessage(ctx, d)
+	defer s.Buffer.Reset()
 	if err != nil {
 		return "", err
 	}

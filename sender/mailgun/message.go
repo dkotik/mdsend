@@ -1,7 +1,6 @@
 package mailgun
 
 import (
-	"bytes"
 	"context"
 	"io"
 
@@ -14,11 +13,10 @@ func (s mailgunSender) prepareMessage(
 	ctx context.Context,
 	d mdsend.Dispatch,
 ) (_ *mailgun.Message, err error) {
-	b := &bytes.Buffer{}
-	if err = mime.NewWriter(b, s.Queue, nil).Write(ctx, d); err != nil {
+	if err = mime.NewWriter(s.Queue, nil).Write(ctx, s.Buffer, d); err != nil {
 		return nil, err
 	}
-	message := s.NewMIMEMessage(io.NopCloser(b), d.To.String())
+	message := s.NewMIMEMessage(io.NopCloser(s.Buffer), d.To.String())
 
 	// message := s.NewMessage(
 	// 	d.From.String(),

@@ -61,6 +61,8 @@ func (q queue) ListDispatches(ctx context.Context, cursor mdsend.ChildCursor) it
 			limit = -limit
 			stmt = q.stmtListDispatchesBackward
 		}
+
+		// nextPage:
 		err := stmt.Reset()
 		if err != nil {
 			yield(dispatch, err)
@@ -93,7 +95,9 @@ func (q queue) ListDispatches(ctx context.Context, cursor mdsend.ChildCursor) it
 					stmt.BindInt64(3, limit)
 					// prevent infinite loop
 					dispatch.ID = ""
+					// goto nextPage
 					continue
+					// return
 				}
 				return
 			}
@@ -138,8 +142,14 @@ func (q queue) CompleteDispatch(ctx context.Context, ID string) (err error) {
 	}
 	q.stmtCompleteDispatch.BindText(1, encodeTime(time.Now()))
 	q.stmtCompleteDispatch.BindText(2, ID)
-	if _, err = q.stmtCompleteDispatch.Step(); err != nil {
-		return err
+	for {
+		ok, err := q.stmtCompleteDispatch.Step()
+		if err != nil {
+			return err
+		}
+		if !ok {
+			break
+		}
 	}
 	return nil
 }

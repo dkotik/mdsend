@@ -1,7 +1,6 @@
 package smtp
 
 import (
-	"bytes"
 	"context"
 	"net/smtp"
 
@@ -10,8 +9,8 @@ import (
 )
 
 func (s senderSMTP) Send(ctx context.Context, m mdsend.Dispatch) (_ string, err error) {
-	b := &bytes.Buffer{}
-	if err = mime.NewWriter(b, s.Queue, nil).Write(ctx, m); err != nil {
+	defer s.Buffer.Reset()
+	if err = mime.NewWriter(s.Queue, nil).Write(ctx, s.Buffer, m); err != nil {
 		return "", err
 	}
 
@@ -20,6 +19,6 @@ func (s senderSMTP) Send(ctx context.Context, m mdsend.Dispatch) (_ string, err 
 		s.Authentication,
 		m.From.Address,         // must be without a name
 		[]string{m.To.Address}, // must be without a name
-		b.Bytes(),
+		s.Buffer.Bytes(),
 	)
 }

@@ -1,6 +1,15 @@
+/*
+Package smtp sends MIME-formatted emails via SMTP.
+
+Credentials are provided by most electronic mail box hosting services. The common ones:
+
+  - Gmail App Passwords: <https://myaccount.google.com/apppasswords>
+    Requires two-factor authentication enabled on your Google account.
+*/
 package smtp
 
 import (
+	"bytes"
 	"errors"
 	"net/smtp"
 	"os"
@@ -60,6 +69,7 @@ func New(config Configuration) (_ mdsend.Sender, err error) {
 	// 	return nil, errors.New("authentication is nil")
 	// }
 	return senderSMTP{
+		Buffer:         bytes.NewBuffer(nil),
 		Queue:          config.Queue,
 		Authentication: config.Authentication,
 		Connection:     config.Server + ":" + config.Port,
@@ -67,6 +77,7 @@ func New(config Configuration) (_ mdsend.Sender, err error) {
 }
 
 type senderSMTP struct {
+	Buffer         *bytes.Buffer
 	Queue          mdsend.Queue
 	Authentication smtp.Auth
 	Connection     string

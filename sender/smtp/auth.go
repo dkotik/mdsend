@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// https://gist.github.com/jpillora/cb46d183eca0710d909a
 type loginAuth struct {
 	username, password string
 }

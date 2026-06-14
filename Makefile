@@ -16,10 +16,10 @@ default:
 	@# go run ./cmd/gui/ tests/data/testemail.md
 live:
 	@clear
-	@rm sender/smtp/testdata/live_test.lock
+	# @rm sender/smtp/testdata/live_test.lock
 	@cd sender/smtp && go test ./... -v
 	# @rm sender/mailgun/testdata/live_test.lock
-	# @cd sender/mailgun && go test ./... -v
+	@cd sender/mailgun && go test ./... -v
 build:
 	goreleaser release --snapshot --rm-dist
 install:
