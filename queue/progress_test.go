@@ -22,7 +22,8 @@ func TestProgressTracker(t *testing.T) {
 	if testing.Short() {
 		t.Skip("progress tracker reads and writes many records")
 	}
-	conn, err := sqlite.OpenConn(":memory:")
+	dsn := "file:shared_memory_db?mode=memory&cache=shared"
+	conn, err := sqlite.OpenConn(dsn)
 	if err != nil {
 		panic(err)
 	}
@@ -32,6 +33,19 @@ func TestProgressTracker(t *testing.T) {
 		}
 	}()
 	q, err := sqliteQ.New(conn, "")
+	if err != nil {
+		panic(err)
+	}
+	conn2, err := sqlite.OpenConn(dsn)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		if err = conn2.Close(); err != nil {
+			panic(err)
+		}
+	}()
+	q2, err := sqliteQ.New(conn2, "")
 	if err != nil {
 		panic(err)
 	}
@@ -58,14 +72,15 @@ func TestProgressTracker(t *testing.T) {
 	}
 
 	synctest.Test(t, func(t *testing.T) {
-		frequency := time.Second
 		ctx, cancel := context.WithCancel(t.Context())
 		eg, ctx := errgroup.WithContext(ctx)
+		frequency := time.Second
+		scanner, pendingMessageIDs := NewScanner(ctx, q, frequency, 5)
+		eg.Go(scanner)
 		handler, progress := NewProgressTracker(
 			ctx,
-			q,
-			frequency,
-			5,
+			q2,
+			pendingMessageIDs,
 			eg,
 		)
 		b := &bytes.Buffer{}
@@ -96,24 +111,36 @@ func TestProgressTracker(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
-		<-time.After(frequency * 20)
+		<-time.After(frequency * 2)
 		<-progress
 		p := <-progress
 		if p.Sent != 333 || p.Total < 333 {
 			t.Error("progress tracker: ", p)
 		}
-		<-time.After(frequency * 20)
-		// <-progress
+
+		for i := range 335 {
+			if err = confirmOne(335 + i); err != nil {
+				t.Fatal(err)
+			}
+		}
+		<-time.After(frequency * 3)
+		<-progress
 		p = <-progress
-		if p.Sent != 333 || p.Total < 333 {
+		if p.Sent != 668 || p.Total < 668 {
 			t.Error("progress tracker: ", p)
 		}
-		<-time.After(frequency * 20)
-		// <-progress
-		// p = <-progress
-		// if p.Sent != 333 || p.Total < 333 {
-		// 	t.Error("progress tracker: ", p)
-		// }
+
+		for i := range 334 {
+			if err = confirmOne(668 + i); err != nil {
+				t.Fatal(err)
+			}
+		}
+		<-time.After(frequency * 3)
+		<-progress
+		p = <-progress
+		if p.Sent != 1000 || p.Total < 900 {
+			t.Error("progress tracker: ", p)
+		}
 
 		cancel()
 		if err = eg.Wait(); err != nil && !errors.Is(err, context.Canceled) {

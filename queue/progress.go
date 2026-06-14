@@ -3,7 +3,7 @@ package queue
 import (
 	"context"
 	"encoding/json"
-	"iter"
+	"fmt"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill/message"
@@ -23,6 +23,14 @@ type Progress struct {
 	Total int
 }
 
+func (p Progress) OfOne() float64 {
+	return float64(p.Sent) / float64(p.Total)
+}
+
+func (p Progress) String() string {
+	return fmt.Sprintf("%d/%d (%.2f%%)", p.Sent, p.Total, p.OfOne()*100)
+}
+
 type progressTracker struct {
 	Queue      mdsend.Queue
 	Discovered chan []string
@@ -33,34 +41,22 @@ type progressTracker struct {
 func NewProgressTracker(
 	ctx context.Context,
 	queue mdsend.Queue,
-	frequency time.Duration,
-	batchSize int64,
+	pendingMessageIDs chan []string,
 	dependencies *errgroup.Group,
 ) (message.NoPublishHandlerFunc, chan Progress) {
-	if frequency == 0 {
-		panic("frequency must be greater than 0")
-	}
-	if batchSize < 1 {
-		panic("batch size must be at least 1")
-	}
 	tracker := progressTracker{
 		Queue:      queue,
-		Discovered: make(chan []string),
+		Discovered: pendingMessageIDs,
 		Sent:       make(chan string),
 		Progress:   make(chan Progress), // closed by Run
 	}
-	// eg, ctx := errgroup.WithContext(ctx)
 	dependencies.Go(func() error {
 		return tracker.Run(ctx)
-	})
-	dependencies.Go(func() error {
-		return tracker.Scan(ctx, frequency*3/4, batchSize)
 	})
 	return tracker.Handle, tracker.Progress
 }
 
 func (t progressTracker) Run(ctx context.Context) (err error) {
-	// ticker := time.NewTicker(frequency)
 	progress := Progress{}
 	known := make(map[string]bool)
 	update, ok := false, false
@@ -80,8 +76,8 @@ func (t progressTracker) Run(ctx context.Context) (err error) {
 		case id = <-t.Sent:
 			known[id] = true
 			update = true
+		// case <-ticker.C:
 		case t.Progress <- progress:
-			// case <-ticker.C:
 			if update {
 				update = false
 				progress.Total = len(known)
@@ -92,80 +88,6 @@ func (t progressTracker) Run(ctx context.Context) (err error) {
 					}
 				}
 			}
-		}
-	}
-}
-
-func (t progressTracker) Scan(ctx context.Context, frequency time.Duration, batchSize int64) (err error) {
-	nextLetter := mdsend.Cursor{
-		ItemID: "",
-		Batch:  1,
-	}
-	nextMessage := mdsend.ChildCursor{
-		ParentID: "",
-		Cursor: mdsend.Cursor{
-			ItemID: "",
-			Batch:  batchSize,
-		},
-	}
-
-	for {
-		for {
-			letterPull, letterStop := iter.Pull2[mdsend.Letter, error](t.Queue.ListLetters(ctx, nextLetter))
-			letter, err, ok := letterPull()
-			letterStop()
-			if err != nil {
-				return err
-			}
-			if !ok {
-				break
-			}
-
-			nextLetter.ItemID = letter.ID
-			nextMessage.ParentID = letter.ID
-
-			for {
-				batch := make([]string, 0, nextMessage.Batch)
-				messagePull, messageStop := iter.Pull2[mdsend.Dispatch, error](t.Queue.ListDispatches(ctx, nextMessage))
-				for range nextMessage.Batch {
-					message, err, ok := messagePull()
-					if err != nil {
-						messageStop()
-						return err
-					}
-					if !ok {
-						nextMessage.Cursor.ItemID = ""
-						break
-					}
-					nextMessage.Cursor.ItemID = message.ID
-					if message.SentAt.IsZero() {
-						batch = append(batch, message.ID)
-					}
-				}
-				messageStop()
-				select {
-				case <-ctx.Done():
-					return ctx.Err()
-				case t.Discovered <- batch:
-					// delivered a batch of discovered messages that were not yet sent
-				}
-
-				if nextMessage.Cursor.ItemID == "" {
-					break
-				}
-				select {
-				case <-ctx.Done():
-					return ctx.Err()
-				case <-time.After(frequency):
-				}
-			}
-		}
-
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-time.After(frequency):
-			nextLetter.ItemID = "" // start the scan over
 		}
 	}
 }
