@@ -75,14 +75,17 @@ func TestProgressTracker(t *testing.T) {
 		ctx, cancel := context.WithCancel(t.Context())
 		eg, ctx := errgroup.WithContext(ctx)
 		frequency := time.Second
-		scanner, pendingMessageIDs := NewScanner(ctx, q, frequency, 5)
-		eg.Go(scanner)
-		handler, progress := NewProgressTracker(
-			ctx,
-			q2,
-			pendingMessageIDs,
-			eg,
+		scanner, queuedMessageIDs := NewScanner(
+			frequency,
+			mdsend.Cursor{},
+			mdsend.ChildCursor{},
 		)
+		scanner.JoinErrorGroup(ctx, eg, q)
+
+		tracker, handler, progress := NewProgressTracker(
+			queuedMessageIDs,
+		)
+		tracker.JoinErrorGroup(ctx, eg, q2)
 		b := &bytes.Buffer{}
 		encoder := json.NewEncoder(b)
 		confirmOne := func(id int) (err error) {

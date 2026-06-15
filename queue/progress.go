@@ -33,30 +33,37 @@ func (p Progress) String() string {
 
 type progressTracker struct {
 	Queue      mdsend.Queue
-	Discovered chan []string
+	Discovered <-chan []string
 	Sent       chan string
 	Progress   chan Progress
 }
 
 func NewProgressTracker(
-	ctx context.Context,
-	queue mdsend.Queue,
-	pendingMessageIDs chan []string,
-	dependencies *errgroup.Group,
-) (message.NoPublishHandlerFunc, chan Progress) {
-	tracker := progressTracker{
-		Queue:      queue,
+	pendingMessageIDs <-chan []string,
+) (Process, message.NoPublishHandlerFunc, <-chan Progress) {
+	tracker := &progressTracker{
 		Discovered: pendingMessageIDs,
 		Sent:       make(chan string),
 		Progress:   make(chan Progress), // closed by Run
 	}
-	dependencies.Go(func() error {
-		return tracker.Run(ctx)
-	})
-	return tracker.Handle, tracker.Progress
+	return tracker, tracker.Handle, tracker.Progress
 }
 
-func (t progressTracker) Run(ctx context.Context) (err error) {
+func (t *progressTracker) JoinErrorGroup(ctx context.Context, eg *errgroup.Group, q mdsend.Queue) {
+	if q == nil {
+		panic("queue is nil")
+	}
+	if t.Queue != nil {
+		panic("tracker is already bound to an error group")
+	}
+	t.Queue = q
+	eg.Go(func() error {
+		defer close(t.Progress)
+		return t.Run(ctx)
+	})
+}
+
+func (t *progressTracker) Run(ctx context.Context) (err error) {
 	progress := Progress{}
 	known := make(map[string]bool)
 	update, ok := false, false
@@ -64,7 +71,6 @@ func (t progressTracker) Run(ctx context.Context) (err error) {
 	for {
 		select {
 		case <-ctx.Done():
-			close(t.Progress)
 			return ctx.Err()
 		case batch := <-t.Discovered:
 			for _, id = range batch {
@@ -76,7 +82,6 @@ func (t progressTracker) Run(ctx context.Context) (err error) {
 		case id = <-t.Sent:
 			known[id] = true
 			update = true
-		// case <-ticker.C:
 		case t.Progress <- progress:
 			if update {
 				update = false
@@ -92,7 +97,7 @@ func (t progressTracker) Run(ctx context.Context) (err error) {
 	}
 }
 
-func (t progressTracker) Handle(msg *message.Message) (err error) {
+func (t *progressTracker) Handle(msg *message.Message) (err error) {
 	var confirmation Confirmation
 	if err = json.Unmarshal(msg.Payload, &confirmation); err == nil {
 		ctx := msg.Context()
