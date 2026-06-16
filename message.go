@@ -15,6 +15,7 @@ type DispatchError uint8
 const (
 	ErrInvalidDispatch DispatchError = iota
 	ErrDuplicateDispatch
+	ErrMessageNotFound
 )
 
 func (err DispatchError) Error() string {
@@ -23,6 +24,8 @@ func (err DispatchError) Error() string {
 		return "invalid dispatch"
 	case ErrDuplicateDispatch:
 		return "duplicate dispatch"
+	case ErrMessageNotFound:
+		return "message not found"
 	default:
 		return ""
 	}

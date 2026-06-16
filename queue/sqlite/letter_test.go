@@ -5,12 +5,10 @@ import (
 	"testing"
 
 	"github.com/dkotik/mdsend"
-	"github.com/dkotik/mdsend/queue"
-	"github.com/oklog/ulid/v2"
 	"zombiezen.com/go/sqlite"
 )
 
-func TestDispatchQueries(t *testing.T) {
+func TestLetterQueries(t *testing.T) {
 	conn, err := sqlite.OpenConn("file::memory:?cache=shared&?_foreign_keys=true")
 	if err != nil {
 		t.Fatal("unable to open SQLite3 connection:", err)
@@ -23,12 +21,12 @@ func TestDispatchQueries(t *testing.T) {
 	// 	t.Fatal("unable to set foreign keys:", err)
 	// }
 
-	qq, err := New(conn, "test_attachments_")
+	qq, err := New(conn, "test_letters_")
 	if err != nil {
 		t.Fatal(err)
 	}
 	q := qq.(sqliteQueue)
-	letterID := "testLetter"
+	letterID := "testLetterForQueries"
 	content := "test content"
 	ctx := t.Context()
 
@@ -39,8 +37,9 @@ func TestDispatchQueries(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	messageID := "testMessageForMarkingAsSent"
 	if err = q.CreateDispatch(ctx, mdsend.Dispatch{
-		ID:       ulid.Make().String(),
+		ID:       messageID,
 		LetterID: letterID,
 		From:     mail.Address{},
 		To: mail.Address{
@@ -54,35 +53,25 @@ func TestDispatchQueries(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err = q.CreateDispatch(ctx, mdsend.Dispatch{
-		ID:       ulid.Make().String(),
-		LetterID: letterID,
-		From:     mail.Address{},
-		To: mail.Address{
-			Name:    "Second",
-			Address: "second@example.com",
-		},
-		Subject: "",
-		Text:    "",
-		HTML:    "",
-	}); err != nil {
+	ok, err := q.MarkLetterAsSent(ctx, letterID)
+	if err != nil {
 		t.Fatal(err)
 	}
-
-	dispatches := make([]mdsend.Dispatch, 0, 2)
-	for d, err := range q.ListDispatches(ctx, queue.ChildCursor{
-		ParentID: letterID,
-		Cursor: queue.Cursor{
-			ItemID: "",
-			Batch:  1,
-		},
-	}) {
-		if err != nil {
-			t.Fatal(err)
-		}
-		dispatches = append(dispatches, d)
+	if ok {
+		t.Error("expected letter to be marked as yet not sent:", q.DB.Changes())
 	}
-	if len(dispatches) != 2 {
-		t.Fatal("expected 2 messages, got", len(dispatches))
+
+	if _, err = q.MarkMessageAsSent(ctx, messageID); err != nil {
+		t.Fatal(err)
+	}
+	if q.DB.Changes() == 0 {
+		t.Error("expected dispatch to be marked as complete:", q.DB.Changes())
+	}
+	ok, err = q.MarkLetterAsSent(ctx, letterID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !ok {
+		t.Error("expected letter to be marked as sent:", q.DB.Changes())
 	}
 }

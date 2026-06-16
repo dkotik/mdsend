@@ -5,6 +5,6 @@ import (
 	"errors"
 )
 
-func (q queue) Cancel(ctx context.Context, ID string) error {
+func (q sqliteQueue) Cancel(ctx context.Context, ID string) error {
 	return errors.New("implement")
 }

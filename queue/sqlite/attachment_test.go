@@ -24,7 +24,7 @@ func TestAttachmentQueries(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	q := qq.(queue)
+	q := qq.(sqliteQueue)
 	letterID := "testLetter"
 	content := []byte("test content")
 	ctx := t.Context()

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"errors"
 	"fmt"
 	"iter"
 	"net/mail"
@@ -9,9 +10,10 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/internal"
+	"github.com/dkotik/mdsend/queue"
 )
 
-func Queue(q mdsend.Queue) func(*testing.T) {
+func Queue(q queue.Queue) func(*testing.T) {
 	l1 := mdsend.Letter{
 		ID: "firstLetter",
 		Frontmatter: map[string]any{
@@ -34,6 +36,7 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 
 	dispatches := []mdsend.Dispatch{
 		{
+			ID:       "firstDispatch",
 			LetterID: l1.ID,
 			From:     mail.Address{},
 			To: mail.Address{
@@ -45,6 +48,7 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 			HTML:    "first HTML",
 		},
 		{
+			ID:       "secondDispatch",
 			LetterID: l1.ID,
 			From:     mail.Address{},
 			To: mail.Address{
@@ -95,16 +99,16 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 			if err = q.DeleteLetter(ctx, l1.ID); err != nil {
 				t.Fatal("unable to delete the first letter:", err)
 			}
-			for l1, err = range q.ListLetters(ctx, mdsend.Cursor{Batch: 1}) {
+			for l1, err = range q.ListLetters(ctx, queue.Cursor{Batch: 1}) {
 				if err != nil {
 					t.Fatal("unable to collect a list of letters:", err)
 				}
 				t.Fatal("There is still a letter left over:", l1)
 			}
 
-			t.Run("there are no dispatches left over", IteratorIsEmpty(q.ListDispatches(ctx, mdsend.ChildCursor{
+			t.Run("there are no dispatches left over", IteratorIsEmpty(q.ListDispatches(ctx, queue.ChildCursor{
 				ParentID: l1.ID,
-				Cursor: mdsend.Cursor{
+				Cursor: queue.Cursor{
 					ItemID: "",
 					Batch:  5,
 				},
@@ -137,9 +141,9 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 		}
 
 		l1dispatches := make([]mdsend.Dispatch, 0, 1)
-		for l1dispatch, err := range q.ListDispatches(ctx, mdsend.ChildCursor{
+		for l1dispatch, err := range q.ListDispatches(ctx, queue.ChildCursor{
 			ParentID: l1.ID,
-			Cursor: mdsend.Cursor{
+			Cursor: queue.Cursor{
 				ItemID: "",
 				Batch:  1,
 			},
@@ -155,8 +159,19 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 		for i, d := range l1dispatches {
 			d.ID = dispatches[i].ID // copy the ID from the expected dispatch
 			t.Run(fmt.Sprintf("dispatch #%d is the same", i+1), DispatchesAreEqual(d, dispatches[i]))
-			if err = q.CompleteDispatch(ctx, d.ID); err != nil {
+			ok, err := q.MarkMessageAsQueued(ctx, d.ID)
+			if err != nil {
 				t.Fatalf("unable to complete dispatch %d: %v", i+1, err)
+			}
+			if !ok {
+				t.Fatalf("dispatch %d was not marked as queued", i+1)
+			}
+			ok, err = q.MarkMessageAsSent(ctx, d.ID)
+			if err != nil {
+				t.Fatalf("unable to complete dispatch %d: %v", i+1, err)
+			}
+			if !ok {
+				t.Fatalf("dispatch %d was not marked as sent", i+1)
 			}
 		}
 
@@ -168,9 +183,9 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 				t.Fatal("unable to delete the second letter:", err)
 			}
 
-			t.Run("there are no dispatches left over", IteratorIsEmpty(q.ListDispatches(ctx, mdsend.ChildCursor{
+			t.Run("there are no dispatches left over", IteratorIsEmpty(q.ListDispatches(ctx, queue.ChildCursor{
 				ParentID: l2.ID,
-				Cursor: mdsend.Cursor{
+				Cursor: queue.Cursor{
 					ItemID: "",
 					Batch:  5,
 				},
@@ -187,7 +202,7 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 
 		// test letter listing
 		ok := false
-		next, stop := iter.Pull2(q.ListLetters(ctx, mdsend.Cursor{Batch: 1}))
+		next, stop := iter.Pull2(q.ListLetters(ctx, queue.Cursor{Batch: 1}))
 		if next == nil {
 			t.Fatal("no letters found")
 		}
@@ -210,5 +225,29 @@ func Queue(q mdsend.Queue) func(*testing.T) {
 		stop()
 
 		t.Run("queue recognizes duplicates", QueueRecognizesDuplicates(q))
+
+		t.Run("transaction support", func(t *testing.T) {
+			qtx, tx, err := q.BeginTransaction(ctx)
+			if err != nil {
+				t.Fatal("unable to begin transaction:", err)
+			}
+			qtx, err = qtx.WithTransaction(ctx, tx)
+			if err != nil {
+				t.Fatal("unable to with transaction:", err)
+			}
+
+			txLetterID := "txTestLetter"
+			if err = qtx.CreateLetter(ctx, mdsend.Letter{
+				ID: txLetterID,
+			}); err != nil {
+				t.Fatal("unable to create letter:", err)
+			}
+			err = errors.New("cause transaction to fail")
+			tx.Close(&err)
+
+			if _, err = q.RetrieveLetter(ctx, txLetterID); err == nil {
+				t.Fatal("letter should not be retrievable after transaction failure")
+			}
+		})
 	}
 }

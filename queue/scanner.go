@@ -11,18 +11,20 @@ import (
 
 type scanner struct {
 	Frequency        time.Duration
-	LetterCursor     mdsend.Cursor
-	MessageCursor    mdsend.ChildCursor
-	Queue            mdsend.Queue
+	LetterLimit      int
+	LetterBatch      []mdsend.Letter
+	LetterCursor     Cursor
+	MessageCursor    ChildCursor
+	Queue            Queue
 	QueuedMessageIDs chan []string
 }
 
 func NewScanner(
 	frequency time.Duration,
-	letterCursor mdsend.Cursor,
-	messageCursor mdsend.ChildCursor,
+	letterCursor Cursor,
+	messageCursor ChildCursor,
 ) (Process, <-chan []string) {
-	s := scanner{
+	s := &scanner{
 		Frequency:        frequency,
 		LetterCursor:     letterCursor,
 		MessageCursor:    messageCursor,
@@ -37,10 +39,16 @@ func NewScanner(
 	if s.MessageCursor.Batch == 0 {
 		s.MessageCursor.Batch = -200
 	}
+	if s.LetterCursor.Batch > 0 {
+		s.LetterLimit = int(s.LetterCursor.Batch)
+	} else {
+		s.LetterLimit = int(-s.LetterCursor.Batch)
+	}
+	s.LetterBatch = make([]mdsend.Letter, 0, s.LetterLimit)
 	return s, s.QueuedMessageIDs
 }
 
-func (s scanner) JoinErrorGroup(ctx context.Context, errGroup *errgroup.Group, q mdsend.Queue) {
+func (s *scanner) JoinErrorGroup(ctx context.Context, errGroup *errgroup.Group, q Queue) {
 	if q == nil {
 		panic("queue is nil")
 	}
@@ -50,33 +58,58 @@ func (s scanner) JoinErrorGroup(ctx context.Context, errGroup *errgroup.Group, q
 	s.Queue = q
 	errGroup.Go(func() error {
 		defer close(s.QueuedMessageIDs)
-		return s.scan(ctx)
+		return s.Scan(ctx)
 	})
 }
 
-func (s scanner) scan(ctx context.Context) (err error) {
+func (s *scanner) LoadNextBatchOfUnsentLetters(ctx context.Context) (err error) {
+	s.LetterBatch = s.LetterBatch[:0]
+	letterPull, letterStop := iter.Pull2[mdsend.Letter, error](s.Queue.ListLetters(ctx, s.LetterCursor))
+	for range s.LetterLimit {
+		letter, err, ok := letterPull()
+		if err != nil {
+			letterStop()
+			return err
+		}
+		if !ok {
+			break
+		}
+		if !letter.SentAt.IsZero() {
+			// skip letters that have already been sent
+			// TODO: try to expire the letter according to schedule
+			continue
+		}
+		s.LetterBatch = append(s.LetterBatch, letter)
+	}
+	found := len(s.LetterBatch)
+	if found == 0 {
+		// wrap the cursor to the beginning
+		s.LetterCursor.ItemID = ""
+	} else {
+		// aim cursor to the next batch
+		s.LetterCursor.ItemID = s.LetterBatch[found-1].ID
+	}
+	letterStop()
+	return nil
+}
+
+func (s *scanner) Scan(ctx context.Context) (err error) {
 	foundUnsent := 0
 	for {
-		for {
-			letterPull, letterStop := iter.Pull2[mdsend.Letter, error](s.Queue.ListLetters(ctx, s.LetterCursor))
-			letter, err, ok := letterPull()
-			letterStop()
-			if err != nil {
-				return err
-			}
-			if !ok {
-				break
-			}
-			if !letter.SentAt.IsZero() {
-				continue // skip letters that have already been sent
-			}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(s.Frequency):
+		}
+		if err = s.LoadNextBatchOfUnsentLetters(ctx); err != nil {
+			return err
+		}
 
-			foundUnsent = 0
-			s.LetterCursor.ItemID = letter.ID
+		for _, letter := range s.LetterBatch {
 			s.MessageCursor.ParentID = letter.ID
 
 			for {
-				batch := make([]string, 0, s.MessageCursor.Batch)
+				batch := make([]string, 0, s.MessageCursor.Batch) // TODO: batch is negative!
 				messagePull, messageStop := iter.Pull2[mdsend.Dispatch, error](s.Queue.ListDispatches(ctx, s.MessageCursor))
 				for range s.MessageCursor.Batch {
 					message, err, ok := messagePull()
@@ -114,17 +147,13 @@ func (s scanner) scan(ctx context.Context) (err error) {
 				case <-time.After(s.Frequency):
 				}
 			}
-		}
 
-		if foundUnsent == 0 {
-			// TODO: attempt to mark the letter as sent
-		}
-
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-time.After(s.Frequency):
-			s.LetterCursor.ItemID = "" // start the scan over
+			if foundUnsent == 0 {
+				if _, err = s.Queue.MarkLetterAsSent(ctx, letter.ID); err != nil {
+					return err
+				}
+			}
+			foundUnsent = 0
 		}
 	}
 }

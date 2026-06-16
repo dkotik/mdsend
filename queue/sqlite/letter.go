@@ -5,16 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"iter"
+	"time"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/queue"
 )
 
-func (q queue) CreateLetter(
+func (q sqliteQueue) CreateLetter(
 	ctx context.Context,
 	l mdsend.Letter,
 ) (err error) {
-	q.DB.SetInterrupt(ctx.Done())
-	defer q.DB.SetInterrupt(context.Background().Done())
+	defer q.BindContext(ctx)()
 	frontmatter, err := json.Marshal(l.Frontmatter)
 	if err != nil {
 		return err
@@ -27,7 +28,11 @@ func (q queue) CreateLetter(
 	q.stmtInsertLetter.BindText(2, string(frontmatter))
 	q.stmtInsertLetter.BindText(3, l.Content)
 	q.stmtInsertLetter.BindText(4, encodeTime(l.CreatedAt))
-	q.stmtInsertLetter.BindText(5, encodeTime(l.SentAt))
+	if l.SentAt.IsZero() {
+		// q.stmtInsertLetter.BindNull(5)
+	} else {
+		q.stmtInsertLetter.BindText(5, encodeTime(l.SentAt))
+	}
 	_, err = q.stmtInsertLetter.Step()
 	if err != nil {
 		return err
@@ -35,9 +40,8 @@ func (q queue) CreateLetter(
 	return err
 }
 
-func (q queue) RetrieveLetter(ctx context.Context, ID string) (result mdsend.Letter, err error) {
-	q.DB.SetInterrupt(ctx.Done())
-	defer q.DB.SetInterrupt(context.Background().Done())
+func (q sqliteQueue) RetrieveLetter(ctx context.Context, ID string) (result mdsend.Letter, err error) {
+	defer q.BindContext(ctx)()
 
 	if err = q.stmtRetrieveLetter.Reset(); err != nil {
 		return result, err
@@ -63,13 +67,64 @@ func (q queue) RetrieveLetter(ctx context.Context, ID string) (result mdsend.Let
 			return result, err
 		}
 	}
+	if result.CreatedAt.IsZero() {
+		return result, mdsend.ErrLetterNotFound
+	}
 	result.ID = ID
 	return result, nil
 }
 
-func (q queue) DeleteLetter(ctx context.Context, ID string) (err error) {
-	q.DB.SetInterrupt(ctx.Done())
-	defer q.DB.SetInterrupt(context.Background().Done())
+func (q sqliteQueue) UpdateLetter(ctx context.Context, l mdsend.Letter) (err error) {
+	defer q.BindContext(ctx)()
+
+	if err = q.stmtUpdateLetter.Reset(); err != nil {
+		return err
+	}
+	frontmatter, err := json.Marshal(l.Frontmatter)
+	if err != nil {
+		return err
+	}
+	q.stmtUpdateLetter.BindText(1, string(frontmatter))
+	q.stmtUpdateLetter.BindText(2, l.Content)
+	q.stmtUpdateLetter.BindText(3, l.SentAt.Format(time.RFC3339))
+	q.stmtUpdateLetter.BindText(4, l.ID)
+
+	for {
+		ok, err := q.stmtUpdateLetter.Step()
+		if err != nil {
+			return err
+		}
+		if !ok {
+			break
+		}
+	}
+	return nil
+}
+
+func (q sqliteQueue) MarkLetterAsSent(ctx context.Context, ID string) (ok bool, err error) {
+	defer q.BindContext(ctx)()
+
+	if err = q.stmtMarkLetterAsSent.Reset(); err != nil {
+		return false, err
+	}
+	q.stmtMarkLetterAsSent.BindText(1, encodeTime(time.Now()))
+	q.stmtMarkLetterAsSent.BindText(2, ID)
+	q.stmtMarkLetterAsSent.BindText(3, ID)
+
+	for {
+		ok, err := q.stmtMarkLetterAsSent.Step()
+		if err != nil {
+			return false, err
+		}
+		if !ok {
+			break
+		}
+	}
+	return q.DB.Changes() > 0, nil
+}
+
+func (q sqliteQueue) DeleteLetter(ctx context.Context, ID string) (err error) {
+	defer q.BindContext(ctx)()
 
 	if err = q.stmtDeleteLetter.Reset(); err != nil {
 		return err
@@ -120,10 +175,9 @@ func (q queue) DeleteLetter(ctx context.Context, ID string) (err error) {
 	return nil
 }
 
-func (q queue) ListLetters(ctx context.Context, cursor mdsend.Cursor) iter.Seq2[mdsend.Letter, error] {
+func (q sqliteQueue) ListLetters(ctx context.Context, cursor queue.Cursor) iter.Seq2[mdsend.Letter, error] {
 	return func(yield func(mdsend.Letter, error) bool) {
-		q.DB.SetInterrupt(ctx.Done())
-		defer q.DB.SetInterrupt(context.Background().Done())
+		defer q.BindContext(ctx)()
 		limit := cursor.Batch
 		var letter mdsend.Letter
 		// lastID := cursor.ItemID

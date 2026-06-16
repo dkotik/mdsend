@@ -15,6 +15,7 @@ const (
 	ErrNoQueue
 	ErrNoFromAddress
 	ErrNoContent
+	ErrLetterNotFound
 )
 
 func (l LetterError) Error() string {
@@ -25,6 +26,8 @@ func (l LetterError) Error() string {
 		return "there is no from address in frontmatter"
 	case ErrNoContent:
 		return "there is no content"
+	case ErrLetterNotFound:
+		return "letter not found"
 	default:
 		return "unknown error"
 	}

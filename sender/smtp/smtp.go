@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/queue"
 )
 
 const (
@@ -29,7 +30,7 @@ const (
 type Configuration struct {
 	Server         string
 	Port           string
-	Queue          mdsend.Queue
+	Queue          queue.Queue
 	Authentication smtp.Auth
 }
 
@@ -78,7 +79,7 @@ func New(config Configuration) (_ mdsend.Sender, err error) {
 
 type senderSMTP struct {
 	Buffer         *bytes.Buffer
-	Queue          mdsend.Queue
+	Queue          queue.Queue
 	Authentication smtp.Auth
 	Connection     string
 }

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/dkotik/mdsend"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -32,7 +31,7 @@ func (p Progress) String() string {
 }
 
 type progressTracker struct {
-	Queue      mdsend.Queue
+	Queue      Queue
 	Discovered <-chan []string
 	Sent       chan string
 	Progress   chan Progress
@@ -49,7 +48,7 @@ func NewProgressTracker(
 	return tracker, tracker.Handle, tracker.Progress
 }
 
-func (t *progressTracker) JoinErrorGroup(ctx context.Context, eg *errgroup.Group, q mdsend.Queue) {
+func (t *progressTracker) JoinErrorGroup(ctx context.Context, eg *errgroup.Group, q Queue) {
 	if q == nil {
 		panic("queue is nil")
 	}
@@ -101,7 +100,7 @@ func (t *progressTracker) Handle(msg *message.Message) (err error) {
 	var confirmation Confirmation
 	if err = json.Unmarshal(msg.Payload, &confirmation); err == nil {
 		ctx := msg.Context()
-		if err = t.Queue.CompleteDispatch(ctx, confirmation.MessageID); err != nil {
+		if _, err = t.Queue.MarkMessageAsSent(ctx, confirmation.MessageID); err != nil {
 			return err
 		}
 		select {

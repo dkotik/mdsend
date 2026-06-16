@@ -20,6 +20,13 @@ const (
 	FieldNameMediaWidth      = "width"
 	FieldNameMediaHeight     = "height"
 	// FieldNameExpireAfter     = "expiration"
+
+	FieldNameSchedule          = "schedule"
+	FieldNameScheduleAfter     = "after"
+	FieldNameScheduleDelay     = "delay"
+	FieldNameScheduleStep      = "step"
+	FieldNameScheduleExpire    = "expire"
+	FieldNameScheduleFluctuate = "fluctuate"
 )
 
 func getIntFromMap(m map[string]interface{}, key string, defaultValue int) (int, error) {

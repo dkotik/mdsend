@@ -13,7 +13,7 @@ import (
 	"zombiezen.com/go/sqlite"
 )
 
-func (q queue) CreateAttachment(
+func (q sqliteQueue) CreateAttachment(
 	ctx context.Context,
 	a mdsend.Attachment,
 ) (err error) {
@@ -39,10 +39,9 @@ func (q queue) CreateAttachment(
 	}
 }
 
-func (q queue) ListAttachments(ctx context.Context, letterID string) iter.Seq2[mdsend.Attachment, error] {
+func (q sqliteQueue) ListAttachments(ctx context.Context, letterID string) iter.Seq2[mdsend.Attachment, error] {
 	return func(yield func(mdsend.Attachment, error) bool) {
-		q.DB.SetInterrupt(ctx.Done())
-		defer q.DB.SetInterrupt(context.Background().Done())
+		defer q.BindContext(ctx)()
 		stmt := q.stmtListAttachments
 		var err error
 		defer func() {

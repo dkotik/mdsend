@@ -7,9 +7,10 @@ import (
 	"iter"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/queue"
 )
 
-var _ AttachmentRepository = (mdsend.Queue)(nil)
+var _ AttachmentRepository = (queue.Queue)(nil)
 
 type AttachmentRepository interface {
 	ListAttachments(ctx context.Context, letterID string) iter.Seq2[mdsend.Attachment, error]

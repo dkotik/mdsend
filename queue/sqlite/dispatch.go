@@ -10,16 +10,16 @@ import (
 	"time"
 
 	"github.com/dkotik/mdsend"
-	"github.com/oklog/ulid/v2"
+	"github.com/dkotik/mdsend/queue"
 	lib "modernc.org/sqlite/lib"
 	"zombiezen.com/go/sqlite"
 )
 
-func (q queue) CreateDispatch(
+func (q sqliteQueue) CreateDispatch(
 	ctx context.Context,
 	d mdsend.Dispatch,
 ) (err error) {
-	if err = q.stmtInsertDispatch.Reset(); err != nil {
+	if err = q.stmtInsertMessage.Reset(); err != nil {
 		return err
 	}
 	b := &bytes.Buffer{}
@@ -27,17 +27,17 @@ func (q queue) CreateDispatch(
 		return err
 	}
 
-	q.stmtInsertDispatch.BindText(1, ulid.Make().String())
-	q.stmtInsertDispatch.BindText(2, d.LetterID)
-	q.stmtInsertDispatch.BindText(3, b.String())
-	q.stmtInsertDispatch.BindText(4, d.From.Name)
-	q.stmtInsertDispatch.BindText(5, d.From.Address)
-	q.stmtInsertDispatch.BindText(6, d.To.Name)
-	q.stmtInsertDispatch.BindText(7, d.To.Address)
-	q.stmtInsertDispatch.BindText(8, d.Subject)
-	q.stmtInsertDispatch.BindText(9, d.Text)
-	q.stmtInsertDispatch.BindText(10, d.HTML)
-	_, err = q.stmtInsertDispatch.Step()
+	q.stmtInsertMessage.BindText(1, d.ID)
+	q.stmtInsertMessage.BindText(2, d.LetterID)
+	q.stmtInsertMessage.BindText(3, b.String())
+	q.stmtInsertMessage.BindText(4, d.From.Name)
+	q.stmtInsertMessage.BindText(5, d.From.Address)
+	q.stmtInsertMessage.BindText(6, d.To.Name)
+	q.stmtInsertMessage.BindText(7, d.To.Address)
+	q.stmtInsertMessage.BindText(8, d.Subject)
+	q.stmtInsertMessage.BindText(9, d.Text)
+	q.stmtInsertMessage.BindText(10, d.HTML)
+	_, err = q.stmtInsertMessage.Step()
 	switch code := sqlite.ErrCode(err); code {
 	case lib.SQLITE_OK:
 		return nil
@@ -48,10 +48,9 @@ func (q queue) CreateDispatch(
 	}
 }
 
-func (q queue) ListDispatches(ctx context.Context, cursor mdsend.ChildCursor) iter.Seq2[mdsend.Dispatch, error] {
+func (q sqliteQueue) ListDispatches(ctx context.Context, cursor queue.ChildCursor) iter.Seq2[mdsend.Dispatch, error] {
 	return func(yield func(mdsend.Dispatch, error) bool) {
-		q.DB.SetInterrupt(ctx.Done())
-		defer q.DB.SetInterrupt(context.Background().Done())
+		defer q.BindContext(ctx)()
 		limit := cursor.Batch
 		var dispatch mdsend.Dispatch
 		dispatch.LetterID = cursor.ParentID
@@ -135,21 +134,40 @@ func (q queue) ListDispatches(ctx context.Context, cursor mdsend.ChildCursor) it
 	}
 }
 
-func (q queue) CompleteDispatch(ctx context.Context, ID string) (err error) {
-
-	if err = q.stmtCompleteDispatch.Reset(); err != nil {
-		return err
+func (q sqliteQueue) MarkMessageAsQueued(ctx context.Context, ID string) (ok bool, err error) {
+	defer q.BindContext(ctx)()
+	if err = q.stmtMarkMessageAsQueued.Reset(); err != nil {
+		return false, err
 	}
-	q.stmtCompleteDispatch.BindText(1, encodeTime(time.Now()))
-	q.stmtCompleteDispatch.BindText(2, ID)
+	q.stmtMarkMessageAsQueued.BindText(1, encodeTime(time.Now()))
+	q.stmtMarkMessageAsQueued.BindText(2, ID)
 	for {
-		ok, err := q.stmtCompleteDispatch.Step()
+		ok, err := q.stmtMarkMessageAsQueued.Step()
 		if err != nil {
-			return err
+			return false, err
 		}
 		if !ok {
 			break
 		}
 	}
-	return nil
+	return q.DB.Changes() > 0, nil
+}
+
+func (q sqliteQueue) MarkMessageAsSent(ctx context.Context, ID string) (ok bool, err error) {
+	defer q.BindContext(ctx)()
+	if err = q.stmtMarkMessageAsSent.Reset(); err != nil {
+		return false, err
+	}
+	q.stmtMarkMessageAsSent.BindText(1, encodeTime(time.Now()))
+	q.stmtMarkMessageAsSent.BindText(2, ID)
+	for {
+		ok, err := q.stmtMarkMessageAsSent.Step()
+		if err != nil {
+			return false, err
+		}
+		if !ok {
+			break
+		}
+	}
+	return q.DB.Changes() > 0, nil
 }

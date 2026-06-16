@@ -5,11 +5,12 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/queue"
 	repository "github.com/dkotik/mdsend/queue/sqlite"
 	"zombiezen.com/go/sqlite"
 )
 
-func newQueue(l mdsend.Letter) (mdsend.Queue, func() error, error) {
+func newQueue(l mdsend.Letter) (queue.Queue, func() error, error) {
 	queue, err := l.GetQueue()
 	if err != nil {
 		if !errors.Is(err, mdsend.ErrNoQueue) {

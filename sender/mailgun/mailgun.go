@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/queue"
 	mailgun "github.com/mailgun/mailgun-go/v4"
 )
 
@@ -23,7 +24,7 @@ var (
 )
 
 type Configuration struct {
-	Queue    mdsend.Queue
+	Queue    queue.Queue
 	APIKey   string
 	Domain   string
 	TestMode bool
@@ -66,7 +67,7 @@ func New(config Configuration) (mdsend.Sender, error) {
 
 type mailgunSender struct {
 	*mailgun.MailgunImpl
-	Queue  mdsend.Queue
+	Queue  queue.Queue
 	Buffer *bytes.Buffer
 }
 

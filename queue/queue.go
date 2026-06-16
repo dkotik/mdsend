@@ -14,6 +14,54 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+// Cursor holds the position of an item in a list from which an iterator
+// can retrieve items sequentially. If [Cursor.ItemID] is empty, the iterator
+// starts from the first batch. The item with the same ID is
+// always skipped, so the iterator will start from the next item.
+//
+// [Cursor.Batch] sets the maximum number of items to retrieve in one
+// repository paging operation. A negative batch value iterates items
+// in descending order from the [Cursor.ItemID].
+//
+// The iterator loads additional batches as needed as long as the range
+// of items to retrieve is not exhausted.
+//
+// Context cancellation will stop the iterator at the end
+// of the current batch.
+type Cursor struct {
+	ItemID string
+	Batch  int64
+}
+
+type ChildCursor struct {
+	ParentID string
+	Cursor
+}
+
+type Transaction interface {
+	Close(*error)
+}
+
+type Queue interface {
+	CreateLetter(context.Context, mdsend.Letter) error
+	RetrieveLetter(context.Context, string) (mdsend.Letter, error)
+	MarkLetterAsSent(context.Context, string) (bool, error)
+	DeleteLetter(context.Context, string) error
+
+	CreateAttachment(context.Context, mdsend.Attachment) error
+	CreateDispatch(context.Context, mdsend.Dispatch) error
+	MarkMessageAsQueued(context.Context, string) (bool, error)
+	MarkMessageAsSent(context.Context, string) (bool, error)
+	// RetrieveAttachmentContents(context.Context, string) ([]byte, error)
+
+	ListLetters(context.Context, Cursor) iter.Seq2[mdsend.Letter, error]
+	ListDispatches(context.Context, ChildCursor) iter.Seq2[mdsend.Dispatch, error]
+	ListAttachments(context.Context, string) iter.Seq2[mdsend.Attachment, error]
+
+	BeginTransaction(context.Context) (Queue, Transaction, error)
+	WithTransaction(context.Context, Transaction) (Queue, error)
+}
+
 func NewSender(s mdsend.Sender) message.HandlerFunc {
 	if s == nil {
 		panic("sender is nil")
@@ -76,7 +124,7 @@ func MountSenders(
 }
 
 type Process interface {
-	JoinErrorGroup(context.Context, *errgroup.Group, mdsend.Queue)
+	JoinErrorGroup(context.Context, *errgroup.Group, Queue)
 }
 
 func CollectMostOf[T any](ctx context.Context, count int) func(iter.Seq2[T, error]) iter.Seq2[T, error] {

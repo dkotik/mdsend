@@ -8,9 +8,10 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/internal"
+	"github.com/dkotik/mdsend/queue"
 )
 
-func QueueRecognizesDuplicates(q mdsend.Queue) func(*testing.T) {
+func QueueRecognizesDuplicates(q queue.Queue) func(*testing.T) {
 	return func(t *testing.T) {
 		ctx := t.Context()
 		l1 := mdsend.Letter{

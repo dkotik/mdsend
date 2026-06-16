@@ -7,4 +7,5 @@
 - Mailchimp
 - Resend
 - HubSpot
+- Loops
 - https://emaillabs.io/en/product/

@@ -1,4 +1,4 @@
-package queue
+package queue_test
 
 import (
 	"bytes"
@@ -13,6 +13,7 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/queue"
 	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
 	"golang.org/x/sync/errgroup"
 	"zombiezen.com/go/sqlite"
@@ -75,14 +76,14 @@ func TestProgressTracker(t *testing.T) {
 		ctx, cancel := context.WithCancel(t.Context())
 		eg, ctx := errgroup.WithContext(ctx)
 		frequency := time.Second
-		scanner, queuedMessageIDs := NewScanner(
+		scanner, queuedMessageIDs := queue.NewScanner(
 			frequency,
-			mdsend.Cursor{},
-			mdsend.ChildCursor{},
+			queue.Cursor{},
+			queue.ChildCursor{},
 		)
 		scanner.JoinErrorGroup(ctx, eg, q)
 
-		tracker, handler, progress := NewProgressTracker(
+		tracker, handler, progress := queue.NewProgressTracker(
 			queuedMessageIDs,
 		)
 		tracker.JoinErrorGroup(ctx, eg, q2)
@@ -90,7 +91,7 @@ func TestProgressTracker(t *testing.T) {
 		encoder := json.NewEncoder(b)
 		confirmOne := func(id int) (err error) {
 			b.Reset()
-			if err = encoder.Encode(Confirmation{
+			if err = encoder.Encode(queue.Confirmation{
 				LetterID:       testLetterID,
 				MessageID:      fmt.Sprintf("message_%d", id),
 				ConfirmationID: fmt.Sprintf("confirmation_%d", id),
