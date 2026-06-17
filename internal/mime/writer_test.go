@@ -18,12 +18,27 @@ func TestPlainMessageEncoding(t *testing.T) {
 	err := NewWriter(newMockAttachmentRepository(), entropy).Write(t.Context(), b, mdsend.Message{
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},
 		To:      mail.Address{Name: "Recipient", Address: "recipient@example.com"},
-		Subject: "Test Subject",
+		Subject: "Test Subject Перший",
 		Text:    "text",
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	t.Run(
+		"validate structure",
+		ValidateMessageStructure(
+			bytes.NewReader(b.Bytes()),
+			partDefinition{
+				Headers: []mdsend.Header{
+					{Name: HeaderMIMEVersion, Value: "1.0"},
+					{Name: "From", Value: "\"Sender\" <sender@example.com>"},
+					{Name: "To", Value: "\"Recipient\" <recipient@example.com>"},
+					{Name: "Subject", Value: "Test Subject Перший"},
+				},
+			},
+		),
+	)
 	goldie.New(t).Assert(t, "plain", b.Bytes())
 }
 
@@ -33,18 +48,44 @@ func TestPlainMixedMessageEncoding(t *testing.T) {
 		mdsend.Attachment{
 			Name:        "log.txt",
 			Hash:        "string",
-			ContentType: "text/plain",
+			ContentType: "text/plain; charset=utf-8",
 			Content:     []byte("plain"),
 		},
 	), entropy).Write(t.Context(), b, mdsend.Message{
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},
 		To:      mail.Address{Name: "Recipient", Address: "recipient@example.com"},
-		Subject: "Test Subject",
+		Subject: "Test Subject 3",
 		Text:    "text",
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Run(
+		"validate structure",
+		ValidateMessageStructure(
+			bytes.NewReader(b.Bytes()),
+			partDefinition{
+				Headers: []mdsend.Header{
+					{Name: HeaderMIMEVersion, Value: "1.0"},
+					{Name: "From", Value: "\"Sender\" <sender@example.com>"},
+					{Name: "To", Value: "\"Recipient\" <recipient@example.com>"},
+					{Name: "Subject", Value: "Test Subject 3"},
+				},
+				Children: []partDefinition{
+					{
+						Headers: []mdsend.Header{
+							{Name: "Content-Type", Value: "text/plain; charset=utf-8"},
+						},
+					},
+					{
+						Headers: []mdsend.Header{
+							{Name: "Content-Type", Value: "text/plain; charset=utf-8"},
+						},
+					},
+				},
+			},
+		),
+	)
 	goldie.New(t).Assert(t, "plain_mixed", b.Bytes())
 }
 
@@ -60,6 +101,32 @@ func TestAlternativeMessageEncoding(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Run(
+		"validate structure",
+		ValidateMessageStructure(
+			bytes.NewReader(b.Bytes()),
+			partDefinition{
+				Headers: []mdsend.Header{
+					{Name: HeaderMIMEVersion, Value: "1.0"},
+					{Name: "From", Value: "\"Sender\" <sender@example.com>"},
+					{Name: "To", Value: "\"Recipient\" <recipient@example.com>"},
+					{Name: "Subject", Value: "😁 Test Subject"},
+				},
+				Children: []partDefinition{
+					{
+						Headers: []mdsend.Header{
+							{Name: "Content-Type", Value: "text/plain; charset=utf-8"},
+						},
+					},
+					{
+						Headers: []mdsend.Header{
+							{Name: "Content-Type", Value: "text/html; charset=utf-8"},
+						},
+					},
+				},
+			},
+		),
+	)
 	goldie.New(t).Assert(t, "alternative", b.Bytes())
 }
 
@@ -94,6 +161,54 @@ func TestMixedMessageEncoding(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Run(
+		"validate structure",
+		ValidateMessageStructure(
+			bytes.NewReader(b.Bytes()),
+			partDefinition{
+				Headers: []mdsend.Header{
+					{Name: HeaderMIMEVersion, Value: "1.0"},
+					{Name: "From", Value: "\"Sender\" <sender@example.com>"},
+					{Name: "To", Value: "\"Recipient\" <recipient@example.com>"},
+					{Name: "Subject", Value: "😁 Test Subject"},
+				},
+				Children: []partDefinition{
+					{
+						Headers: []mdsend.Header{
+							{Name: "Content-Type", Value: "multipart/alternative; boundary=\"HdK5vaOVwn+qpPmNt:8aYf_b0b3NcDPps:cNTLYiQokKKhDxuy_HQ+-beg2,Dlc/\""},
+						},
+						Children: []partDefinition{
+							{
+								Headers: []mdsend.Header{
+									{Name: "Content-Type", Value: "text/plain; charset=utf-8"},
+								},
+							},
+							{
+								Headers: []mdsend.Header{
+									{Name: "Content-Type", Value: "text/html; charset=utf-8"},
+								},
+							},
+						},
+					},
+					{
+						Headers: []mdsend.Header{
+							{Name: "Content-Type", Value: "image/jpeg"},
+						},
+					},
+					{
+						Headers: []mdsend.Header{
+							{Name: "Content-Type", Value: "image/jpeg"},
+						},
+					},
+					{
+						Headers: []mdsend.Header{
+							{Name: "Content-Type", Value: "image/jpeg"},
+						},
+					},
+				},
+			},
+		),
+	)
 	goldie.New(t).Assert(t, "mixed", b.Bytes())
 }
 
@@ -128,69 +243,53 @@ func TestRelatedMessageEncoding(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Run(
+		"validate structure",
+		ValidateMessageStructure(
+			bytes.NewReader(b.Bytes()),
+			partDefinition{
+				Headers: []mdsend.Header{
+					{Name: HeaderMIMEVersion, Value: "1.0"},
+					{Name: "From", Value: "\"Sender\" <sender@example.com>"},
+					{Name: "To", Value: "\"Recipient\" <recipient@example.com>"},
+					{Name: "Subject", Value: "😁 Test Subject"},
+				},
+				Children: []partDefinition{
+					{
+						Headers: []mdsend.Header{
+							{Name: "Content-Type", Value: "multipart/alternative; boundary=\"++(aWO.mx3Zr(d'8mdBe:I+9be-=btD5/=_NgO9=_D5vOpz2Q_et=VohfwsUFilo\""},
+						},
+						Children: []partDefinition{
+							{
+								Headers: []mdsend.Header{
+									{Name: "Content-Type", Value: "text/plain; charset=utf-8"},
+								},
+							},
+							{
+								Headers: []mdsend.Header{
+									{Name: "Content-Type", Value: "text/html; charset=utf-8"},
+								},
+							},
+						},
+					},
+					{
+						Headers: []mdsend.Header{
+							{Name: "Content-Type", Value: "image/jpeg"},
+						},
+					},
+					{
+						Headers: []mdsend.Header{
+							{Name: "Content-Type", Value: "image/jpeg"},
+						},
+					},
+					{
+						Headers: []mdsend.Header{
+							{Name: "Content-Type", Value: "image/jpeg"},
+						},
+					},
+				},
+			},
+		),
+	)
 	goldie.New(t).Assert(t, "related", b.Bytes())
 }
-
-/*
-func TestMessageEncodingWithAttachments(t *testing.T) {
-	b := &bytes.Buffer{}
-	if err := (Message{
-		Entropy: rand.NewChaCha8([32]byte{}),
-		Header:  textproto.MIMEHeader{},
-		Text:    "text",
-		HTML:    "<b>text</b>",
-		Attachments: []Attachment{
-			{
-				Name:        "cat.jpg",
-				ContentType: ContentTypeImageJPEG,
-				Content:     internal.Cat,
-			},
-			{
-				Name:        "panda.jpg",
-				ContentType: ContentTypeImageJPEG,
-				Content:     internal.Panda,
-			},
-			{
-				Name:        "chamillion.jpg",
-				ContentType: ContentTypeImageJPEG,
-				Content:     internal.Chamillion,
-			},
-		},
-	}).Encode(b); err != nil {
-		t.Fatal(err)
-	}
-	goldie.New(t).Assert(t, "attachments", b.Bytes())
-}
-
-func TestMessageEncodingWithEmbeddedAttachments(t *testing.T) {
-	b := &bytes.Buffer{}
-	if err := (Message{
-		Entropy: rand.NewChaCha8([32]byte{}),
-		Header:  textproto.MIMEHeader{},
-		Text:    "text",
-		HTML:    "<b>text</b> <img src=\"cid:cat\" alt=\"cat\" />",
-		Attachments: []Attachment{
-			{
-				Name:        "panda.jpg",
-				ContentType: ContentTypeImageJPEG,
-				Content:     internal.Panda,
-			},
-			{
-				Name:        "chamillion.jpg",
-				ContentType: ContentTypeImageJPEG,
-				Content:     internal.Chamillion,
-			},
-		},
-		EmbeddedAttachments: []EmbeddedAttachment{
-			{
-				Name:        "cat.jpg",
-				ContentType: ContentTypeImageJPEG,
-				Content:     internal.Cat,
-			},
-		},
-	}).Encode(b); err != nil {
-		t.Fatal(err)
-	}
-	goldie.New(t).Assert(t, "embedded", b.Bytes())
-}
-*/

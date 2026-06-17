@@ -1,6 +1,6 @@
 From: "Sender" <sender@example.com>
 To: "Recipient" <recipient@example.com>
-Subject: Test Subject
+Subject: Test Subject 3
 MIME-Version: 1.0
 Content-Type: multipart/mixed;
  boundary="nF)SCtkuHBUZO54vMxgK9YM5WE-QZjqdU=)AscTY4aIpiJYo_u17hNyJv(5h3y-:"
@@ -11,7 +11,7 @@ Content-Transfer-Encoding: quoted-printable
 
 text
 --nF)SCtkuHBUZO54vMxgK9YM5WE-QZjqdU=)AscTY4aIpiJYo_u17hNyJv(5h3y-:
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: attachment; filename="log.txt"
 Content-Transfer-Encoding: base64
 

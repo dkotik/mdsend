@@ -5,8 +5,15 @@ import (
 	"encoding/base64"
 	"image/jpeg"
 	"io"
+	"mime"
+	"mime/multipart"
+	"net/mail"
+	"net/textproto"
 	"os"
+	"strings"
 	"testing"
+
+	"github.com/dkotik/mdsend"
 )
 
 func TestValidBoundaryGeneration(t *testing.T) {
@@ -34,10 +41,79 @@ func TestValidBoundaryGeneration(t *testing.T) {
 	}
 }
 
-func TestMessageStructure(t *testing.T) {
-	// mime.TypeByExtension(ext string)
-	// mime.ParseMediaType(v string)
-	// r := multipart.NewReader(r io.Reader, boundary string)
+type partDefinition struct {
+	Headers []mdsend.Header
+	// Content  []byte
+	Children []partDefinition
+}
+
+func (p partDefinition) Match(
+	header textproto.MIMEHeader,
+	body io.Reader,
+) func(*testing.T) {
+	return func(t *testing.T) {
+		wd := new(mime.WordDecoder)
+		for _, h := range p.Headers {
+			actual, err := wd.DecodeHeader(header.Get(h.Name))
+			if err != nil {
+				t.Fatal("unable to decode header:", err)
+			}
+			if h.Value != actual {
+				t.Log("A:", h.Value)
+				t.Log("B:", actual)
+				t.Fatal("header does not match")
+			}
+		}
+
+		childrenCount := len(p.Children)
+		if childrenCount == 0 {
+			return
+		}
+		mediaType, params, err := mime.ParseMediaType(header.Get(HeaderContentType))
+		if err != nil {
+			t.Fatal(err)
+		}
+		boundary := params["boundary"]
+		if boundary == "" {
+			t.Fatal("boundary not found in multipart content type")
+		}
+		if !strings.HasPrefix(mediaType, "multipart/") {
+			t.Fatal("expected multipart content type, got:", mediaType)
+		}
+
+		reader := multipart.NewReader(body, boundary)
+		index := 0
+		for {
+			part, err := reader.NextPart()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			if index == childrenCount {
+				t.Fatal("there are more children than expected")
+			}
+			t.Run(
+				"validate child",
+				p.Children[index].Match(part.Header, part),
+			)
+			index++
+		}
+		if index != childrenCount {
+			t.Fatal("not all children were validated")
+		}
+	}
+}
+
+func ValidateMessageStructure(r io.Reader, m partDefinition) func(*testing.T) {
+	return func(t *testing.T) {
+		ml, err := mail.ReadMessage(r)
+		if err != nil {
+			t.Fatal("unable to parse electronic mail body:", err)
+		}
+		m.Match(textproto.MIMEHeader(ml.Header), ml.Body)(t)
+	}
 }
 
 func TestFileEncoding(t *testing.T) {

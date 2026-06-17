@@ -1,6 +1,6 @@
 From: "Sender" <sender@example.com>
 To: "Recipient" <recipient@example.com>
-Subject: Test Subject
+Subject: =?UTF-8?b?VGVzdCBTdWJqZWN0INCf0LXRgNGI0LjQuQ==?=
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
