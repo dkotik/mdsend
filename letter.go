@@ -1,7 +1,6 @@
 package mdsend
 
 import (
-	"errors"
 	"fmt"
 	"net/mail"
 	"strings"
@@ -108,9 +107,9 @@ func (l Letter) GetSendAfter() (time.Time, error) {
 }
 
 func (l Letter) Validate() (err error) {
-	if l.ID == "" {
-		return errors.New("letter has no ID")
-	}
+	// if l.ID == "" {
+	// 	return errors.New("letter has no ID")
+	// }
 	if strings.TrimSpace(l.Content) == "" {
 		return ErrNoContent
 	}
@@ -118,6 +117,9 @@ func (l Letter) Validate() (err error) {
 		return err
 	}
 	if _, err = l.GetFrom(); err != nil {
+		return err
+	}
+	if _, err = l.GetSchedule(); err != nil {
 		return err
 	}
 	return nil

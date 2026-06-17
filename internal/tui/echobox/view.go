@@ -1,8 +1,9 @@
 package echobox
 
 import (
-	"github.com/dkotik/mdsend/userinterface/bubbletea/scroll"
 	"strings"
+
+	"github.com/dkotik/mdsend/internal/tui/scroll"
 )
 
 func (m *Model) messagesToLines(messages []EchoMsg) {

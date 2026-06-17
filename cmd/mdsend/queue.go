@@ -7,8 +7,22 @@ import (
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/queue"
 	repository "github.com/dkotik/mdsend/queue/sqlite"
+	"github.com/urfave/cli/v3"
 	"zombiezen.com/go/sqlite"
 )
+
+var flagDatabase = &cli.StringFlag{
+	Name:    `database`,
+	Usage:   `Path to the queue database file or data source name.`,
+	Aliases: []string{`db`},
+	Sources: cli.ValueSourceChain{
+		Chain: []cli.ValueSource{
+			cli.EnvVar("MDSEND_DATABASE"),
+			xdgDataFile("queue.sqlite3"),
+		},
+	},
+	Value: "mdsend_queue.sqlite3",
+}
 
 func newQueue(l mdsend.Letter) (queue.Queue, func() error, error) {
 	queue, err := l.GetQueue()

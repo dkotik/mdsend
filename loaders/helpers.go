@@ -8,7 +8,7 @@ import (
 	"net/mail"
 	"path/filepath"
 
-	yaml "gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v3"
 )
 
 // DocumentBoundary determines where markdown files are chunked.

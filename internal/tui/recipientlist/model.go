@@ -1,8 +1,9 @@
 package recipientlist
 
 import (
-	"github.com/dkotik/mdsend/userinterface/bubbletea/scroll"
 	"time"
+
+	"github.com/dkotik/mdsend/internal/tui/scroll"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

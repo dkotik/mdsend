@@ -1,7 +1,7 @@
 package echobox
 
 import (
-	"github.com/dkotik/mdsend/userinterface/bubbletea/scroll"
+	"github.com/dkotik/mdsend/internal/tui/scroll"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"

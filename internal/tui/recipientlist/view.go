@@ -3,8 +3,9 @@ package recipientlist
 import (
 	"fmt"
 	"log"
-	"github.com/dkotik/mdsend/userinterface/bubbletea/scroll"
 	"strings"
+
+	"github.com/dkotik/mdsend/internal/tui/scroll"
 )
 
 // var (

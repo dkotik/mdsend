@@ -135,7 +135,7 @@ func Queue(q queue.Queue) func(*testing.T) {
 		}
 		for i, a := range l1attachments {
 			t.Run(
-				fmt.Sprint("attachment %d", i+1),
+				fmt.Sprintf("attachment %d", i+1),
 				AttachmentsAreEqual(a, attachments[i]),
 			)
 		}
