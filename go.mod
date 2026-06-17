@@ -37,14 +37,17 @@ require (
 
 require (
 	github.com/ThreeDotsLabs/watermill v1.5.2 // indirect
+	github.com/ThreeDotsLabs/watermill-sqlite/wmsqlitezombiezen v0.1.2 // indirect
 	github.com/adrg/xdg v0.5.3 // indirect
 	github.com/btcsuite/btcd/btcutil v1.1.6 // indirect
+	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/charmbracelet/harmonica v0.1.0 // indirect
 	github.com/containerd/console v1.0.2 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-chi/chi v4.0.0+incompatible // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
@@ -74,6 +77,7 @@ require (
 	github.com/sebdah/goldie/v2 v2.8.0 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
+	github.com/sony/gobreaker v1.0.0 // indirect
 	github.com/spf13/afero v1.1.2 // indirect
 	github.com/spf13/cast v1.3.0 // indirect
 	github.com/spf13/jwalterweatherman v1.0.0 // indirect
@@ -83,6 +87,7 @@ require (
 	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/sys v0.44.0 // indirect
 	golang.org/x/term v0.0.0-20210422114643-f5beecf764ed // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.65.7 // indirect

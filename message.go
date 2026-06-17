@@ -69,15 +69,17 @@ func MergeHeaders(ms ...map[string]any) (result []Header) {
 
 // Dispatch is an intent to delivery a copy of a letter to a particular recipient.
 type Dispatch struct {
-	ID       string
-	LetterID string
-	Headers  []Header
-	From     mail.Address
-	To       mail.Address
-	Subject  string
-	Text     string
-	HTML     string
-	SentAt   time.Time
+	ID            string
+	LetterID      string
+	Headers       []Header
+	From          mail.Address
+	To            mail.Address
+	Subject       string
+	Text          string
+	HTML          string
+	ScheduleAfter time.Time
+	ScheduledAt   time.Time
+	SentAt        time.Time
 }
 
 // DEPRECATED: use Dispatch instead

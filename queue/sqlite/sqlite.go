@@ -32,9 +32,9 @@ type sqliteQueue struct {
 	stmtListLettersForward      *sqlite.Stmt
 	stmtListLettersBackward     *sqlite.Stmt
 	stmtListAttachments         *sqlite.Stmt
-	stmtListDispatchesForward   *sqlite.Stmt
-	stmtListDispatchesBackward  *sqlite.Stmt
-	stmtMarkMessageAsQueued     *sqlite.Stmt
+	stmtLisMessagesForward      *sqlite.Stmt
+	stmtListMessagesBackward    *sqlite.Stmt
+	stmtMarkMessagesAsQueued    *sqlite.Stmt
 	stmtMarkMessageAsSent       *sqlite.Stmt
 }
 
@@ -131,7 +131,7 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 	if q.stmtInsertLetter, err = conn.Prepare(`INSERT INTO ` + lettersTable + `(id, frontmatter, content, created_at, sent_at) VALUES(?,?,?,?,?)`); err != nil {
 		return nil, fmt.Errorf("unable to prepare insert letter statement: %w", err)
 	}
-	if q.stmtInsertMessage, err = conn.Prepare(`INSERT INTO ` + messagesTable + ` (id, letter_id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`); err != nil {
+	if q.stmtInsertMessage, err = conn.Prepare(`INSERT INTO ` + messagesTable + ` (id, letter_id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`); err != nil {
 		return nil, fmt.Errorf("unable to prepare insert dispatch statement: %w", err)
 	}
 	if q.stmtInsertAttachment, err = q.DB.Prepare(`INSERT INTO ` + attachmentsTable + ` (id, letter_id, name, content_hash, content_id, content_type, content) VALUES (?, ?, ?, ?, ?, ?, ?)`); err != nil {
@@ -166,13 +166,15 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 	if q.stmtListAttachments, err = conn.Prepare(`SELECT name, content_hash, content_id, content_type, content FROM ` + attachmentsTable + ` WHERE letter_id=?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list attachments statement: %w", err)
 	}
-	if q.stmtListDispatchesForward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id>? LIMIT ?`); err != nil {
+	if q.stmtLisMessagesForward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id>? LIMIT ?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list dispatches statement: %w", err)
 	}
-	if q.stmtListDispatchesBackward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id<? ORDER BY id DESC LIMIT ?`); err != nil {
+	if q.stmtListMessagesBackward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id<? ORDER BY id DESC LIMIT ?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list dispatches statement: %w", err)
 	}
-	if q.stmtMarkMessageAsQueued, err = conn.Prepare(`UPDATE ` + messagesTable + ` SET queued_at=? WHERE id=? AND queued_at IS NULL`); err != nil {
+	if q.stmtMarkMessagesAsQueued, err = conn.Prepare(`UPDATE ` + messagesTable + ` SET queued_at=? WHERE id IN (SELECT value FROM json_each(?))`); err != nil {
+		// TODO: is below suffix needed?
+		// AND queued_at IS NULL
 		return nil, fmt.Errorf("unable to prepare mark message as queued statement: %w", err)
 	}
 	if q.stmtMarkMessageAsSent, err = conn.Prepare(`UPDATE ` + messagesTable + ` SET sent_at=? WHERE id=? AND sent_at IS NULL`); err != nil {

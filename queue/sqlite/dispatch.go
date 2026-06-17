@@ -37,6 +37,7 @@ func (q sqliteQueue) CreateDispatch(
 	q.stmtInsertMessage.BindText(8, d.Subject)
 	q.stmtInsertMessage.BindText(9, d.Text)
 	q.stmtInsertMessage.BindText(10, d.HTML)
+	q.stmtInsertMessage.BindText(11, d.ScheduleAfter.Format(time.RFC3339))
 	_, err = q.stmtInsertMessage.Step()
 	switch code := sqlite.ErrCode(err); code {
 	case lib.SQLITE_OK:
@@ -55,10 +56,10 @@ func (q sqliteQueue) ListDispatches(ctx context.Context, cursor queue.ChildCurso
 		var dispatch mdsend.Dispatch
 		dispatch.LetterID = cursor.ParentID
 
-		stmt := q.stmtListDispatchesForward
+		stmt := q.stmtLisMessagesForward
 		if limit < 0 {
 			limit = -limit
-			stmt = q.stmtListDispatchesBackward
+			stmt = q.stmtListMessagesBackward
 		}
 
 		// nextPage:
@@ -121,7 +122,21 @@ func (q sqliteQueue) ListDispatches(ctx context.Context, cursor queue.ChildCurso
 			dispatch.HTML = stmt.ColumnText(8)
 
 			if !stmt.ColumnIsNull(9) {
-				dispatch.SentAt, err = decodeTime(stmt.ColumnText(9))
+				dispatch.ScheduleAfter, err = decodeTime(stmt.ColumnText(9))
+				if err != nil {
+					yield(dispatch, err)
+					return
+				}
+			}
+			if !stmt.ColumnIsNull(10) {
+				dispatch.ScheduledAt, err = decodeTime(stmt.ColumnText(10))
+				if err != nil {
+					yield(dispatch, err)
+					return
+				}
+			}
+			if !stmt.ColumnIsNull(11) {
+				dispatch.SentAt, err = decodeTime(stmt.ColumnText(11))
 				if err != nil {
 					yield(dispatch, err)
 					return
@@ -134,23 +149,27 @@ func (q sqliteQueue) ListDispatches(ctx context.Context, cursor queue.ChildCurso
 	}
 }
 
-func (q sqliteQueue) MarkMessageAsQueued(ctx context.Context, ID string) (ok bool, err error) {
-	defer q.BindContext(ctx)()
-	if err = q.stmtMarkMessageAsQueued.Reset(); err != nil {
-		return false, err
+func (q sqliteQueue) MarkMessagesAsQueued(ctx context.Context, IDs ...string) (err error) {
+	ids, err := json.Marshal(IDs)
+	if err != nil {
+		return err
 	}
-	q.stmtMarkMessageAsQueued.BindText(1, encodeTime(time.Now()))
-	q.stmtMarkMessageAsQueued.BindText(2, ID)
+	defer q.BindContext(ctx)()
+	if err = q.stmtMarkMessagesAsQueued.Reset(); err != nil {
+		return err
+	}
+	q.stmtMarkMessagesAsQueued.BindText(1, encodeTime(time.Now()))
+	q.stmtMarkMessagesAsQueued.BindBytes(2, ids)
 	for {
-		ok, err := q.stmtMarkMessageAsQueued.Step()
+		ok, err := q.stmtMarkMessagesAsQueued.Step()
 		if err != nil {
-			return false, err
+			return err
 		}
 		if !ok {
 			break
 		}
 	}
-	return q.DB.Changes() > 0, nil
+	return nil
 }
 
 func (q sqliteQueue) MarkMessageAsSent(ctx context.Context, ID string) (ok bool, err error) {

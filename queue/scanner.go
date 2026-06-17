@@ -17,17 +17,23 @@ type scanner struct {
 	MessageCursor    ChildCursor
 	Queue            Queue
 	QueuedMessageIDs chan []string
+	Scheduler        Scheduler
 }
 
 func NewScanner(
 	frequency time.Duration,
 	letterCursor Cursor,
 	messageCursor ChildCursor,
+	scheduler Scheduler,
 ) (Process, <-chan []string) {
+	if scheduler == nil {
+		panic("scheduler is nil")
+	}
 	s := &scanner{
 		Frequency:        frequency,
 		LetterCursor:     letterCursor,
 		MessageCursor:    messageCursor,
+		Scheduler:        scheduler,
 		QueuedMessageIDs: make(chan []string),
 	}
 	if s.Frequency == 0 {

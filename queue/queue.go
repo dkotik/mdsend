@@ -50,7 +50,7 @@ type Queue interface {
 
 	CreateAttachment(context.Context, mdsend.Attachment) error
 	CreateDispatch(context.Context, mdsend.Dispatch) error
-	MarkMessageAsQueued(context.Context, string) (bool, error)
+	MarkMessagesAsQueued(context.Context, ...string) error
 	MarkMessageAsSent(context.Context, string) (bool, error)
 	// RetrieveAttachmentContents(context.Context, string) ([]byte, error)
 

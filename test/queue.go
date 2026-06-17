@@ -158,15 +158,12 @@ func Queue(q queue.Queue) func(*testing.T) {
 		}
 		for i, d := range l1dispatches {
 			d.ID = dispatches[i].ID // copy the ID from the expected dispatch
-			t.Run(fmt.Sprintf("dispatch #%d is the same", i+1), DispatchesAreEqual(d, dispatches[i]))
-			ok, err := q.MarkMessageAsQueued(ctx, d.ID)
+			t.Run(fmt.Sprintf("dispatch #%d is the same", i+1), MessagesAreEqual(d, dispatches[i]))
+			err := q.MarkMessagesAsQueued(ctx, d.ID)
 			if err != nil {
 				t.Fatalf("unable to complete dispatch %d: %v", i+1, err)
 			}
-			if !ok {
-				t.Fatalf("dispatch %d was not marked as queued", i+1)
-			}
-			ok, err = q.MarkMessageAsSent(ctx, d.ID)
+			ok, err := q.MarkMessageAsSent(ctx, d.ID)
 			if err != nil {
 				t.Fatalf("unable to complete dispatch %d: %v", i+1, err)
 			}

@@ -71,7 +71,7 @@ func AttachmentsAreEqual(a, b mdsend.Attachment) func(*testing.T) {
 	}
 }
 
-func DispatchesAreEqual(a, b mdsend.Dispatch) func(*testing.T) {
+func MessagesAreEqual(a, b mdsend.Dispatch) func(*testing.T) {
 	return func(t *testing.T) {
 		if a.ID != b.ID {
 			t.Log("A:", a.ID)
@@ -123,6 +123,16 @@ func DispatchesAreEqual(a, b mdsend.Dispatch) func(*testing.T) {
 				t.Fatal("html does not match")
 			}
 		})
+		if !a.ScheduleAfter.Equal(b.ScheduleAfter) {
+			t.Log("A:", a.ScheduleAfter.Format(time.RFC3339))
+			t.Log("B:", b.ScheduleAfter.Format(time.RFC3339))
+			t.Fatal("queue after time does not match")
+		}
+		if !a.ScheduledAt.Equal(b.ScheduledAt) {
+			t.Log("A:", a.ScheduledAt.Format(time.RFC3339))
+			t.Log("B:", b.ScheduledAt.Format(time.RFC3339))
+			t.Fatal("queued at time does not match")
+		}
 		if !a.SentAt.Equal(b.SentAt) {
 			t.Log("A:", a.SentAt.Format(time.RFC3339))
 			t.Log("B:", b.SentAt.Format(time.RFC3339))

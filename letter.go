@@ -38,11 +38,8 @@ type Letter struct {
 	Frontmatter map[string]any
 	Content     string
 	CreatedAt   time.Time
-	QueuedAt    time.Time
 	SentAt      time.Time
-	// RecipientCount int
-	// SendAfter      time.Time
-	// ExpireAfter    time.Duration
+	// MessageCount int
 }
 
 func (l Letter) GetQueue() (string, error) {

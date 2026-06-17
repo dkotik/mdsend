@@ -80,6 +80,11 @@ func TestProgressTracker(t *testing.T) {
 			frequency,
 			queue.Cursor{},
 			queue.ChildCursor{},
+			sqliteQ.NewScheduler(
+				q,
+				queue.NewMarshalerJSON(),
+				"test-topic",
+			),
 		)
 		scanner.JoinErrorGroup(ctx, eg, q)
 
