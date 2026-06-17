@@ -11,7 +11,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/dkotik/mdsend"
-	"github.com/dkotik/mdsend/sender"
+	"github.com/dkotik/mdsend/mailer"
 )
 
 func TestQueue(t *testing.T) {
@@ -37,16 +37,16 @@ func TestQueue(t *testing.T) {
 	pubSub := gochannel.NewGoChannel(gochannel.Config{
 		// Persistent: true,
 	}, logger)
-	senderLogger := sender.NewLogger(slogger)
+	senderLogger := mailer.NewLogger(slogger)
 	MountSenders(
 		router,
 		pubSub,
 		pubSub,
 		"",
-		senderLogger(sender.NewVoid()),
-		senderLogger(sender.NewVoid()),
-		senderLogger(sender.NewVoid()),
-		senderLogger(sender.NewVoid()),
+		senderLogger(mailer.NewVoid()),
+		senderLogger(mailer.NewVoid()),
+		senderLogger(mailer.NewVoid()),
+		senderLogger(mailer.NewVoid()),
 	)
 
 	received := 0

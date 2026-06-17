@@ -1,4 +1,4 @@
-package sender
+package mailer
 
 import (
 	"context"
@@ -8,28 +8,28 @@ import (
 )
 
 type delay struct {
-	mdsend.Sender
+	mdsend.Mailer
 	Duration time.Duration
 }
 
-func NewDelay(d time.Duration) func(mdsend.Sender) mdsend.Sender {
+func NewDelay(d time.Duration) func(mdsend.Mailer) mdsend.Mailer {
 	if d < time.Millisecond {
 		panic("duration is too short")
 	}
-	return func(s mdsend.Sender) mdsend.Sender {
+	return func(s mdsend.Mailer) mdsend.Mailer {
 		if s == nil {
 			panic("sender is nil")
 		}
 		return delay{
-			Sender:   s,
+			Mailer:   s,
 			Duration: d,
 		}
 	}
 }
-func (d delay) Send(ctx context.Context, msg mdsend.Message) (string, error) {
+func (d delay) SendMail(ctx context.Context, msg mdsend.Message) (string, error) {
 	select {
 	case <-time.After(d.Duration):
-		return d.Sender.Send(ctx, msg)
+		return d.Mailer.SendMail(ctx, msg)
 	case <-ctx.Done():
 		return "", ctx.Err()
 	}

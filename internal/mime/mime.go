@@ -1,7 +1,7 @@
 /*
 Package mime encodes electronic mail parts for delivery.
 
-The message may be encoded as either mixed or related, depending
+One way to encode the message is as either mixed or related, depending
 on the presence of inline attachments:
 
 	multipart/related
@@ -15,6 +15,7 @@ This approach may not work in older clients, like Apple Mail.
 
 A better way to structure the multipart MIME message is by
 subordinating the inline attachments to the alternative related part.
+The packages uses this approach to ensure compatibility with older clients:
 
 	multipart/mixed
 	|- multipart/alternative

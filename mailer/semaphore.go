@@ -1,4 +1,4 @@
-package sender
+package mailer
 
 import (
 	"context"
@@ -7,15 +7,15 @@ import (
 )
 
 type semaphore struct {
-	available chan mdsend.Sender
+	available chan mdsend.Mailer
 }
 
-func NewSemaphore(available ...mdsend.Sender) mdsend.Sender {
+func NewSemaphore(available ...mdsend.Mailer) mdsend.Mailer {
 	if len(available) == 0 {
 		panic("at least one sender is required")
 	}
 	s := semaphore{
-		available: make(chan mdsend.Sender, len(available)),
+		available: make(chan mdsend.Mailer, len(available)),
 	}
 	for _, sender := range available {
 		s.available <- sender
@@ -23,10 +23,10 @@ func NewSemaphore(available ...mdsend.Sender) mdsend.Sender {
 	return s
 }
 
-func (s semaphore) Send(ctx context.Context, m mdsend.Message) (string, error) {
+func (s semaphore) SendMail(ctx context.Context, m mdsend.Message) (string, error) {
 	sender := <-s.available
 	defer func() {
 		s.available <- sender
 	}()
-	return sender.Send(ctx, m)
+	return sender.SendMail(ctx, m)
 }

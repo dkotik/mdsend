@@ -6,6 +6,6 @@ import (
 
 const Version = "dev"
 
-type Sender interface {
-	Send(context.Context, Message) (string, error)
+type Mailer interface {
+	SendMail(context.Context, Message) (string, error)
 }

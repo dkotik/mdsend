@@ -1,4 +1,4 @@
-package sender
+package mailer
 
 import (
 	"context"
@@ -8,24 +8,24 @@ import (
 )
 
 type logger struct {
-	mdsend.Sender
+	mdsend.Mailer
 	Logger *slog.Logger
 }
 
-func NewLogger(l *slog.Logger) func(mdsend.Sender) mdsend.Sender {
+func NewLogger(l *slog.Logger) func(mdsend.Mailer) mdsend.Mailer {
 	if l == nil {
 		l = slog.Default()
 	}
-	return func(s mdsend.Sender) mdsend.Sender {
+	return func(s mdsend.Mailer) mdsend.Mailer {
 		if s == nil {
 			panic("sender is nil")
 		}
-		return logger{Sender: s, Logger: l}
+		return logger{Mailer: s, Logger: l}
 	}
 }
 
-func (l logger) Send(ctx context.Context, msg mdsend.Message) (id string, err error) {
-	id, err = l.Sender.Send(ctx, msg)
+func (l logger) SendMail(ctx context.Context, msg mdsend.Message) (id string, err error) {
+	id, err = l.Mailer.SendMail(ctx, msg)
 	if err == nil {
 		l.Logger.DebugContext(
 			ctx,

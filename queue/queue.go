@@ -62,7 +62,7 @@ type Queue interface {
 	WithTransaction(context.Context, Transaction) (Queue, error)
 }
 
-func NewSender(s mdsend.Sender) message.HandlerFunc {
+func NewSender(s mdsend.Mailer) message.HandlerFunc {
 	if s == nil {
 		panic("sender is nil")
 	}
@@ -75,7 +75,7 @@ func NewSender(s mdsend.Sender) message.HandlerFunc {
 			LetterID:  m.LetterID,
 			MessageID: m.ID,
 		}
-		confirmation.ConfirmationID, err = s.Send(msg.Context(), m)
+		confirmation.ConfirmationID, err = s.SendMail(msg.Context(), m)
 		if err != nil {
 			return nil, err
 		}
@@ -93,7 +93,7 @@ func MountSenders(
 	pub message.Publisher,
 	sub message.Subscriber,
 	topicPrefix string,
-	senders ...mdsend.Sender,
+	senders ...mdsend.Mailer,
 ) {
 	if r == nil {
 		panic("router is nil")

@@ -175,7 +175,7 @@ func TestMixedMessageEncoding(t *testing.T) {
 				Children: []partDefinition{
 					{
 						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "multipart/alternative; boundary=\"HdK5vaOVwn+qpPmNt:8aYf_b0b3NcDPps:cNTLYiQokKKhDxuy_HQ+-beg2,Dlc/\""},
+							{Name: "Content-Type", Value: "multipart/alternative; boundary=\"6H48lprQ5jsIY3Q8:6x9i/'O6SWNdslloeYLjBi)Riw3.d6lAvlNNTU9Zg8_:ZaT\""},
 						},
 						Children: []partDefinition{
 							{
@@ -245,6 +245,15 @@ func TestRelatedMessageEncoding(t *testing.T) {
 	}
 	t.Run(
 		"validate structure",
+		/*
+			multipart/mixed
+			|- multipart/alternative
+			|  |- text/plain
+			|  `- multipart/related
+			|     |- text/html
+			|     `- inline_attachments...
+			`- attachments...
+		*/
 		ValidateMessageStructure(
 			bytes.NewReader(b.Bytes()),
 			partDefinition{
@@ -257,7 +266,7 @@ func TestRelatedMessageEncoding(t *testing.T) {
 				Children: []partDefinition{
 					{
 						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "multipart/alternative; boundary=\"++(aWO.mx3Zr(d'8mdBe:I+9be-=btD5/=_NgO9=_D5vOpz2Q_et=VohfwsUFilo\""},
+							{Name: "Content-Type", Value: "multipart/alternative; boundary=\"/y-Da+X'9'De5C,n(2Sv(wD1heyVBka:XtW:+5,e+(:.e2Vj=gNyi'RDve9)hyla\""},
 						},
 						Children: []partDefinition{
 							{
@@ -267,14 +276,21 @@ func TestRelatedMessageEncoding(t *testing.T) {
 							},
 							{
 								Headers: []mdsend.Header{
-									{Name: "Content-Type", Value: "text/html; charset=utf-8"},
+									{Name: "Content-Type", Value: "multipart/related; boundary=\"y=BbvMTZKArDv14o2eR7/y'?ok:fkQaf=qstd+=gwzmkK:zAMh70OtiBfDfIgFyF\""},
+								},
+								Children: []partDefinition{
+									{
+										Headers: []mdsend.Header{
+											{Name: "Content-Type", Value: "text/html; charset=utf-8"},
+										},
+									},
+									{
+										Headers: []mdsend.Header{
+											{Name: "Content-Type", Value: "image/jpeg"},
+										},
+									},
 								},
 							},
-						},
-					},
-					{
-						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "image/jpeg"},
 						},
 					},
 					{

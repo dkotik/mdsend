@@ -1,4 +1,4 @@
-package sender
+package mailer
 
 import (
 	"context"
@@ -8,15 +8,15 @@ import (
 )
 
 type timeout struct {
-	Sender mdsend.Sender
+	Sender mdsend.Mailer
 	Limit  time.Duration
 }
 
-func NewTimeout(d time.Duration) func(mdsend.Sender) mdsend.Sender {
+func NewTimeout(d time.Duration) func(mdsend.Mailer) mdsend.Mailer {
 	if d < time.Millisecond*10 {
 		panic("timeout is less than 10ms")
 	}
-	return func(s mdsend.Sender) mdsend.Sender {
+	return func(s mdsend.Mailer) mdsend.Mailer {
 		if s == nil {
 			panic("sender is nil")
 		}
@@ -27,8 +27,8 @@ func NewTimeout(d time.Duration) func(mdsend.Sender) mdsend.Sender {
 	}
 }
 
-func (t timeout) Send(ctx context.Context, m mdsend.Message) (string, error) {
+func (t timeout) SendMail(ctx context.Context, m mdsend.Message) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, t.Limit)
 	defer cancel()
-	return t.Sender.Send(ctx, m)
+	return t.Sender.SendMail(ctx, m)
 }

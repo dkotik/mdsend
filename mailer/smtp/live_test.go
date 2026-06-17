@@ -1,7 +1,6 @@
-package mailgun
+package smtp
 
 import (
-	"errors"
 	"net/mail"
 	"os"
 	"strings"
@@ -13,21 +12,17 @@ import (
 	"github.com/dkotik/mdsend/internal/mime"
 )
 
-func TestLiveSend(t *testing.T) {
-	destination := strings.TrimSpace(os.Getenv(EnvironmentEmailTo))
+const testLetterID = "test-letter-id"
+
+func TestSend(t *testing.T) {
+	destination := strings.TrimSpace(os.Getenv(EnvironmentTestTo))
 	if destination == "" {
-		t.Skip("environment variable " + EnvironmentEmailTo + " is not set")
+		t.Skip("environment variable " + EnvironmentTestTo + " is not set")
 	}
 
 	config := getLiveConfigOrSkip(t)
-	mg, err := New(config)
+	sender, err := New(config)
 	if err != nil {
-		if errors.Is(err, ErrMissingAPIKey) {
-			t.Skip("missing API key")
-		}
-		if errors.Is(err, ErrMissingDomain) {
-			t.Skip("missing API domain")
-		}
 		t.Fatal(err)
 	}
 
@@ -37,7 +32,6 @@ func TestLiveSend(t *testing.T) {
 		Height:  100,
 		Quality: 20,
 	}
-
 	cat, err := media.Compress(mdsend.Attachment{
 		LetterID:    testLetterID,
 		Content:     internal.Cat,
@@ -59,7 +53,8 @@ func TestLiveSend(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	messageID, err := mg.Send(ctx, mdsend.Message{
+	messageID, err := sender.SendMail(ctx, mdsend.Message{
+		ID:       "testMessage",
 		LetterID: testLetterID,
 		From: mail.Address{
 			Name:    "Test Sender",
@@ -69,7 +64,7 @@ func TestLiveSend(t *testing.T) {
 			Name:    "Test Recipient",
 			Address: destination,
 		},
-		Subject: "live Mailgun send test",
+		Subject: "live SMTP send test",
 		Text:    "test text",
 		HTML:    "<html><body><h1>test</h1><p>test paragraph</p><p>test paragraph 2</p><p><img src=\"cid:cat@testdomain.com\" alt=\"cat\" /></p></body></html>",
 	})

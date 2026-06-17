@@ -6,16 +6,14 @@ default:
 	@echo ":::::::::::::::::::::::::::::::::::::::::"
 	@go test ./...
 	@#cd internal/mime && go test ./...
-	@#cd sender && go test ./...
 	@#cd queue && go test ./...
 	@#cd cmd/mdsend && go test ./...
 	@echo "::::::::::::::::::::::::::::::::::::"
 live:
 	@clear
-	# @rm sender/smtp/testdata/live_test.lock
-	@cd sender/smtp && go test ./... -v
-	# @rm sender/mailgun/testdata/live_test.lock
-	@cd sender/mailgun && go test ./... -v
+	# @rm mailer/smtp/testdata/live_test.lock
+	# @rm mailer/mailgun/testdata/live_test.lock
+	@cd mailer && go test ./... -v -count=1
 build:
 	goreleaser release --snapshot --rm-dist
 install:

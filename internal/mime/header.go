@@ -236,7 +236,7 @@ func (w Writer) WriteRelatedBoundaryHeader(out io.Writer) (err error) {
 	if _, err = out.Write([]byte(HeaderContentType + `: multipart/related;` + CRNL + ` boundary="`)); err != nil {
 		return err
 	}
-	if _, err = out.Write([]byte(w.mixedBoundary)); err != nil {
+	if _, err = out.Write([]byte(w.relatedBoundary)); err != nil {
 		return err
 	}
 	if _, err = out.Write([]byte(`"` + CRNL)); err != nil {

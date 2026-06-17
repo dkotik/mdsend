@@ -3,16 +3,16 @@ To: "Recipient" <recipient@example.com>
 Subject: =?UTF-8?b?8J+YgSBUZXN0IFN1YmplY3Q=?=
 MIME-Version: 1.0
 Content-Type: multipart/alternative;
- boundary="ZqFqEy=U+UWi5GF2XhBe9iAP4U6(gV'NL:X?F+WX=px0.Yc1METS?1BqO_VczCSi"
+ boundary="HdK5vaOVwn+qpPmNt:8aYf_b0b3NcDPps:cNTLYiQokKKhDxuy_HQ+-beg2,Dlc/"
 
---ZqFqEy=U+UWi5GF2XhBe9iAP4U6(gV'NL:X?F+WX=px0.Yc1METS?1BqO_VczCSi
+--HdK5vaOVwn+qpPmNt:8aYf_b0b3NcDPps:cNTLYiQokKKhDxuy_HQ+-beg2,Dlc/
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 text
---ZqFqEy=U+UWi5GF2XhBe9iAP4U6(gV'NL:X?F+WX=px0.Yc1METS?1BqO_VczCSi
+--HdK5vaOVwn+qpPmNt:8aYf_b0b3NcDPps:cNTLYiQokKKhDxuy_HQ+-beg2,Dlc/
 Content-Type: text/html; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 <b>text</b>
---ZqFqEy=U+UWi5GF2XhBe9iAP4U6(gV'NL:X?F+WX=px0.Yc1METS?1BqO_VczCSi--
+--HdK5vaOVwn+qpPmNt:8aYf_b0b3NcDPps:cNTLYiQokKKhDxuy_HQ+-beg2,Dlc/--

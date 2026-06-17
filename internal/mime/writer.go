@@ -17,8 +17,9 @@ type Writer struct {
 	cachedAttachments        map[string][]cachedAttachment
 	cachedAttachmentContents map[string][]byte
 
-	mixedBoundary string
-	textBoundary  string
+	mixedBoundary   string
+	textBoundary    string
+	relatedBoundary string
 }
 
 func NewWriter(attachments AttachmentRepository, entropy *rand.Rand) Writer {
@@ -35,6 +36,7 @@ func NewWriter(attachments AttachmentRepository, entropy *rand.Rand) Writer {
 		cachedAttachmentContents: make(map[string][]byte),
 		mixedBoundary:            NewBoundary(entropy),
 		textBoundary:             NewBoundary(entropy),
+		relatedBoundary:          NewBoundary(entropy),
 	}
 }
 
@@ -116,46 +118,89 @@ func (w Writer) Write(
 		return err
 	}
 
+	attachments, inline := SplitAttachments(m.HTML, attachments)
 	if len(attachments) == 0 {
-		return writeAlternative(out, m.Text, m.HTML, w.textBoundary)
+		// panic("no attachments")
+		return w.writeAlternativeWithAttachments(out, m.Text, m.HTML, w.textBoundary, inline)
 	}
 
-	inlineReferences := FindInlineReferences(m.HTML)
-
-	// if _, err = io.WriteString(out, CRNL); err != nil {
-	// 	return err
-	// }
-
-	if inlineReferences.Count() == 0 {
-		if err = w.WriteMixedBoundaryHeader(out); err != nil {
-			return err
-		}
-	} else {
-		if err = w.WriteRelatedBoundaryHeader(out); err != nil {
-			return err
-		}
+	if err = w.WriteMixedBoundaryHeader(out); err != nil {
+		return err
 	}
+
 	_, err = fmt.Fprintf(out, CRNL+"--%s\r\n", w.mixedBoundary)
 	if err != nil {
 		return err
 	}
-	if err = writeAlternative(out, m.Text, m.HTML, w.textBoundary); err != nil {
-		return err
+
+	if len(inline) == 0 {
+		if err = writeAlternative(out, m.Text, m.HTML, w.textBoundary); err != nil {
+			return err
+		}
+	} else {
+		if _, err = out.Write([]byte(HeaderContentType + `: multipart/alternative;` + CRNL + ` boundary="`)); err != nil {
+			return err
+		}
+		if _, err = out.Write([]byte(w.textBoundary)); err != nil {
+			return err
+		}
+		if _, err = out.Write([]byte(`"` + CRNL + CRNL)); err != nil {
+			return err
+		}
+		_, err = fmt.Fprintf(out, "--%s\r\n", w.textBoundary)
+		if err != nil {
+			return err
+		}
+		if err = writeText(out, m.Text); err != nil {
+			return err
+		}
+		_, err = fmt.Fprintf(out, "\r\n--%s\r\n", w.textBoundary)
+		if err != nil {
+			return err
+		}
+		if err = w.WriteRelatedBoundaryHeader(out); err != nil {
+			return err
+		}
+		_, err = fmt.Fprintf(out, "\r\n--%s\r\n", w.relatedBoundary)
+		if err != nil {
+			return err
+		}
+		if err = writeHTML(out, m.HTML); err != nil {
+			return err
+		}
+		for _, attachment := range inline {
+			_, err = fmt.Fprintf(out, "\r\n--%s\r\n", w.relatedBoundary)
+			if err != nil {
+				return err
+			}
+			if err = attachment.WriteInlineHeader(out, attachment.CanonicalContentID); err != nil {
+				return err
+			}
+			data, ok := w.cachedAttachmentContents[attachment.Hash]
+			if !ok {
+				return fmt.Errorf("attachment content not found: %s", attachment.Hash)
+			}
+			if _, err = io.Copy(out, bytes.NewReader(data)); err != nil {
+				return err
+			}
+		}
+		_, err = fmt.Fprintf(out, "\r\n--%s--\r\n", w.relatedBoundary)
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintf(out, "\r\n--%s--\r\n", w.textBoundary)
+		if err != nil {
+			return err
+		}
 	}
+
 	for _, attachment := range attachments {
 		_, err = fmt.Fprintf(out, "\r\n--%s\r\n", w.mixedBoundary)
 		if err != nil {
 			return err
 		}
-		cid := inlineReferences.MatchContentID(attachment.Hash)
-		if cid == "" {
-			if err = attachment.WriteHeader(out); err != nil {
-				return err
-			}
-		} else {
-			if err = attachment.WriteInlineHeader(out, cid); err != nil {
-				return err
-			}
+		if err = attachment.WriteHeader(out); err != nil {
+			return err
 		}
 		data, ok := w.cachedAttachmentContents[attachment.Hash]
 		if !ok {

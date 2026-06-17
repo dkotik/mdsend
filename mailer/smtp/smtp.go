@@ -58,7 +58,7 @@ func (c Configuration) withDefaults() (_ Configuration, err error) {
 	return c, nil
 }
 
-func New(config Configuration) (_ mdsend.Sender, err error) {
+func New(config Configuration) (_ mdsend.Mailer, err error) {
 	config, err = config.withDefaults()
 	if err != nil {
 		return nil, err
