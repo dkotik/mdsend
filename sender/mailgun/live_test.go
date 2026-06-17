@@ -59,7 +59,7 @@ func TestLiveSend(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	messageID, err := mg.Send(ctx, mdsend.Dispatch{
+	messageID, err := mg.Send(ctx, mdsend.Message{
 		LetterID: testLetterID,
 		From: mail.Address{
 			Name:    "Test Sender",

@@ -31,11 +31,11 @@ func (l Letter) GetMediaConstraints() (m MediaConstraints, err error) {
 	case nil:
 		return MediaConstraints{}, nil
 	case map[string]any:
-		m.Quality, err = getPercentageFromMap(media, FieldNameMediaQuality, 80)
+		m.Quality, err = getPercentageFromMap(media, FieldNameMediaConstraintsQuality, 80)
 		if err != nil {
 			return m, err
 		}
-		resolution, err := getIntFromMap(media, FieldNameMediaResolution, 1080)
+		resolution, err := getIntFromMap(media, FieldNameMediaConstrainsResolution, 1080)
 		if err != nil {
 			return m, err
 		}
@@ -46,11 +46,11 @@ func (l Letter) GetMediaConstraints() (m MediaConstraints, err error) {
 			return m, fmt.Errorf("resolution must be at most 7680")
 		}
 		m = m.WithResolution(resolution)
-		m.Width, err = getIntFromMap(media, FieldNameMediaWidth, m.Width)
+		m.Width, err = getIntFromMap(media, FieldNameMediaConstraintsWidth, m.Width)
 		if err != nil {
 			return m, err
 		}
-		m.Height, err = getIntFromMap(media, FieldNameMediaHeight, m.Height)
+		m.Height, err = getIntFromMap(media, FieldNameMediaConstrainsHeight, m.Height)
 		if err != nil {
 			return m, err
 		}

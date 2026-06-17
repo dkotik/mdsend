@@ -53,7 +53,7 @@ func TestSend(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	messageID, err := sender.Send(ctx, mdsend.Dispatch{
+	messageID, err := sender.Send(ctx, mdsend.Message{
 		ID:       "testMessage",
 		LetterID: testLetterID,
 		From: mail.Address{

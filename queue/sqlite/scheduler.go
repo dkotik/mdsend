@@ -35,20 +35,20 @@ func NewScheduler(q queue.Queue, m queue.Marshaler, topic string) queue.Schedule
 
 func (s scheduler) ScheduleForDelivery(
 	ctx context.Context,
-	dispatch []mdsend.Dispatch,
+	m []mdsend.Message,
 ) (err error) {
-	if len(dispatch) == 0 {
+	if len(m) == 0 {
 		return nil
 	}
-	forPublisher := make([]*message.Message, 0, len(dispatch))
-	ids := make([]string, 0, len(dispatch))
-	for _, d := range dispatch {
-		m, err := s.Marshaler.MarshalMessage(d)
+	forPublisher := make([]*message.Message, 0, len(m))
+	ids := make([]string, 0, len(m))
+	for _, d := range m {
+		wmm, err := s.Marshaler.MarshalMessage(d)
 		if err != nil {
 			return err
 		}
 		// m.SetContext(ctx)
-		forPublisher = append(forPublisher, m)
+		forPublisher = append(forPublisher, wmm)
 		ids = append(ids, d.ID)
 	}
 	forPublisher[0].SetContext(ctx)

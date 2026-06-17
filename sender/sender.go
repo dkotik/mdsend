@@ -12,6 +12,6 @@ func NewVoid() mdsend.Sender {
 	return void{}
 }
 
-func (v void) Send(ctx context.Context, msg mdsend.Dispatch) (string, error) {
+func (v void) Send(ctx context.Context, msg mdsend.Message) (string, error) {
 	return msg.ID, nil
 }

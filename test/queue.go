@@ -34,9 +34,9 @@ func Queue(q queue.Queue) func(*testing.T) {
 		SentAt:    internal.MockTime.Add(time.Hour * 170),
 	}
 
-	dispatches := []mdsend.Dispatch{
+	messages := []mdsend.Message{
 		{
-			ID:       "firstDispatch",
+			ID:       "firstMessage",
 			LetterID: l1.ID,
 			From:     mail.Address{},
 			To: mail.Address{
@@ -48,7 +48,7 @@ func Queue(q queue.Queue) func(*testing.T) {
 			HTML:    "first HTML",
 		},
 		{
-			ID:       "secondDispatch",
+			ID:       "secondMessage",
 			LetterID: l1.ID,
 			From:     mail.Address{},
 			To: mail.Address{
@@ -89,9 +89,9 @@ func Queue(q queue.Queue) func(*testing.T) {
 			}
 		}
 
-		for _, d := range dispatches {
-			if err = q.CreateDispatch(ctx, d); err != nil {
-				t.Fatal("unable to create dispatch:", err)
+		for _, d := range messages {
+			if err = q.CreateMessage(ctx, d); err != nil {
+				t.Fatal("unable to create message:", err)
 			}
 		}
 
@@ -106,7 +106,7 @@ func Queue(q queue.Queue) func(*testing.T) {
 				t.Fatal("There is still a letter left over:", l1)
 			}
 
-			t.Run("there are no dispatches left over", IteratorIsEmpty(q.ListDispatches(ctx, queue.ChildCursor{
+			t.Run("there are no messages left over", IteratorIsEmpty(q.ListMessages(ctx, queue.ChildCursor{
 				ParentID: l1.ID,
 				Cursor: queue.Cursor{
 					ItemID: "",
@@ -140,8 +140,8 @@ func Queue(q queue.Queue) func(*testing.T) {
 			)
 		}
 
-		l1dispatches := make([]mdsend.Dispatch, 0, 1)
-		for l1dispatch, err := range q.ListDispatches(ctx, queue.ChildCursor{
+		l1messages := make([]mdsend.Message, 0, 1)
+		for l1message, err := range q.ListMessages(ctx, queue.ChildCursor{
 			ParentID: l1.ID,
 			Cursor: queue.Cursor{
 				ItemID: "",
@@ -149,26 +149,26 @@ func Queue(q queue.Queue) func(*testing.T) {
 			},
 		}) {
 			if err != nil {
-				t.Fatal("unable to list dispatches for first letter:", err)
+				t.Fatal("unable to list messages for first letter:", err)
 			}
-			l1dispatches = append(l1dispatches, l1dispatch)
+			l1messages = append(l1messages, l1message)
 		}
-		if len(l1dispatches) != len(dispatches) {
-			t.Fatal("dispatch count mismatch: expected", len(dispatches), "got", len(l1dispatches))
+		if len(l1messages) != len(messages) {
+			t.Fatal("message count mismatch: expected", len(messages), "got", len(l1messages))
 		}
-		for i, d := range l1dispatches {
-			d.ID = dispatches[i].ID // copy the ID from the expected dispatch
-			t.Run(fmt.Sprintf("dispatch #%d is the same", i+1), MessagesAreEqual(d, dispatches[i]))
+		for i, d := range l1messages {
+			d.ID = messages[i].ID // copy the ID from the expected message
+			t.Run(fmt.Sprintf("message #%d is the same", i+1), MessagesAreEqual(d, messages[i]))
 			err := q.MarkMessagesAsQueued(ctx, d.ID)
 			if err != nil {
-				t.Fatalf("unable to complete dispatch %d: %v", i+1, err)
+				t.Fatalf("unable to complete message %d: %v", i+1, err)
 			}
 			ok, err := q.MarkMessageAsSent(ctx, d.ID)
 			if err != nil {
-				t.Fatalf("unable to complete dispatch %d: %v", i+1, err)
+				t.Fatalf("unable to complete message %d: %v", i+1, err)
 			}
 			if !ok {
-				t.Fatalf("dispatch %d was not marked as sent", i+1)
+				t.Fatalf("message %d was not marked as sent", i+1)
 			}
 		}
 
@@ -180,7 +180,7 @@ func Queue(q queue.Queue) func(*testing.T) {
 				t.Fatal("unable to delete the second letter:", err)
 			}
 
-			t.Run("there are no dispatches left over", IteratorIsEmpty(q.ListDispatches(ctx, queue.ChildCursor{
+			t.Run("there are no messages left over", IteratorIsEmpty(q.ListMessages(ctx, queue.ChildCursor{
 				ParentID: l2.ID,
 				Cursor: queue.Cursor{
 					ItemID: "",

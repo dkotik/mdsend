@@ -41,7 +41,7 @@ func NewWriter(attachments AttachmentRepository, entropy *rand.Rand) Writer {
 func (w Writer) Write(
 	ctx context.Context,
 	out io.Writer,
-	m mdsend.Dispatch,
+	m mdsend.Message,
 ) (err error) {
 	attachments, ok := w.cachedAttachments[m.LetterID]
 	if !ok {

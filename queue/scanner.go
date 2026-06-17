@@ -116,7 +116,7 @@ func (s *scanner) Scan(ctx context.Context) (err error) {
 
 			for {
 				batch := make([]string, 0, s.MessageCursor.Batch) // TODO: batch is negative!
-				messagePull, messageStop := iter.Pull2[mdsend.Dispatch, error](s.Queue.ListDispatches(ctx, s.MessageCursor))
+				messagePull, messageStop := iter.Pull2[mdsend.Message, error](s.Queue.ListMessages(ctx, s.MessageCursor))
 				for range s.MessageCursor.Batch {
 					message, err, ok := messagePull()
 					if err != nil {

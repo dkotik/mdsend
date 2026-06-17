@@ -24,7 +24,7 @@ func NewLogger(l *slog.Logger) func(mdsend.Sender) mdsend.Sender {
 	}
 }
 
-func (l logger) Send(ctx context.Context, msg mdsend.Dispatch) (id string, err error) {
+func (l logger) Send(ctx context.Context, msg mdsend.Message) (id string, err error) {
 	id, err = l.Sender.Send(ctx, msg)
 	if err == nil {
 		l.Logger.DebugContext(

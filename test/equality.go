@@ -71,7 +71,7 @@ func AttachmentsAreEqual(a, b mdsend.Attachment) func(*testing.T) {
 	}
 }
 
-func MessagesAreEqual(a, b mdsend.Dispatch) func(*testing.T) {
+func MessagesAreEqual(a, b mdsend.Message) func(*testing.T) {
 	return func(t *testing.T) {
 		if a.ID != b.ID {
 			t.Log("A:", a.ID)

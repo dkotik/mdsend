@@ -65,7 +65,7 @@ func TestQueue(t *testing.T) {
 	go func() {
 		<-time.After(time.Second / 4)
 		for range 10 {
-			if err := publisher.Publish(context.Background(), mdsend.Dispatch{
+			if err := publisher.Publish(context.Background(), mdsend.Message{
 				ID: watermill.NewUUID(),
 			}); err != nil {
 				panic(err)

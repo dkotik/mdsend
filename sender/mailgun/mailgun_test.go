@@ -82,7 +82,7 @@ func TestMailgunSender(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	messageID, err := mg.Send(t.Context(), mdsend.Dispatch{
+	messageID, err := mg.Send(t.Context(), mdsend.Message{
 		From: mail.Address{
 			Name:    "Test Sender",
 			Address: "test@test.com",

@@ -38,7 +38,7 @@ func TestLetterQueries(t *testing.T) {
 	}
 
 	messageID := "testMessageForMarkingAsSent"
-	if err = q.CreateDispatch(ctx, mdsend.Dispatch{
+	if err = q.CreateMessage(ctx, mdsend.Message{
 		ID:       messageID,
 		LetterID: letterID,
 		From:     mail.Address{},
@@ -65,7 +65,7 @@ func TestLetterQueries(t *testing.T) {
 		t.Fatal(err)
 	}
 	if q.DB.Changes() == 0 {
-		t.Error("expected dispatch to be marked as complete:", q.DB.Changes())
+		t.Error("expected message to be marked as complete:", q.DB.Changes())
 	}
 	ok, err = q.MarkLetterAsSent(ctx, letterID)
 	if err != nil {

@@ -15,9 +15,9 @@ import (
 	"zombiezen.com/go/sqlite"
 )
 
-func (q sqliteQueue) CreateDispatch(
+func (q sqliteQueue) CreateMessage(
 	ctx context.Context,
-	d mdsend.Dispatch,
+	d mdsend.Message,
 ) (err error) {
 	if err = q.stmtInsertMessage.Reset(); err != nil {
 		return err
@@ -43,18 +43,18 @@ func (q sqliteQueue) CreateDispatch(
 	case lib.SQLITE_OK:
 		return nil
 	case lib.SQLITE_CONSTRAINT_UNIQUE:
-		return mdsend.ErrDuplicateDispatch
+		return mdsend.ErrDuplicateMessage
 	default:
 		return err
 	}
 }
 
-func (q sqliteQueue) ListDispatches(ctx context.Context, cursor queue.ChildCursor) iter.Seq2[mdsend.Dispatch, error] {
-	return func(yield func(mdsend.Dispatch, error) bool) {
+func (q sqliteQueue) ListMessages(ctx context.Context, cursor queue.ChildCursor) iter.Seq2[mdsend.Message, error] {
+	return func(yield func(mdsend.Message, error) bool) {
 		defer q.BindContext(ctx)()
 		limit := cursor.Batch
-		var dispatch mdsend.Dispatch
-		dispatch.LetterID = cursor.ParentID
+		var m mdsend.Message
+		m.LetterID = cursor.ParentID
 
 		stmt := q.stmtLisMessagesForward
 		if limit < 0 {
@@ -65,7 +65,7 @@ func (q sqliteQueue) ListDispatches(ctx context.Context, cursor queue.ChildCurso
 		// nextPage:
 		err := stmt.Reset()
 		if err != nil {
-			yield(dispatch, err)
+			yield(m, err)
 			return
 		}
 
@@ -80,21 +80,21 @@ func (q sqliteQueue) ListDispatches(ctx context.Context, cursor queue.ChildCurso
 		for {
 			ok, err := stmt.Step()
 			if err != nil {
-				yield(dispatch, err)
+				yield(m, err)
 				return
 			}
 			if !ok {
-				if dispatch.ID != "" {
+				if m.ID != "" {
 					// could be more pages
 					if err = stmt.Reset(); err != nil {
-						yield(dispatch, err)
+						yield(m, err)
 						return
 					}
 					stmt.BindText(1, cursor.ParentID)
-					stmt.BindText(2, dispatch.ID)
+					stmt.BindText(2, m.ID)
 					stmt.BindInt64(3, limit)
 					// prevent infinite loop
-					dispatch.ID = ""
+					m.ID = ""
 					// goto nextPage
 					continue
 					// return
@@ -102,47 +102,47 @@ func (q sqliteQueue) ListDispatches(ctx context.Context, cursor queue.ChildCurso
 				return
 			}
 
-			dispatch.ID = stmt.ColumnText(0)
+			m.ID = stmt.ColumnText(0)
 			var headers []mdsend.Header
 			if err := json.NewDecoder(stmt.ColumnReader(1)).Decode(&headers); err != nil {
-				yield(dispatch, fmt.Errorf("unable to decode headers: %w", err))
+				yield(m, fmt.Errorf("unable to decode headers: %w", err))
 				return
 			}
-			dispatch.Headers = headers
-			dispatch.From = mail.Address{
+			m.Headers = headers
+			m.From = mail.Address{
 				Name:    stmt.ColumnText(2),
 				Address: stmt.ColumnText(3),
 			}
-			dispatch.To = mail.Address{
+			m.To = mail.Address{
 				Name:    stmt.ColumnText(4),
 				Address: stmt.ColumnText(5),
 			}
-			dispatch.Subject = stmt.ColumnText(6)
-			dispatch.Text = stmt.ColumnText(7)
-			dispatch.HTML = stmt.ColumnText(8)
+			m.Subject = stmt.ColumnText(6)
+			m.Text = stmt.ColumnText(7)
+			m.HTML = stmt.ColumnText(8)
 
 			if !stmt.ColumnIsNull(9) {
-				dispatch.ScheduleAfter, err = decodeTime(stmt.ColumnText(9))
+				m.ScheduleAfter, err = decodeTime(stmt.ColumnText(9))
 				if err != nil {
-					yield(dispatch, err)
+					yield(m, err)
 					return
 				}
 			}
 			if !stmt.ColumnIsNull(10) {
-				dispatch.ScheduledAt, err = decodeTime(stmt.ColumnText(10))
+				m.ScheduledAt, err = decodeTime(stmt.ColumnText(10))
 				if err != nil {
-					yield(dispatch, err)
+					yield(m, err)
 					return
 				}
 			}
 			if !stmt.ColumnIsNull(11) {
-				dispatch.SentAt, err = decodeTime(stmt.ColumnText(11))
+				m.SentAt, err = decodeTime(stmt.ColumnText(11))
 				if err != nil {
-					yield(dispatch, err)
+					yield(m, err)
 					return
 				}
 			}
-			if !yield(dispatch, nil) {
+			if !yield(m, nil) {
 				return
 			}
 		}

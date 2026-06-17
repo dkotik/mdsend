@@ -32,7 +32,7 @@ func QueueRecognizesDuplicates(q queue.Queue) func(*testing.T) {
 			}
 		}()
 
-		d := mdsend.Dispatch{
+		d := mdsend.Message{
 			LetterID: "testLetter",
 			From:     mail.Address{},
 			To: mail.Address{
@@ -43,11 +43,11 @@ func QueueRecognizesDuplicates(q queue.Queue) func(*testing.T) {
 			Text:    "",
 			HTML:    "",
 		}
-		if err := q.CreateDispatch(ctx, d); err != nil {
+		if err := q.CreateMessage(ctx, d); err != nil {
 			t.Fatal(err)
 		}
-		if err := q.CreateDispatch(ctx, d); !errors.Is(err, mdsend.ErrDuplicateDispatch) {
-			t.Fatalf("expected duplicate dispatch error, got: %v", err)
+		if err := q.CreateMessage(ctx, d); !errors.Is(err, mdsend.ErrDuplicateMessage) {
+			t.Fatalf("expected duplicate message error, got: %v", err)
 		}
 
 		a := mdsend.Attachment{

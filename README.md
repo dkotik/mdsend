@@ -1,8 +1,9 @@
 # Mdsend
 
-Project status: active development towads beta.
 
-> Send markdown files as MIME-encoded electronic mail.
+Send markdown files as electronic mail with flexible and durable scheduling.
+
+**Project status: active development towads beta.**
 
 ## Installation
 
@@ -23,24 +24,12 @@ Project status: active development towads beta.
 subject: "Test Email"
 from: "Test Account <test@gmail.com>"
 to: "Test Account <test@gmail.com>"
-to: "./localfile.yaml|toml|json|csv|txt"
 ---
 
 # Title
 
 Message body.
 ```
-
-EmailSend(file.md, templating engine, provider engine)
-
-## Delivery Locking
-
-## Distributors
-
-- [x] Mailgun
-- [ ] Resend
-- [ ] Loops
-- [ ] https://purelymail.com/
 
 ## Development Roadmap
 
@@ -59,25 +48,20 @@ EmailSend(file.md, templating engine, provider engine)
 - support Cuelang! https://github.com/cuelang/cue
 - add to https://github.com/rothgar/awesome-tuis and bubbletea list of apps
 - https://mailtrap.io/
-- SendGrid
-- Amazon SES
-- Postmark
-- Sparkpost
-- Brevo
-- SendGrid
-- Mailchimp
-- Resend
-- HubSpot
-- Loops
-- https://emaillabs.io/en/product/
-
-```
-// multipart/mixed
-// |- multipart/alternative
-// | |- text/plain
-// | `- multipart/related // | |- text/html // |`- image/png
-// `- attachments..
-```
+- [x] Mailgun
+- [ ] Resend
+- [ ] Loops
+- [ ] https://purelymail.com/
+- [ ] SendGrid
+- [ ] Amazon SES
+- [ ] Postmark
+- [ ] Sparkpost
+- [ ] Brevo
+- [ ] SendGrid
+- [ ] Mailchimp
+- [ ] HubSpot
+- [ ] Twilio
+- [ ] https://emaillabs.io/en/product/
 
 ## Tools
 

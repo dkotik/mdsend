@@ -26,7 +26,7 @@ func NewDelay(d time.Duration) func(mdsend.Sender) mdsend.Sender {
 		}
 	}
 }
-func (d delay) Send(ctx context.Context, msg mdsend.Dispatch) (string, error) {
+func (d delay) Send(ctx context.Context, msg mdsend.Message) (string, error) {
 	select {
 	case <-time.After(d.Duration):
 		return d.Sender.Send(ctx, msg)

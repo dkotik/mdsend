@@ -27,7 +27,7 @@ func TestSemaphore(t *testing.T) {
 	for range 15 {
 		wg.Add(1)
 		go func() {
-			_, _ = s.Send(ctx, mdsend.Dispatch{})
+			_, _ = s.Send(ctx, mdsend.Message{})
 			wg.Done()
 		}()
 	}

@@ -49,13 +49,13 @@ type Queue interface {
 	DeleteLetter(context.Context, string) error
 
 	CreateAttachment(context.Context, mdsend.Attachment) error
-	CreateDispatch(context.Context, mdsend.Dispatch) error
+	CreateMessage(context.Context, mdsend.Message) error
 	MarkMessagesAsQueued(context.Context, ...string) error
 	MarkMessageAsSent(context.Context, string) (bool, error)
 	// RetrieveAttachmentContents(context.Context, string) ([]byte, error)
 
 	ListLetters(context.Context, Cursor) iter.Seq2[mdsend.Letter, error]
-	ListDispatches(context.Context, ChildCursor) iter.Seq2[mdsend.Dispatch, error]
+	ListMessages(context.Context, ChildCursor) iter.Seq2[mdsend.Message, error]
 	ListAttachments(context.Context, string) iter.Seq2[mdsend.Attachment, error]
 
 	BeginTransaction(context.Context) (Queue, Transaction, error)
@@ -67,7 +67,7 @@ func NewSender(s mdsend.Sender) message.HandlerFunc {
 		panic("sender is nil")
 	}
 	return func(msg *message.Message) (_ []*message.Message, err error) {
-		var m mdsend.Dispatch
+		var m mdsend.Message
 		if err = json.Unmarshal(msg.Payload, &m); err != nil {
 			return nil, fmt.Errorf("invalid JSON payload: %w", err)
 		}

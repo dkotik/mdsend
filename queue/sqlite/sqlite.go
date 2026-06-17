@@ -28,7 +28,7 @@ type sqliteQueue struct {
 	stmtMarkLetterAsSent        *sqlite.Stmt
 	stmtDeleteLetter            *sqlite.Stmt
 	stmtDeleteLetterAttachments *sqlite.Stmt
-	stmtDeleteLetterDispatches  *sqlite.Stmt
+	stmtDeleteLetterMessages    *sqlite.Stmt
 	stmtListLettersForward      *sqlite.Stmt
 	stmtListLettersBackward     *sqlite.Stmt
 	stmtListAttachments         *sqlite.Stmt
@@ -132,7 +132,7 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 		return nil, fmt.Errorf("unable to prepare insert letter statement: %w", err)
 	}
 	if q.stmtInsertMessage, err = conn.Prepare(`INSERT INTO ` + messagesTable + ` (id, letter_id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`); err != nil {
-		return nil, fmt.Errorf("unable to prepare insert dispatch statement: %w", err)
+		return nil, fmt.Errorf("unable to prepare insert message statement: %w", err)
 	}
 	if q.stmtInsertAttachment, err = q.DB.Prepare(`INSERT INTO ` + attachmentsTable + ` (id, letter_id, name, content_hash, content_id, content_type, content) VALUES (?, ?, ?, ?, ?, ?, ?)`); err != nil {
 		return nil, fmt.Errorf("unable to prepare insert attachment statement: %w", err)
@@ -143,7 +143,7 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 	if q.stmtUpdateLetter, err = conn.Prepare(`UPDATE ` + lettersTable + ` SET frontmatter=?, content=?, sent_at=? WHERE id=?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare update letter statement: %w", err)
 	}
-	// AND sent_at IS NULL AND NOT EXISTS (SELECT 1 FROM ` + dispatchesTable + ` WHERE sent_at IS NULL AND letter_id=?)
+	// AND sent_at IS NULL AND NOT EXISTS (SELECT 1 FROM ` + messagesTable + ` WHERE sent_at IS NULL AND letter_id=?)
 	if q.stmtMarkLetterAsSent, err = conn.Prepare(`UPDATE ` + lettersTable + ` SET sent_at=?  WHERE id=? AND sent_at IS NULL AND NOT EXISTS (SELECT 1 FROM ` + messagesTable + ` WHERE letter_id=? AND sent_at IS NULL)`); err != nil {
 		return nil, fmt.Errorf("unable to prepare mark letter as sent statement: %w", err)
 	}
@@ -153,8 +153,8 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 	if q.stmtDeleteLetterAttachments, err = conn.Prepare(`DELETE FROM ` + attachmentsTable + ` WHERE letter_id=?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare delete letter attachments statement: %w", err)
 	}
-	if q.stmtDeleteLetterDispatches, err = conn.Prepare(`DELETE FROM ` + messagesTable + ` WHERE letter_id=?`); err != nil {
-		return nil, fmt.Errorf("unable to prepare delete letter dispatches statement: %w", err)
+	if q.stmtDeleteLetterMessages, err = conn.Prepare(`DELETE FROM ` + messagesTable + ` WHERE letter_id=?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare delete letter messages statement: %w", err)
 	}
 
 	if q.stmtListLettersForward, err = conn.Prepare(`SELECT id, frontmatter, content, created_at, sent_at FROM ` + lettersTable + ` WHERE id>? LIMIT ?`); err != nil {
@@ -167,10 +167,10 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 		return nil, fmt.Errorf("unable to prepare list attachments statement: %w", err)
 	}
 	if q.stmtLisMessagesForward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id>? LIMIT ?`); err != nil {
-		return nil, fmt.Errorf("unable to prepare list dispatches statement: %w", err)
+		return nil, fmt.Errorf("unable to prepare list messages statement: %w", err)
 	}
 	if q.stmtListMessagesBackward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id<? ORDER BY id DESC LIMIT ?`); err != nil {
-		return nil, fmt.Errorf("unable to prepare list dispatches statement: %w", err)
+		return nil, fmt.Errorf("unable to prepare list messages statement: %w", err)
 	}
 	if q.stmtMarkMessagesAsQueued, err = conn.Prepare(`UPDATE ` + messagesTable + ` SET queued_at=? WHERE id IN (SELECT value FROM json_each(?))`); err != nil {
 		// TODO: is below suffix needed?
@@ -178,7 +178,7 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 		return nil, fmt.Errorf("unable to prepare mark message as queued statement: %w", err)
 	}
 	if q.stmtMarkMessageAsSent, err = conn.Prepare(`UPDATE ` + messagesTable + ` SET sent_at=? WHERE id=? AND sent_at IS NULL`); err != nil {
-		return nil, fmt.Errorf("unable to prepare complete dispatch statement: %w", err)
+		return nil, fmt.Errorf("unable to prepare complete message statement: %w", err)
 	}
 
 	return q, nil

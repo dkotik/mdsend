@@ -10,7 +10,7 @@ import (
 	"zombiezen.com/go/sqlite"
 )
 
-func TestDispatchQueries(t *testing.T) {
+func TestMessageQueries(t *testing.T) {
 	conn, err := sqlite.OpenConn("file::memory:?cache=shared&?_foreign_keys=true")
 	if err != nil {
 		t.Fatal("unable to open SQLite3 connection:", err)
@@ -39,7 +39,7 @@ func TestDispatchQueries(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err = q.CreateDispatch(ctx, mdsend.Dispatch{
+	if err = q.CreateMessage(ctx, mdsend.Message{
 		ID:       ulid.Make().String(),
 		LetterID: letterID,
 		From:     mail.Address{},
@@ -54,7 +54,7 @@ func TestDispatchQueries(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err = q.CreateDispatch(ctx, mdsend.Dispatch{
+	if err = q.CreateMessage(ctx, mdsend.Message{
 		ID:       ulid.Make().String(),
 		LetterID: letterID,
 		From:     mail.Address{},
@@ -69,8 +69,8 @@ func TestDispatchQueries(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	dispatches := make([]mdsend.Dispatch, 0, 2)
-	for d, err := range q.ListDispatches(ctx, queue.ChildCursor{
+	messages := make([]mdsend.Message, 0, 2)
+	for d, err := range q.ListMessages(ctx, queue.ChildCursor{
 		ParentID: letterID,
 		Cursor: queue.Cursor{
 			ItemID: "",
@@ -80,9 +80,9 @@ func TestDispatchQueries(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		dispatches = append(dispatches, d)
+		messages = append(messages, d)
 	}
-	if len(dispatches) != 2 {
-		t.Fatal("expected 2 messages, got", len(dispatches))
+	if len(messages) != 2 {
+		t.Fatal("expected 2 messages, got", len(messages))
 	}
 }

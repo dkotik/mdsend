@@ -23,10 +23,10 @@ func NewSemaphore(available ...mdsend.Sender) mdsend.Sender {
 	return s
 }
 
-func (s semaphore) Send(ctx context.Context, dispatch mdsend.Dispatch) (string, error) {
+func (s semaphore) Send(ctx context.Context, m mdsend.Message) (string, error) {
 	sender := <-s.available
 	defer func() {
 		s.available <- sender
 	}()
-	return sender.Send(ctx, dispatch)
+	return sender.Send(ctx, m)
 }

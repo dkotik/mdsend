@@ -27,7 +27,7 @@ func NewTimeout(d time.Duration) func(mdsend.Sender) mdsend.Sender {
 	}
 }
 
-func (t timeout) Send(ctx context.Context, m mdsend.Dispatch) (string, error) {
+func (t timeout) Send(ctx context.Context, m mdsend.Message) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, t.Limit)
 	defer cancel()
 	return t.Sender.Send(ctx, m)

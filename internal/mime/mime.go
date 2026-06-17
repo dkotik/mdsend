@@ -1,5 +1,31 @@
 /*
 Package mime encodes electronic mail parts for delivery.
+
+The message may be encoded as either mixed or related, depending
+on the presence of inline attachments:
+
+	multipart/related
+		|- multipart/alternative
+		| |- text/plain
+		| `- text/html
+		|- attachments...
+		`- inline_attachments...
+
+This approach may not work in older clients, like Apple Mail.
+
+A better way to structure the multipart MIME message is by
+subordinating the inline attachments to the alternative related part.
+
+	multipart/mixed
+	|- multipart/alternative
+	|  |- text/plain
+	|  `- multipart/related
+	|     |- text/html
+	|     `- inline_attachments...
+	`- attachments...
+
+Inline images can be encoded into the HTML image tag as base64 encoded data. However, Outlook completely blocks such images. Therefore, this
+package always encodes inline images as attachments and references them via a content ID in the HTML image source attribute.
 */
 package mime
 

@@ -60,7 +60,7 @@ func TestProgressTracker(t *testing.T) {
 	}
 
 	for i := range 1000 {
-		if err = q.CreateDispatch(ctx, mdsend.Dispatch{
+		if err = q.CreateMessage(ctx, mdsend.Message{
 			ID: fmt.Sprintf("message_%d", i),
 			To: mail.Address{
 				Name:    "Recipient",

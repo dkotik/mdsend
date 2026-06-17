@@ -11,7 +11,7 @@ import (
 
 func (s mailgunSender) prepareMessage(
 	ctx context.Context,
-	d mdsend.Dispatch,
+	d mdsend.Message,
 ) (_ *mailgun.Message, err error) {
 	if err = mime.NewWriter(s.Queue, nil).Write(ctx, s.Buffer, d); err != nil {
 		return nil, err

@@ -72,7 +72,7 @@ type mailgunSender struct {
 }
 
 // Send queues one message to one recipient.
-func (s mailgunSender) Send(ctx context.Context, d mdsend.Dispatch) (_ string, err error) {
+func (s mailgunSender) Send(ctx context.Context, d mdsend.Message) (_ string, err error) {
 	// first returned value is human readable status, second is message ID
 	msg, err := s.prepareMessage(ctx, d)
 	if err != nil {
@@ -94,7 +94,7 @@ type mailgunTestSender struct {
 	mailgunSender
 }
 
-func (s mailgunTestSender) Send(ctx context.Context, d mdsend.Dispatch) (_ string, err error) {
+func (s mailgunTestSender) Send(ctx context.Context, d mdsend.Message) (_ string, err error) {
 	message, err := s.prepareMessage(ctx, d)
 	defer s.Buffer.Reset()
 	if err != nil {

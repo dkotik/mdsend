@@ -158,13 +158,13 @@ func (q sqliteQueue) DeleteLetter(ctx context.Context, ID string) (err error) {
 		}
 	}
 
-	if err = q.stmtDeleteLetterDispatches.Reset(); err != nil {
+	if err = q.stmtDeleteLetterMessages.Reset(); err != nil {
 		return err
 	}
-	q.stmtDeleteLetterDispatches.BindText(1, ID)
+	q.stmtDeleteLetterMessages.BindText(1, ID)
 
 	for {
-		ok, err := q.stmtDeleteLetterDispatches.Step()
+		ok, err := q.stmtDeleteLetterMessages.Step()
 		if err != nil {
 			return err
 		}

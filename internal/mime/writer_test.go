@@ -15,7 +15,7 @@ var entropy = rand.New(rand.NewPCG(0, 0))
 
 func TestPlainMessageEncoding(t *testing.T) {
 	b := &bytes.Buffer{}
-	err := NewWriter(newMockAttachmentRepository(), entropy).Write(t.Context(), b, mdsend.Dispatch{
+	err := NewWriter(newMockAttachmentRepository(), entropy).Write(t.Context(), b, mdsend.Message{
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},
 		To:      mail.Address{Name: "Recipient", Address: "recipient@example.com"},
 		Subject: "Test Subject",
@@ -36,7 +36,7 @@ func TestPlainMixedMessageEncoding(t *testing.T) {
 			ContentType: "text/plain",
 			Content:     []byte("plain"),
 		},
-	), entropy).Write(t.Context(), b, mdsend.Dispatch{
+	), entropy).Write(t.Context(), b, mdsend.Message{
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},
 		To:      mail.Address{Name: "Recipient", Address: "recipient@example.com"},
 		Subject: "Test Subject",
@@ -50,7 +50,7 @@ func TestPlainMixedMessageEncoding(t *testing.T) {
 
 func TestAlternativeMessageEncoding(t *testing.T) {
 	b := &bytes.Buffer{}
-	err := NewWriter(newMockAttachmentRepository(), entropy).Write(t.Context(), b, mdsend.Dispatch{
+	err := NewWriter(newMockAttachmentRepository(), entropy).Write(t.Context(), b, mdsend.Message{
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},
 		To:      mail.Address{Name: "Recipient", Address: "recipient@example.com"},
 		Subject: "😁 Test Subject",
@@ -84,7 +84,7 @@ func TestMixedMessageEncoding(t *testing.T) {
 			ContentType: ContentTypeImageJPEG,
 			Content:     internal.Chamillion,
 		},
-	), entropy).Write(t.Context(), b, mdsend.Dispatch{
+	), entropy).Write(t.Context(), b, mdsend.Message{
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},
 		To:      mail.Address{Name: "Recipient", Address: "recipient@example.com"},
 		Subject: "😁 Test Subject",
@@ -118,7 +118,7 @@ func TestRelatedMessageEncoding(t *testing.T) {
 			ContentType: ContentTypeImageJPEG,
 			Content:     internal.Chamillion,
 		},
-	), entropy).Write(t.Context(), b, mdsend.Dispatch{
+	), entropy).Write(t.Context(), b, mdsend.Message{
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},
 		To:      mail.Address{Name: "Recipient", Address: "recipient@example.com"},
 		Subject: "😁 Test Subject",

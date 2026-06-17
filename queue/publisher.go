@@ -11,7 +11,7 @@ import (
 )
 
 type Publisher interface {
-	Publish(context.Context, mdsend.Dispatch) error
+	Publish(context.Context, mdsend.Message) error
 }
 
 type roundRobinPublisher struct {
@@ -43,18 +43,18 @@ func NewRoundRobinPublisher(publisher message.Publisher, prefix string, count ui
 	}
 }
 
-func (p roundRobinPublisher) Publish(ctx context.Context, dispatch mdsend.Dispatch) (err error) {
+func (p roundRobinPublisher) Publish(ctx context.Context, m mdsend.Message) (err error) {
 	p.Buffer.Reset()
-	if err = json.NewEncoder(p.Buffer).Encode(dispatch); err != nil {
+	if err = json.NewEncoder(p.Buffer).Encode(m); err != nil {
 		return fmt.Errorf("failed to encode message to JSON: %w", err)
 	}
 	topic := p.Topics[p.Current]
 	p.Current = (p.Current + 1) % len(p.Topics)
 
-	m := message.NewMessage(dispatch.ID, p.Buffer.Bytes())
-	m.SetContext(ctx)
+	wmm := message.NewMessage(m.ID, p.Buffer.Bytes())
+	wmm.SetContext(ctx)
 	return p.Publisher.Publish(
 		topic,
-		m,
+		wmm,
 	)
 }

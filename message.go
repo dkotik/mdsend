@@ -2,7 +2,6 @@ package mdsend
 
 import (
 	"fmt"
-	"io"
 	"net/mail"
 	"net/textproto"
 	"sort"
@@ -10,20 +9,20 @@ import (
 	"time"
 )
 
-type DispatchError uint8
+type MessageError uint8
 
 const (
-	ErrInvalidDispatch DispatchError = iota
-	ErrDuplicateDispatch
+	ErrInvalidMessage MessageError = iota
+	ErrDuplicateMessage
 	ErrMessageNotFound
 )
 
-func (err DispatchError) Error() string {
+func (err MessageError) Error() string {
 	switch err {
-	case ErrInvalidDispatch:
-		return "invalid dispatch"
-	case ErrDuplicateDispatch:
-		return "duplicate dispatch"
+	case ErrInvalidMessage:
+		return "invalid message"
+	case ErrDuplicateMessage:
+		return "duplicate message"
 	case ErrMessageNotFound:
 		return "message not found"
 	default:
@@ -67,8 +66,8 @@ func MergeHeaders(ms ...map[string]any) (result []Header) {
 	return
 }
 
-// Dispatch is an intent to delivery a copy of a letter to a particular recipient.
-type Dispatch struct {
+// Message is an intent to delivery a copy of a letter to a particular recipient.
+type Message struct {
 	ID            string
 	LetterID      string
 	Headers       []Header
@@ -80,13 +79,4 @@ type Dispatch struct {
 	ScheduleAfter time.Time
 	ScheduledAt   time.Time
 	SentAt        time.Time
-}
-
-// DEPRECATED: use Dispatch instead
-type Message interface {
-	To() []string
-	CC() []string
-	BCC() []string
-	Subject() string
-	MIMEBody() io.ReadCloser
 }
