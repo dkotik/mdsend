@@ -73,6 +73,9 @@ func (l Letter) GetSubject() (string, error) {
 	}
 }
 
+// GetFrom returns the [FieldNameFrom] address from the frontmatter.
+// There must be only one valid address. Mutliple from addresses
+// can disrupt delivery.
 func (l Letter) GetFrom() (mail.Address, error) {
 	switch from := l.Frontmatter[FieldNameFrom].(type) {
 	case map[string]any:
@@ -104,23 +107,4 @@ func (l Letter) GetSendAfter() (time.Time, error) {
 	default:
 		return time.Time{}, fmt.Errorf("invalid send after format: %T", sendAfter)
 	}
-}
-
-func (l Letter) Validate() (err error) {
-	// if l.ID == "" {
-	// 	return errors.New("letter has no ID")
-	// }
-	if strings.TrimSpace(l.Content) == "" {
-		return ErrNoContent
-	}
-	if _, err = l.GetSubject(); err != nil {
-		return err
-	}
-	if _, err = l.GetFrom(); err != nil {
-		return err
-	}
-	if _, err = l.GetSchedule(); err != nil {
-		return err
-	}
-	return nil
 }

@@ -26,6 +26,7 @@ func main() {
 				Aliases: []string{`q`},
 				Flags: []cli.Flag{
 					flagDatabase,
+					verboseFlag,
 				},
 			},
 			{
@@ -34,6 +35,7 @@ func main() {
 				Aliases: []string{`s`},
 				Flags: []cli.Flag{
 					flagDatabase,
+					verboseFlag,
 					&cli.DurationFlag{
 						Name:    `delay`,
 						Aliases: []string{"d"},
@@ -67,6 +69,11 @@ func main() {
 				Aliases: []string{`t`},
 				Flags: []cli.Flag{
 					flagDatabase,
+					verboseFlag,
+				},
+				Action: func(ctx context.Context, c *cli.Command) error {
+
+					return nil
 				},
 			},
 		},

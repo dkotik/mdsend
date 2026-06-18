@@ -34,20 +34,14 @@ Message body.
 ## Development Roadmap
 
 - [ ] Anticipate circular imports for recipient lists.
-- [ ] Bump `github.com/pelletier/go-toml` to v2.
 - [ ] Text-part writer should minify html! minified html will have <img src=url> without quotes! (change inline detector)
 - [ ] Should write a better markdown renderer that recognizes single-line youtube and image paragraphs, centers them.
-- [ ] Email validation: <https://github.com/reacherhq/check-if-email-exists>.
 - [ ] https://github.com/charmbracelet/glamour
 - [ ] Beautify the default template. Add `dark.html` one.
-- [ ] --log param
-* Ensure that "From" is set up correctly with just one email address - MG queues it with 2 and never delivers! MG sux, write AWS SNS queue driver?
-* // TODO: look into https://github.com/modoboa/modoboa server.
 * Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
 * alternative API: https://docs.sendwithses.com/ - add it as a driver to "providers"
 - support Cuelang! https://github.com/cuelang/cue
-- add to https://github.com/rothgar/awesome-tuis and bubbletea list of apps
-- https://mailtrap.io/
+- [ ] <https://mailtrap.io/>
 - [x] Mailgun
 - [ ] Resend
 - [ ] Loops
@@ -61,7 +55,8 @@ Message body.
 - [ ] Mailchimp
 - [ ] HubSpot
 - [ ] Twilio
-- [ ] https://emaillabs.io/en/product/
+- [ ] <https://emaillabs.io/en/product/>
+- [ ] add to https://github.com/rothgar/awesome-tuis and bubbletea list of apps
 
 ## Tools
 
@@ -71,9 +66,19 @@ Message body.
 Standard U.S. (#10 envelope 4 1/8in. by 9 1/2in.) or European standard C4 (229mm by 324mm) template, depending on your envelope printer setting. There is also DL envelope 110mm x 220mm.
 
 - <https://www.caniemail.com/> - check what is template-appropriate
-- <https://github.com/AfterShip/email-verifier>
 - <https://www.htmlemailcheck.com/check/>
 - Use <https://www.mail-tester.com/> to check the deliverability of your mail.
+- Address verification:
+  - <https://github.com/AfterShip/email-verifier>
+  - <https://github.com/reacherhq/check-if-email-exists>
+  - <https://hunter.io>
+  - <https://verify-email.org>
+  - <https://email-checker.net>
+  - <https://github.com/mailcheck/mailcheck>
+  - <https://github.com/ivolo/disposable-email-domains>
+  - <https://github.com/willwhite/freemail>
+- Hosting:
+  - <https://github.com/modoboa/modoboa>
 
 ## Similar Projects
 

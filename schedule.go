@@ -2,6 +2,7 @@ package mdsend
 
 import (
 	"fmt"
+	"iter"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -12,25 +13,35 @@ type Schedule struct {
 	After     time.Time     `json:"after"`
 	Delay     time.Duration `json:"delay"`
 	Step      time.Duration `json:"step"`
-	Expire    time.Duration `json:"expire"`
 	Fluctuate time.Duration `json:"fluctuate"`
+	Expire    time.Duration `json:"expire"`
 }
 
-func (s Schedule) Next() (time.Time, Schedule) {
-	next := s.After
-	if next.IsZero() {
-		next = time.Now()
+func fluctuateDuration(d time.Duration) time.Duration {
+	if d == 0 {
+		return 0
 	}
-	if s.Delay != 0 {
-		next = next.Add(s.Delay)
-		s.Delay = 0
+	return time.Duration(rand.NormFloat64() * float64(d))
+}
+
+func (s Schedule) Each() iter.Seq[time.Time] {
+	return func(yield func(time.Time) bool) {
+		if s.After.IsZero() {
+			s.After = time.Now()
+		}
+		next := s.After.Add(s.Delay)
+		fluctuate := s.Fluctuate
+		if !yield(next.Add(fluctuateDuration(fluctuate))) {
+			return
+		}
+		step := s.Step
+		for {
+			next = next.Add(step)
+			if !yield(next.Add(fluctuateDuration(fluctuate))) {
+				return
+			}
+		}
 	}
-	s.After = next.Add(s.Step)
-	if s.Fluctuate != 0 {
-		noise := rand.NormFloat64() * float64(s.Fluctuate)
-		next = next.Add(time.Duration(noise))
-	}
-	return next, s
 }
 
 func (l Letter) GetSchedule() (s Schedule, err error) {

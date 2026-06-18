@@ -17,7 +17,7 @@ require (
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/oklog/ulid/v2 v2.1.1
-	github.com/pelletier/go-toml v1.2.0
+	github.com/pelletier/go-toml/v2 v2.4.0
 	github.com/sebdah/goldie/v2 v2.8.0
 	github.com/urfave/cli/v3 v3.10.0
 	github.com/yuin/goldmark v1.4.5
