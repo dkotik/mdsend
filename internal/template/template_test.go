@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/dkotik/mdsend/loader"
 	"github.com/dkotik/mdsend/markdown"
 )
 
 func TestTemplateRendering(t *testing.T) {
-	m, err := markdown.NewMessage("../testdata/pass/a.md")
+	m, err := loader.NewMessage("../testdata/pass/a.md")
 	if err != nil {
 		t.Fatal(err)
 	}

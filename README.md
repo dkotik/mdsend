@@ -1,20 +1,25 @@
 # Mdsend
 
-
-Send markdown files as electronic mail with flexible and durable scheduling.
+Send markdown files as mail.
 
 **Project status: active development towads beta.**
 
+## Features
+
+- **Durable:** mail queues are fault tolerant and atomic, brokered by <Watermill.io> over SQLite3.
+- **Flexible:** select the mailer backend based on highest deliverability. Swap it out later without changing anything in your letters or templates.
+- **Portable:** runs on many kinds of systems. Will include an embeddable HTTP service and Posgres support in the future.
+
 ## Installation
 
-- Go:
-  ```sh
-  go install github.com/dkotik/mdsend@latest
-  ```
 - MacOS:
   ```sh
   brew tap dkotik/tap
   brew install mdsend
+  ```
+- Build from source:
+  ```sh
+  go install github.com/dkotik/mdsend@latest
   ```
 
 ## Example
@@ -38,10 +43,12 @@ Message body.
 - [ ] Should write a better markdown renderer that recognizes single-line youtube and image paragraphs, centers them.
 - [ ] https://github.com/charmbracelet/glamour
 - [ ] Beautify the default template. Add `dark.html` one.
-* Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
-* alternative API: https://docs.sendwithses.com/ - add it as a driver to "providers"
-- support Cuelang! https://github.com/cuelang/cue
-- [ ] <https://mailtrap.io/>
+- [ ] Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
+- [ ] alternative API: https://docs.sendwithses.com/ - add it as a driver to "providers"
+- [ ] support Cuelang! https://github.com/cuelang/cue
+- [ ] Snailmail support:
+  - [ ] Markdown to PDF rendering.
+  - [ ] Envelope face PDF generation.
 - [x] Mailgun
 - [ ] Resend
 - [ ] Loops
@@ -56,14 +63,13 @@ Message body.
 - [ ] HubSpot
 - [ ] Twilio
 - [ ] <https://emaillabs.io/en/product/>
+- [ ] <https://mailtrap.io/>
 - [ ] add to https://github.com/rothgar/awesome-tuis and bubbletea list of apps
 
 ## Tools
 
 * OBEY THE LAW. The CAN-SPAM act became law on Jan. 1, 2004. It says there many things you must do as a commercial email-er. Highlights are basically don't be deceptive, and that you MUST include a physical mailing address as well as a working unsubscribe link.
 * unsubscribe button: https://blog.leavemealone.app/how-does-the-gmail-unsubscribe-button-work/
-
-Standard U.S. (#10 envelope 4 1/8in. by 9 1/2in.) or European standard C4 (229mm by 324mm) template, depending on your envelope printer setting. There is also DL envelope 110mm x 220mm.
 
 - <https://www.caniemail.com/> - check what is template-appropriate
 - <https://www.htmlemailcheck.com/check/>

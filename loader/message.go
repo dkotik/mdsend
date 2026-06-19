@@ -1,4 +1,4 @@
-package markdown
+package loader
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 
 	"github.com/btcsuite/btcd/btcutil/base58"
 	"github.com/cespare/xxhash/v2"
+	"github.com/dkotik/mdsend/markdown"
 	"github.com/pelletier/go-toml/v2"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/text"
@@ -84,7 +85,7 @@ func NewMessage(p string) (m Message, err error) {
 	}
 
 	ast.Walk(
-		New().Parser().Parse(text.NewReader(content)),
+		markdown.New().Parser().Parse(text.NewReader(content)),
 		ast.Walker(func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 			if entering {
 				if n, ok := n.(*ast.Image); ok {

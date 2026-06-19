@@ -7,21 +7,21 @@ type Unsubscribe struct {
 	URL string
 }
 
+func (l Letter) GetListID() (listID string, err error) {
+	listID, _ = l.Frontmatter[FieldNameListID].(string)
+	return listID, nil
+}
+
 func (l Letter) GetUnsubscribe() (u Unsubscribe, err error) {
-	// switch from := l.Frontmatter[FieldNameFrom].(type) {
-	// case map[string]any:
-	// 	return newAddressFromMap(from)
-	// case string:
-	// 	if strings.TrimSpace(from) == "" {
-	// 		return mail.Address{}, ErrNoFromAddress
-	// 	}
-	// 	address, err := mail.ParseAddress(from)
-	// 	if err != nil {
-	// 		return mail.Address{}, err
-	// 	}
-	// 	return *address, nil
-	// default:
-	// 	return mail.Unsubscribe{}, ErrNoFromAddress
-	// }
+	m, ok := l.Frontmatter[FieldNameUnsubscribe].(map[string]any)
+	if !ok {
+		return Unsubscribe{}, nil
+	}
+	if u.Address, err = newAddressFromMap(m[FieldNameUnsubscribeEmail].(map[string]any)); err != nil {
+		return Unsubscribe{}, err
+	}
+	if url, ok := m[FieldNameUnsubscribeURL].(string); ok {
+		u.URL = url
+	}
 	return
 }

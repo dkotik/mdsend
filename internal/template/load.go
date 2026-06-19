@@ -10,14 +10,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/dkotik/mdsend/markdown"
+	"github.com/dkotik/mdsend/loader"
 )
 
 //go:embed html/*
 var templates embed.FS
 
-func loadTemplate(m markdown.Message) (data []byte, err error) {
-	p, ok := m.Frontmatter[markdown.TemplatesKey]
+func loadTemplate(m loader.Message) (data []byte, err error) {
+	p, ok := m.Frontmatter[loader.TemplatesKey]
 	defer func() {
 		if err == nil {
 			data = bytes.TrimSpace(data)
