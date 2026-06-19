@@ -8,6 +8,7 @@ Send markdown files as mail.
 
 - **Durable:** mail queues are fault tolerant and atomic, brokered by <Watermill.io> over SQLite3.
 - **Flexible:** select the mailer backend based on highest deliverability. Swap it out later without changing anything in your letters or templates.
+  - Supports recipient lists formats: CSV, JSON, YAML, TOML, and Cue.
 - **Portable:** runs on many kinds of systems. Will include an embeddable HTTP service and Posgres support in the future.
 
 ## Installation
@@ -38,14 +39,13 @@ Message body.
 
 ## Development Roadmap
 
-- [ ] Anticipate circular imports for recipient lists.
+- [ ] Anticipate circular imports for recipient lists and extensions.
 - [ ] Text-part writer should minify html! minified html will have <img src=url> without quotes! (change inline detector)
 - [ ] Should write a better markdown renderer that recognizes single-line youtube and image paragraphs, centers them.
 - [ ] https://github.com/charmbracelet/glamour
 - [ ] Beautify the default template. Add `dark.html` one.
 - [ ] Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
 - [ ] alternative API: https://docs.sendwithses.com/ - add it as a driver to "providers"
-- [ ] support Cuelang! https://github.com/cuelang/cue
 - [ ] Snailmail support:
   - [ ] Markdown to PDF rendering.
   - [ ] Envelope face PDF generation.

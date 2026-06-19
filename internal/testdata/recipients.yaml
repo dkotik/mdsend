@@ -1,8 +1,0 @@
-- name: first
-  email: first@testmail.com
-- name: second
-  email: second@testmail.com
-- name: third
-  email: third@testmail.com
-- name: fourth
-  email: fourth@testmail.com
