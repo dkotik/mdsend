@@ -1,7 +1,6 @@
 package loader
 
 import (
-	"bytes"
 	"fmt"
 	"iter"
 	"os"
@@ -10,11 +9,10 @@ import (
 
 	"github.com/btcsuite/btcd/btcutil/base58"
 	"github.com/cespare/xxhash/v2"
+	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/markdown"
-	"github.com/pelletier/go-toml/v2"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/text"
-	"gopkg.in/yaml.v3"
 )
 
 type Message struct {
@@ -36,22 +34,23 @@ func NewMessage(p string) (m Message, err error) {
 	if err != nil {
 		return
 	}
-	frontmatter, content, delimeter, err := Cut(raw)
-	if err != nil {
-		return
-	}
-	switch delimeter {
-	case delimeterYAML:
-		if err = yaml.NewDecoder(bytes.NewReader(frontmatter)).Decode(&m.Frontmatter); err != nil {
-			return m, fmt.Errorf("invalid YAML front-matter: %w", err)
-		}
-	case delimeterTOML:
-		if err = toml.NewDecoder(bytes.NewReader(frontmatter)).Decode(&m.Frontmatter); err != nil {
-			return m, fmt.Errorf("invalid TOML front-matter: %w", err)
-		}
-	default:
-		return m, fmt.Errorf("unsupported front-matter delimeter: %s", string(delimeter))
-	}
+	frontmatter, content := []byte(raw), []byte(raw)
+	// frontmatter, content, delimeter, err := cut(raw)
+	// if err != nil {
+	// 	return
+	// }
+	// switch delimeter {
+	// case delimeterYAML:
+	// 	if err = yaml.NewDecoder(bytes.NewReader(frontmatter)).Decode(&m.Frontmatter); err != nil {
+	// 		return m, fmt.Errorf("invalid YAML front-matter: %w", err)
+	// 	}
+	// case delimeterTOML:
+	// 	if err = toml.NewDecoder(bytes.NewReader(frontmatter)).Decode(&m.Frontmatter); err != nil {
+	// 		return m, fmt.Errorf("invalid TOML front-matter: %w", err)
+	// 	}
+	// default:
+	// 	return m, fmt.Errorf("unsupported front-matter delimeter: %s", string(delimeter))
+	// }
 	if m.Frontmatter == nil {
 		m.Frontmatter = make(map[string]any)
 	}
@@ -70,7 +69,7 @@ func NewMessage(p string) (m Message, err error) {
 		m.Attachments[original] = p
 	}
 
-	switch attachments := m.Frontmatter[AttachmentsKey].(type) {
+	switch attachments := m.Frontmatter[mdsend.FieldNameAttachments].(type) {
 	case nil: // ignore
 	case []any:
 		for _, attachment := range attachments {
@@ -97,7 +96,7 @@ func NewMessage(p string) (m Message, err error) {
 		}))
 	m.Content = string(content)
 
-	id, ok := m.Frontmatter[IdempotentIdentifierKey]
+	id, ok := m.Frontmatter[mdsend.FieldNameID]
 	if ok {
 		m.ID = strings.TrimSpace(fmt.Sprintf("%s", id))
 	}
@@ -114,7 +113,7 @@ func NewMessage(p string) (m Message, err error) {
 		}
 		m.ID = base58.Encode(hash.Sum(nil))
 	}
-	m.Frontmatter[IdempotentIdentifierKey] = m.ID
+	m.Frontmatter[mdsend.FieldNameID] = m.ID
 	return
 }
 

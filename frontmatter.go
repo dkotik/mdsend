@@ -4,22 +4,23 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
 const (
-	FieldNameExtends                   = "extends"
-	FieldNameQueue                     = "queue"
-	FieldNameSubject                   = "subject"
-	FieldNameFrom                      = "from"
-	FieldNameReplyTo                   = "reply_to"
-	FieldNameTo                        = "to"
-	FieldNameCarbonCopy                = "cc"
-	FieldNameBlindCarbonCopy           = "bcc"
-	FieldNameName                      = "name"
-	FieldNameEmail                     = "email"
-	FieldNameAttachments               = "attachments"
-	FieldNameSendAfter                 = "send_after"
+	FieldNameID              = "id"
+	FieldNameExtends         = "extends"
+	FieldNameQueue           = "queue"
+	FieldNameSubject         = "subject"
+	FieldNameFrom            = "from"
+	FieldNameReplyTo         = "reply_to"
+	FieldNameTo              = "to"
+	FieldNameCarbonCopy      = "cc"
+	FieldNameBlindCarbonCopy = "bcc"
+	FieldNameName            = "name"
+	FieldNameEmail           = "email"
+	FieldNameAttachments     = "attachments"
+	FieldNameTemplates       = "templates"
+	// FieldNameSendAfter                 = "send_after"
 	FieldNameMediaContraints           = "media_constraints"
 	FieldNameMediaConstraintsQuality   = "quality"
 	FieldNameMediaConstrainsResolution = "resolution"
@@ -36,64 +37,6 @@ const (
 	FieldNameUnsubscribeEmail          = "unsubscribe_email"
 	FieldNameUnsubscribeURL            = "unsubscribe_url"
 )
-
-func mergeMaps(ms ...map[string]any) (result map[string]any) {
-	switch len(ms) {
-	case 0:
-		return make(map[string]any)
-	case 1:
-		return ms[0]
-	}
-	result = make(map[string]any)
-
-	// copy the first map
-	for k, v := range ms[0] {
-		result[strings.ToLower(k)] = v
-	}
-
-	// override with later maps
-	var (
-		existing any
-		ok       bool
-	)
-	for _, m := range ms[1:] {
-		for k, v := range m {
-			k = strings.ToLower(k)
-			existing, ok = result[k]
-			if !ok { // simplest
-				result[k] = v
-				continue
-			}
-
-			switch existing := existing.(type) {
-			case []any:
-				switch v := v.(type) {
-				case nil:
-					continue // skip nil values
-				case []any:
-					result[k] = append(existing, v...)
-				default:
-					result[k] = append(existing, v)
-				}
-			case map[string]any:
-				switch v := v.(type) {
-				case nil:
-					continue // skip nil values
-				case map[string]any:
-					result[k] = mergeMaps(existing, v)
-				default:
-					result[k] = v
-				}
-			default:
-				if v == nil {
-					continue // skip nil values
-				}
-				result[k] = v
-			}
-		}
-	}
-	return result
-}
 
 func getIntFromMap(m map[string]interface{}, key string, defaultValue int) (int, error) {
 	switch v := m[key].(type) {

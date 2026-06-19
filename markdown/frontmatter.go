@@ -1,29 +1,46 @@
-package loader
+package markdown
 
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 	"unicode"
+
+	"cuelang.org/go/cue/cuecontext"
+	"github.com/pelletier/go-toml/v2"
+	"gopkg.in/yaml.v3"
 )
 
 const (
-	IdempotentIdentifierKey = "id"
-	FromKey                 = "from"
-	ToKey                   = "to"
-	CarbonCopyKey           = "cc"
-	BlindCopyKey            = "bcc"
-	SubjectKey              = "subject"
-	AttachmentsKey          = "attachments"
-	TemplatesKey            = "templates"
-	NameKey                 = "name"
-	EmailKey                = "email"
-
 	lineBreak      rune = '\n'
 	carriageReturn rune = '\r'
-	delimeterYAML  rune = '-'
-	delimeterTOML  rune = '+'
+
+	FontmatterDelimeterYAML rune = '-'
+	FrontmaterDelimeterTOML rune = '+'
+	FrontmaterDelimeterCue  rune = ':'
 )
+
+func ParseFrontmatter(source []byte, delimeter rune) (frontmatter map[string]any, err error) {
+	switch delimeter {
+	case FontmatterDelimeterYAML:
+		if err = yaml.NewDecoder(bytes.NewReader(source)).Decode(&frontmatter); err != nil {
+			return nil, fmt.Errorf("invalid YAML front-matter: %w", err)
+		}
+	case FrontmaterDelimeterTOML:
+		if err = toml.NewDecoder(bytes.NewReader(source)).Decode(&frontmatter); err != nil {
+			return nil, fmt.Errorf("invalid TOML front-matter: %w", err)
+		}
+	case FrontmaterDelimeterCue:
+		ctx := cuecontext.New()
+		if err = ctx.CompileBytes(source).Decode(&frontmatter); err != nil {
+			return nil, fmt.Errorf("invalid CUE front-matter: %w", err)
+		}
+	default:
+		return nil, fmt.Errorf("unsupported front-matter delimeter: %s", string(delimeter))
+	}
+	return frontmatter, nil
+}
 
 func Cut(source []byte) (frontmatter, content []byte, delimeter rune, err error) {
 	var (
@@ -47,7 +64,7 @@ func Cut(source []byte) (frontmatter, content []byte, delimeter rune, err error)
 		}
 		cursor = cursor + count
 	}
-	if delimeter != delimeterYAML && delimeter != delimeterTOML { // no frontmatter
+	if delimeter != FontmatterDelimeterYAML && delimeter != FrontmaterDelimeterTOML { // no frontmatter
 		return nil, source, delimeter, nil
 	}
 

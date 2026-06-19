@@ -3,6 +3,8 @@ package loader
 import (
 	"os"
 	"testing"
+
+	"github.com/dkotik/mdsend"
 )
 
 func TestRecipientList(t *testing.T) {
@@ -38,8 +40,8 @@ func TestRecipientList(t *testing.T) {
 	// 	f.Close()
 	// }
 	l := loader{
-		FS:    os.DirFS("testdata"),
-		Cache: make(map[string][]byte),
+		FS: os.DirFS("testdata"),
+		// Cache: make(map[string][]byte),
 	}
 	for recipient, err := range l.eachRecipient(map[string]any{
 		"to": []any{
@@ -55,7 +57,7 @@ func TestRecipientList(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Log(recipient)
-		email, ok := recipient[EmailKey]
+		email, ok := recipient[mdsend.FieldNameEmail]
 		if !ok {
 			t.Fatal("recipient does not contain an email address")
 		}

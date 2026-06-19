@@ -1,20 +1,22 @@
 package loader
 
 import (
+	"context"
+	"errors"
 	"io/fs"
 
 	"github.com/dkotik/mdsend"
 )
 
 type Loader interface {
-	LoadLetter(string) (mdsend.Letter, Recipients, error)
+	LoadLetter(context.Context, string) (mdsend.Letter, Recipients, error)
 }
 
 type loader struct {
 	FS       fs.FS
 	Markdown MarkdownConfiguration
 
-	Cache map[string][]byte
+	Cache Cache
 	// TemplateCache map[string]*template.Template
 }
 
@@ -25,29 +27,46 @@ func NewLoader(config Configuration) (_ Loader, _ Recipients, err error) {
 	return loader{
 		FS:       config.FS,
 		Markdown: config.Markdown,
-		Cache:    make(map[string][]byte),
+		Cache:    NewMapCache(),
 		// TemplateCache: make(map[string]*template.Template),
 	}, nil, nil
 }
 
-func (l loader) load(p string) ([]byte, error) {
-	data, ok := l.Cache[p]
-	if ok {
-		return data, nil
-	}
-	data, err := fs.ReadFile(l.FS, p)
+func (l loader) getFile(ctx context.Context, p string) ([]byte, error) {
+	data, err := l.Cache.Pull(ctx, p)
 	if err != nil {
 		return nil, err
 	}
-	l.Cache[p] = data
+	if data != nil {
+		return data, nil
+	}
+	data, err = fs.ReadFile(l.FS, p)
+	if err != nil {
+		return nil, err
+	}
+	if err := l.Cache.Push(ctx, p, data); err != nil {
+		return nil, err
+	}
 	return data, nil
 }
 
-func (l loader) LoadLetter(p string) (mdsend.Letter, Recipients, error) {
+func (l loader) loadLetter(ctx context.Context, p string, cache Cache) (mdsend.Letter, error) {
 	// data, err := fs.ReadFile(l.FS, p)
 	// if err != nil {
 	// 	return mdsend.Letter{}, nil, err
 	// }
 
-	return mdsend.Letter{}, nil, nil
+	return mdsend.Letter{}, errors.New("impl")
+}
+
+func (l loader) LoadLetter(ctx context.Context, p string) (mdsend.Letter, Recipients, error) {
+	// data, err := fs.ReadFile(l.FS, p)
+	// if err != nil {
+	// 	return mdsend.Letter{}, nil, err
+	// }
+	letter, err := l.loadLetter(ctx, p, l.Cache)
+	if err != nil {
+		return mdsend.Letter{}, nil, err
+	}
+	return letter, nil, nil
 }

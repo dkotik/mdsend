@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/loader"
 )
 
@@ -17,7 +18,7 @@ import (
 var templates embed.FS
 
 func loadTemplate(m loader.Message) (data []byte, err error) {
-	p, ok := m.Frontmatter[loader.TemplatesKey]
+	p, ok := m.Frontmatter[mdsend.FieldNameTemplates]
 	defer func() {
 		if err == nil {
 			data = bytes.TrimSpace(data)

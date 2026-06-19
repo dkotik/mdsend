@@ -267,7 +267,7 @@ func (l loader) eachRecipientFromEntry(
 				}
 			}
 		case map[string]any:
-			if _, ok = v[EmailKey]; !ok {
+			if _, ok = v[mdsend.FieldNameEmail]; !ok {
 				yield(nil, fmt.Errorf("contact contains no electronic mail address: %s", v))
 				return
 			}

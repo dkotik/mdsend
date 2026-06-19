@@ -93,18 +93,3 @@ func (l Letter) GetFrom() (mail.Address, error) {
 		return mail.Address{}, ErrNoFromAddress
 	}
 }
-
-func (l Letter) GetSendAfter() (time.Time, error) {
-	switch sendAfter := l.Frontmatter[FieldNameSendAfter].(type) {
-	case nil:
-		return time.Time{}, nil
-	case string:
-		t, err := time.Parse(time.RFC3339, sendAfter)
-		if err != nil {
-			return time.Time{}, err
-		}
-		return t, nil
-	default:
-		return time.Time{}, fmt.Errorf("invalid send after format: %T", sendAfter)
-	}
-}
