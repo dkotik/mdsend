@@ -1,14 +1,20 @@
 package loader
 
 import (
-	"errors"
+	"context"
+	"encoding/json"
 	"fmt"
+	"path"
 	"strings"
 
+	"cuelang.org/go/cue/cuecontext"
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/markdown"
+	"github.com/pelletier/go-toml/v2"
+	"gopkg.in/yaml.v3"
 )
 
-func (l loader) loadExtensions(letter mdsend.Letter, rootDirectory string) (_ mdsend.Letter, err error) {
+func (l loader) extend(ctx context.Context, letter mdsend.Letter, rootDirectory string, known map[string]struct{}) (_ mdsend.Letter, err error) {
 	ext, ok := letter.Frontmatter[mdsend.FieldNameExtends]
 	if !ok {
 		return letter, nil
@@ -29,7 +35,98 @@ func (l loader) loadExtensions(letter mdsend.Letter, rootDirectory string) (_ md
 		return letter, fmt.Errorf("unsupported extension file type: %v(%T)", ext, ext)
 	}
 
-	return letter, errors.New("impl")
+	for _, p := range extends {
+		p = strings.TrimSpace(p)
+		if strings.HasPrefix(p, "/") {
+			p = path.Clean(p)
+		} else {
+			p = path.Join(rootDirectory, p)
+		}
+		if _, ok := known[p]; ok {
+			return letter, fmt.Errorf("infinite import cycle detected: %s", p)
+		}
+		known[p] = struct{}{}
+		data, err := l.getFile(ctx, p)
+		if err != nil {
+			return letter, err
+		}
+
+		switch ext := strings.ToLower(path.Ext(p)); ext {
+		case ".json":
+			var frontmatter map[string]any
+			if err := json.Unmarshal(data, &frontmatter); err != nil {
+				return letter, err
+			}
+			if frontmatter == nil {
+				continue
+			}
+			mergeLeft(frontmatter, letter.Frontmatter)
+			letter.Frontmatter = frontmatter
+			continue
+		case ".yaml", ".yml":
+			var frontmatter map[string]any
+			if err := yaml.Unmarshal(data, &frontmatter); err != nil {
+				return letter, err
+			}
+			if frontmatter == nil {
+				continue
+			}
+			mergeLeft(frontmatter, letter.Frontmatter)
+			letter.Frontmatter = frontmatter
+			continue
+		case ".toml":
+			var frontmatter map[string]any
+			if err := toml.Unmarshal(data, &frontmatter); err != nil {
+				return letter, err
+			}
+			if frontmatter == nil {
+				continue
+			}
+			mergeLeft(frontmatter, letter.Frontmatter)
+			letter.Frontmatter = frontmatter
+			continue
+		case ".cue":
+			var frontmatter map[string]any
+			if err := cuecontext.New().CompileBytes(data).Decode(&frontmatter); err != nil {
+				return letter, err
+			}
+			if frontmatter == nil {
+				continue
+			}
+			mergeLeft(frontmatter, letter.Frontmatter)
+			letter.Frontmatter = frontmatter
+			continue
+		case ".md", ".markdown":
+			// drop down
+		default:
+			return letter, fmt.Errorf("unsupported extension file type: %s", ext)
+		}
+
+		frontmatterRaw, body, delimeter, err := markdown.Cut(data)
+		if err != nil {
+			return letter, err
+		}
+		frontmatter, err := markdown.ParseFrontmatter(frontmatterRaw, delimeter)
+		if err != nil {
+			return letter, err
+		}
+		subLetter := mdsend.Letter{
+			Frontmatter: frontmatter,
+			Content:     string(body),
+		}
+		subLetter, err = l.extend(ctx, subLetter, path.Dir(p), known)
+		if err != nil {
+			return letter, err
+		}
+		most, tail, _ := markdown.SplitOnLastHorizontalRule([]byte(subLetter.Content))
+		// panic(tail)
+		letter.Content = string(most) + letter.Content + "\n\n" + string(tail)
+		if subLetter.Frontmatter != nil {
+			mergeLeft(subLetter.Frontmatter, letter.Frontmatter)
+		}
+	}
+
+	return letter, nil
 }
 
 func mergeLeft(a, b map[string]any) {
@@ -38,7 +135,7 @@ func mergeLeft(a, b map[string]any) {
 		ok       bool
 	)
 	for k, v := range b {
-		k = strings.ToLower(k)
+		// k = strings.ToLower(k)
 		existing, ok = a[k]
 		if !ok { // simplest
 			a[k] = v
@@ -73,63 +170,3 @@ func mergeLeft(a, b map[string]any) {
 		}
 	}
 }
-
-/*
-func mergeMaps(ms ...map[string]any) (result map[string]any) {
-	switch len(ms) {
-	case 0:
-		return make(map[string]any)
-	case 1:
-		return ms[0]
-	}
-	result = make(map[string]any)
-
-	// copy the first map
-	for k, v := range ms[0] {
-		result[strings.ToLower(k)] = v
-	}
-
-	// override with later maps
-	var (
-		existing any
-		ok       bool
-	)
-	for _, m := range ms[1:] {
-		for k, v := range m {
-			k = strings.ToLower(k)
-			existing, ok = result[k]
-			if !ok { // simplest
-				result[k] = v
-				continue
-			}
-
-			switch existing := existing.(type) {
-			case []any:
-				switch v := v.(type) {
-				case nil:
-					continue // skip nil values
-				case []any:
-					result[k] = append(existing, v...)
-				default:
-					result[k] = append(existing, v)
-				}
-			case map[string]any:
-				switch v := v.(type) {
-				case nil:
-					continue // skip nil values
-				case map[string]any:
-					result[k] = mergeMaps(existing, v)
-				default:
-					result[k] = v
-				}
-			default:
-				if v == nil {
-					continue // skip nil values
-				}
-				result[k] = v
-			}
-		}
-	}
-	return result
-}
-*/

@@ -1,0 +1,6 @@
+first: true
+list:
+  - 1
+  - 2
+map:
+  mapKey1: mapValue1

@@ -1,0 +1,34 @@
+---
+extends:
+    - first.yaml
+    - second.toml
+    - third.json
+    - fourth.cue
+    - fifth.md
+first: true
+fourth: true
+list:
+    - 3
+    - 1
+    - 2
+map:
+    mapKey1: mapValue1
+    mapKey2: mapValue2
+second: true
+subject: Test Letter Extensions
+third: true
+---
+Sixth Most
+
+Above the horizontal rule.
+
+* * *
+
+Middle
+
+Letter
+
+Tail
+
+
+Sixth Tail

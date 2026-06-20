@@ -1,0 +1,5 @@
+second = true
+map = {
+  mapKey1 = "mapValue1",
+  mapKey2 = "mapValue2",
+}
