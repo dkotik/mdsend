@@ -105,6 +105,11 @@ func sniffLoadCompressAttachment(source io.ReadSeeker) (string, []byte, error) {
 	return contentType, b.Bytes(), nil
 }
 
+type AttachmentEntry struct {
+	Name string `json:"name"`
+	Path string `json:"path"`
+}
+
 type Attachment struct {
 	LetterID string
 	Name     string

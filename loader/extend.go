@@ -9,7 +9,6 @@ import (
 
 	"cuelang.org/go/cue/cuecontext"
 	"github.com/dkotik/mdsend"
-	"github.com/dkotik/mdsend/markdown"
 	"github.com/pelletier/go-toml/v2"
 	"gopkg.in/yaml.v3"
 )
@@ -102,23 +101,15 @@ func (l loader) extend(ctx context.Context, letter mdsend.Letter, rootDirectory 
 			return letter, fmt.Errorf("unsupported extension file type: %s", ext)
 		}
 
-		frontmatterRaw, body, delimeter, err := markdown.Cut(data)
+		subLetter, err := mdsend.NewLetter(data)
 		if err != nil {
 			return letter, err
-		}
-		frontmatter, err := markdown.ParseFrontmatter(frontmatterRaw, delimeter)
-		if err != nil {
-			return letter, err
-		}
-		subLetter := mdsend.Letter{
-			Frontmatter: frontmatter,
-			Content:     string(body),
 		}
 		subLetter, err = l.extend(ctx, subLetter, path.Dir(p), known)
 		if err != nil {
 			return letter, err
 		}
-		most, tail, _ := markdown.SplitOnLastHorizontalRule([]byte(subLetter.Content))
+		most, tail, _ := SplitOnLastHorizontalRule([]byte(subLetter.Content))
 		// panic(tail)
 		letter.Content = string(most) + letter.Content + "\n\n" + string(tail)
 		if subLetter.Frontmatter != nil {
@@ -169,4 +160,55 @@ func mergeLeft(a, b map[string]any) {
 			a[k] = v
 		}
 	}
+}
+
+// var reHorizontalRule = regexp.MustCompile(`(?m)^[ \t]*(?:([-_*])\s*)\1\s*\1(?:\s*\1)*$`)
+
+const falseChar = byte('@')
+
+func SplitOnLastHorizontalRule(data []byte) (most, tail []byte, ok bool) {
+	first := falseChar
+	count := 0
+	lastLineIndex := 0
+	cutBegin := 0
+	cutEnd := 0
+	for i, c := range data {
+		switch c {
+		case ' ', '\t':
+		// ignore whitespace
+		case '-', '_', '*':
+			if count == 0 {
+				first = c
+			} else if c != first {
+				first = falseChar
+			}
+			count++
+		case '\n', '\r':
+			if first != falseChar && count >= 3 {
+				cutBegin = lastLineIndex + 1
+				cutEnd = i + 1
+			}
+			count = 0
+			first = falseChar
+			lastLineIndex = i
+		default:
+			first = falseChar
+		}
+	}
+
+	if cutBegin == 0 {
+		return data, nil, false
+	}
+	for _, c := range data[cutEnd:] {
+		// drain whitespace from the beginnig of the tail
+		switch c {
+		case ' ', '\t', '\n', '\r':
+			cutEnd++
+		default:
+			goto done
+		}
+	}
+
+done:
+	return data[:cutBegin], data[cutEnd:], true
 }

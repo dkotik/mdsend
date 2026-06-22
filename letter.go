@@ -11,7 +11,7 @@ type LetterError uint
 
 const (
 	ErrNoSubject LetterError = iota + 1
-	ErrNoQueue
+	// ErrNoQueue
 	ErrNoFromAddress
 	ErrNoContent
 	ErrLetterNotFound
@@ -41,16 +41,31 @@ type Letter struct {
 	// MessageCount int
 }
 
-func (l Letter) GetQueue() (string, error) {
+func NewLetter(b []byte) (letter Letter, err error) {
+	frontmatterRaw, body, delimeter, err := splitFrontmatterFromContent(b)
+	if err != nil {
+		return letter, err
+	}
+	frontmatter, err := parseFrontmatter(frontmatterRaw, delimeter)
+	if err != nil {
+		return letter, err
+	}
+	return Letter{
+		Frontmatter: frontmatter,
+		Content:     string(body),
+	}, nil
+}
+
+func (l Letter) GetQueue() string {
 	switch queue := l.Frontmatter[FieldNameQueue].(type) {
 	case string:
 		queue = strings.TrimSpace(queue)
 		if len(queue) == 0 {
-			return "", ErrNoQueue
+			return ""
 		}
-		return queue, nil
+		return queue
 	default:
-		return "", ErrNoQueue
+		return ""
 	}
 }
 

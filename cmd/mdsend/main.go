@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -25,9 +26,37 @@ func main() {
 				Name:    `queue`,
 				Usage:   `Manages the queue of markdown documents to send.`,
 				Aliases: []string{`q`},
-				Flags: []cli.Flag{
-					flagDatabase,
-					verboseFlag,
+				Commands: []*cli.Command{
+					{
+						Name:  `add`,
+						Usage: `Adds a letter to the queue.`,
+						Flags: []cli.Flag{
+							flagDatabase,
+							verboseFlag,
+						},
+						Action: cmdQueueAdd,
+					},
+					{
+						Name:  `remove`,
+						Usage: `Removes a letter from the queue.`,
+						Flags: []cli.Flag{
+							flagDatabase,
+							verboseFlag,
+						},
+						Action: func(ctx context.Context, c *cli.Command) error {
+							return errors.New(`not implemented, yet`)
+						},
+					},
+					{
+						Name:  `view`,
+						Usage: `Views the queue of markdown documents to send.`,
+						Flags: []cli.Flag{
+							flagDatabase,
+						},
+						Action: func(ctx context.Context, c *cli.Command) error {
+							return errors.New(`not implemented, yet`)
+						},
+					},
 				},
 			},
 			{
@@ -40,7 +69,7 @@ func main() {
 					&cli.DurationFlag{
 						Name:    `delay`,
 						Aliases: []string{"d"},
-						Usage:   `The time delay between sending each electronic mail message.`,
+						Usage:   `The minimum time delay between sending each electronic mail message.`,
 					},
 					&cli.DurationFlag{
 						Name:    `fluctuate`,
@@ -63,19 +92,17 @@ func main() {
 						},
 					},
 				},
+				Action: cmdSend,
 			},
 			{
-				Name:    `test`,
-				Usage:   `Tests the markdown document for validity. Valid documents are ready to be sent.`,
+				Name:    `validate`,
+				Usage:   `Validates the markdown document for correctness and readiness to be sent.`,
 				Aliases: []string{`t`},
 				Flags: []cli.Flag{
 					flagDatabase,
 					verboseFlag,
 				},
-				Action: func(ctx context.Context, c *cli.Command) error {
-
-					return nil
-				},
+				Action: cmdValidate,
 			},
 		},
 	}).Run(ctx, os.Args)

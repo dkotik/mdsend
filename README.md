@@ -23,7 +23,7 @@ Send markdown files as mail.
   go install github.com/dkotik/mdsend@latest
   ```
 
-## Example
+## Letter
 
 ```markdown
 ---
@@ -32,9 +32,9 @@ from: "Test Account <test@gmail.com>"
 to: "Test Account <test@gmail.com>"
 ---
 
-# Title
+# Title of the Example Letter
 
-Message body.
+Write text in **Markdown** notation.
 ```
 
 ## Development Roadmap
@@ -44,10 +44,6 @@ Message body.
 - [ ] https://github.com/charmbracelet/glamour
 - [ ] Beautify the default template. Add `dark.html` one.
 - [ ] Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
-- [ ] alternative API: https://docs.sendwithses.com/ - add it as a driver to "providers"
-- [ ] Snailmail support:
-  - [ ] Markdown to PDF rendering.
-  - [ ] Envelope face PDF generation.
 - [x] Mailgun
 - [ ] Resend
 - [ ] Loops
@@ -88,5 +84,6 @@ Message body.
 ## Similar Projects
 
 - <https://github.com/domodwyer/mailyak>
+- <https://sendune.com/>
 - <https://github.com/charmbracelet/pop>
 - <https://github.com/wneessen/go-mail>

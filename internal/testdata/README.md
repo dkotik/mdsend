@@ -2,4 +2,4 @@
 
 - `cat.jpg`: Cindy vanHeerden.
 - `panda.jpg`: Snow Chang.
-- `camillion.jpg`: Regan Dsouza
+- `camillion.jpg`: Regan Dsouza.

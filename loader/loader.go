@@ -2,7 +2,6 @@ package loader
 
 import (
 	"context"
-	"errors"
 	"io/fs"
 
 	"github.com/dkotik/mdsend"
@@ -50,21 +49,16 @@ func (l loader) getFile(ctx context.Context, p string) ([]byte, error) {
 	return data, nil
 }
 
-func (l loader) loadLetter(ctx context.Context, p string, cache Cache) (mdsend.Letter, error) {
-	// data, err := fs.ReadFile(l.FS, p)
-	// if err != nil {
-	// 	return mdsend.Letter{}, nil, err
-	// }
-
-	return mdsend.Letter{}, errors.New("impl")
+func (l loader) loadLetter(ctx context.Context, p string) (mdsend.Letter, error) {
+	data, err := l.getFile(ctx, p)
+	if err != nil {
+		return mdsend.Letter{}, err
+	}
+	return mdsend.NewLetter(data)
 }
 
 func (l loader) LoadLetter(ctx context.Context, p string) (mdsend.Letter, Recipients, error) {
-	// data, err := fs.ReadFile(l.FS, p)
-	// if err != nil {
-	// 	return mdsend.Letter{}, nil, err
-	// }
-	letter, err := l.loadLetter(ctx, p, l.Cache)
+	letter, err := l.loadLetter(ctx, p)
 	if err != nil {
 		return mdsend.Letter{}, nil, err
 	}
