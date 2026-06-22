@@ -1,0 +1,15 @@
+![sm](relativePathPrefix/perfect "sm")
+
+# Title [](relativePathPrefix/inTitle.jpg "In Title")
+
+Inside paragraph: ![](relativePathPrefix/inParagraph.jpg "In Paragraph") Tail of the paragraph. And just a reference [refLink]!
+
+In List:
+
+- ![](relativePathPrefix/inList.jpg "In List")
+
+
+![flowing tail](relativePathPrefix/finalMash1.txt "fm1")
+[flowing tail](relativePathPrefix/finalMash2.txt "fm2")
+
+[refLink]: relativePathPrefix/greatRefLink "last title"

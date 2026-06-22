@@ -2,13 +2,12 @@ package markdown
 
 import (
 	"github.com/yuin/goldmark"
-	meta "github.com/yuin/goldmark-meta"
 )
 
 var gm = goldmark.New(
-	goldmark.WithExtensions(
-		meta.Meta,
-	),
+	// goldmark.WithExtensions(
+	// 	meta.Meta,
+	// ),
 	goldmark.WithRendererOptions(
 	// renderer.WithNodeRenderers(
 	// 	util.Prioritized(&imageRenderer{

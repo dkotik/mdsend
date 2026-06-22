@@ -28,8 +28,13 @@ func (i *imageRenderer) renderImage(w util.BufWriter, source []byte, node ast.No
 	}
 	_, _ = w.WriteString(contentID)
 
-	_, _ = w.WriteString(`" alt="`)
-	_, _ = w.Write(util.EscapeHTML(n.Text(source)))
+	if n.FirstChild() != nil {
+		fc, ok := n.FirstChild().(*ast.Text)
+		if ok {
+			_, _ = w.WriteString(`" alt="`)
+			_, _ = w.Write(util.EscapeHTML(fc.Value(source)))
+		}
+	}
 	_ = w.WriteByte('"')
 	if n.Title != nil {
 		_, _ = w.WriteString(` title="`)
