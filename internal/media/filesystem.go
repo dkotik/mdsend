@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"sync"
 )
 
 var ErrCyclicalImport = errors.New("cyclical import of dependencies")
@@ -22,8 +23,10 @@ func (fs unsafeUnconstrainedFileSystem) Open(path string) (fs.File, error) {
 }
 
 type cyclicalImportPreventingFileSystem struct {
+	fs fs.FS
+
+	mu      *sync.Mutex
 	imports map[string]int
-	fs      fs.FS
 }
 
 func NewCyclicalImportPreventingFileSystem(
@@ -34,16 +37,20 @@ func NewCyclicalImportPreventingFileSystem(
 	}
 	return cyclicalImportPreventingFileSystem{
 		fs:      fs,
+		mu:      &sync.Mutex{},
 		imports: make(map[string]int),
 	}
 }
 
 func (fs cyclicalImportPreventingFileSystem) Open(p string) (fs.File, error) {
+	fs.mu.Lock()
 	count := fs.imports[p]
 	if count > 64 {
 		return nil, ErrCyclicalImport
 	}
 	fs.imports[p] = count + 1
+	fs.mu.Unlock()
+
 	file, err := fs.fs.Open(p)
 	if err != nil {
 		return nil, err

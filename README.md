@@ -37,6 +37,46 @@ to: "Test Account <test@gmail.com>"
 Write text in **Markdown** notation.
 ```
 
+## Load Recipient Lists
+
+Target address fields, `to`, `cc`, and `bcc` support a list of entries. Any entry can also point to a configuration file in a variety of common formats that will be merged into the parent list.
+
+```yaml
+to: mailinglist.yaml
+cc:
+  - another_list.toml
+  - jsonIsFine.json
+  - cuelist.cue
+bcc:
+  - name: Named Entry
+    email: test@test.com
+    title: Mr.
+    first_name: First
+```
+
+Each entry is a map, regardless of how it was loaded. Any value of the map is accessible to the template engine through the context.
+
+```markdown
+Greeting {{ .Recipient.title }} {{ .Recipient.first_name }},
+
+I am writing, because ...
+```
+
+## Extend One Letter with Another
+
+Merge the content and frontmatter fields into a letter from another file by using the `extends` field.
+
+```yaml
+extends:
+  # this letter will inherit the content
+  # and configuration values of `template.md`
+  - template.md
+  # load a configuration file
+  - config.yaml
+```
+
+Any Markdown content below the last horizontal rule is added as a footer to the current letter. You may nest the extensions deep as long as there are no circular references.
+
 ## Development Roadmap
 
 - [x] Anticipate circular imports for recipient lists and extensions.

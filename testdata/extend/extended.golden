@@ -18,7 +18,15 @@ second: true
 subject: Test Letter Extensions
 third: true
 ---
+
+
+<!-- begin content from fifth.md --->
+
+<!-- begin content from sixth.md --->
+
 Sixth Most
+
+<!-- end content from sixth.md --->
 
 Above the horizontal rule.
 
@@ -26,9 +34,21 @@ Above the horizontal rule.
 
 Middle
 
+<!-- end content from fifth.md --->
+
 Letter
+
+
+<!-- begin footer from fifth.md --->
 
 Tail
 
 
+<!-- begin footer from sixth.md --->
+
 Sixth Tail
+
+<!-- end footer from sixth.md --->
+
+<!-- end footer from fifth.md --->
+

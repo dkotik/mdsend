@@ -1,11 +1,17 @@
 package mdsend
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"io"
+	"io/fs"
 	"net/mail"
+	"path"
 	"strings"
 	"time"
 
+	"github.com/dkotik/mdsend/internal/media"
 	"github.com/dkotik/mdsend/markdown"
 )
 
@@ -41,6 +47,30 @@ type Letter struct {
 	CreatedAt   time.Time
 	SentAt      time.Time
 	// MessageCount int
+}
+
+func NewLetterFromFile(
+	ctx context.Context,
+	fs fs.FS,
+	p string,
+) (letter Letter, err error) {
+	file, err := fs.Open(p)
+	if err != nil {
+		return letter, err
+	}
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return letter, errors.Join(err, file.Close())
+	}
+	if err = file.Close(); err != nil {
+		return letter, err
+	}
+	letter, err = NewLetter(data)
+	if err != nil {
+		return letter, err
+	}
+	letter, err = extend(ctx, letter, path.Dir(p), media.NewCyclicalImportPreventingFileSystem(fs))
+	return letter, err
 }
 
 func NewLetter(b []byte) (letter Letter, err error) {

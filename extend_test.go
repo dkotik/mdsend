@@ -5,28 +5,18 @@ import (
 	"os"
 	"testing"
 
+	"github.com/dkotik/mdsend/internal/media"
 	"github.com/sebdah/goldie/v2"
 	"gopkg.in/yaml.v3"
 )
 
 func TestLetterExtensions(t *testing.T) {
-	letter, err := extend(
+	letter, err := NewLetterFromFile(
 		t.Context(),
-		Letter{
-			Frontmatter: map[string]any{
-				FieldNameSubject: "Test Letter Extensions",
-				FieldNameExtends: []any{
-					"first.yaml",
-					"second.toml",
-					"third.json",
-					"fourth.cue",
-					"fifth.md",
-				},
-			},
-			Content: "Letter",
-		},
-		".",
-		os.DirFS("testdata/extend"),
+		media.NewCyclicalImportPreventingFileSystem(
+			os.DirFS("testdata/extend"),
+		),
+		"xedletter.md",
 	)
 	if err != nil {
 		t.Fatal(err)

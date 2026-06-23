@@ -1,6 +1,7 @@
 package mdsend
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -11,11 +12,13 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/cuecontext"
+	"github.com/dkotik/mdsend/internal/media"
 	"github.com/dkotik/mdsend/markdown"
 	"github.com/pelletier/go-toml/v2"
 	"gopkg.in/yaml.v3"
 )
 
+// use [media.NewCyclicalImportPreventingFileSystem] only
 func extend(
 	ctx context.Context,
 	letter Letter,
@@ -127,8 +130,47 @@ func extend(
 		if err != nil {
 			return letter, err
 		}
+
+		if rootDirectory != "" && rootDirectory != "." {
+			b := &bytes.Buffer{}
+			if err = markdown.CopyWithRelativePathPrefix(b, []byte(subLetter.Content), rootDirectory); err != nil {
+				return letter, err
+			}
+
+			if attachments, ok := subLetter.Frontmatter[FieldNameAttachments]; ok {
+				subLetter.Frontmatter[FieldNameAttachments] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, attachments)
+			}
+			if to, ok := subLetter.Frontmatter[FieldNameTo]; ok {
+				subLetter.Frontmatter[FieldNameTo] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, to)
+			}
+			if cc, ok := subLetter.Frontmatter[FieldNameCarbonCopy]; ok {
+				subLetter.Frontmatter[FieldNameCarbonCopy] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, cc)
+			}
+			if bcc, ok := subLetter.Frontmatter[FieldNameBlindCarbonCopy]; ok {
+				subLetter.Frontmatter[FieldNameBlindCarbonCopy] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, bcc)
+			}
+		}
+
 		most, tail, _ := markdown.SplitOnLastHorizontalRule([]byte(subLetter.Content))
-		letter.Content = string(most) + letter.Content + "\n\n" + string(tail)
+		most = bytes.TrimSpace(most)
+		tail = bytes.TrimSpace(tail)
+		b := &bytes.Buffer{}
+		b.Grow(len(most) + len(letter.Content) + len(tail) + 200)
+
+		if len(most) > 0 {
+			_, _ = fmt.Fprintf(b, "\n\n<!-- begin content from %s --->\n\n", p)
+			_, _ = io.Copy(b, bytes.NewReader(most))
+			_, _ = fmt.Fprintf(b, "\n\n<!-- end content from %s --->\n\n", p)
+		}
+
+		_, _ = io.WriteString(b, letter.Content)
+
+		if len(tail) > 0 {
+			_, _ = fmt.Fprintf(b, "\n\n<!-- begin footer from %s --->\n\n", p)
+			_, _ = io.Copy(b, bytes.NewReader(tail))
+			_, _ = fmt.Fprintf(b, "\n\n<!-- end footer from %s --->\n\n", p)
+		}
+		letter.Content = b.String()
 		if subLetter.Frontmatter != nil {
 			mergeLeft(subLetter.Frontmatter, letter.Frontmatter)
 		}

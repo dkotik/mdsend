@@ -7,7 +7,7 @@ import (
 	"html/template"
 	"io"
 
-	"github.com/dkotik/mdsend/loader"
+	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/markdown"
 	"github.com/yuin/goldmark"
 )
@@ -34,7 +34,7 @@ type messageTemplate struct {
 // New creates a [Template]. It is not safe for asynchronous
 // rendering.
 func New(
-	m loader.Message,
+	m mdsend.Letter,
 	r goldmark.Markdown,
 ) (Template, error) {
 	if r == nil {

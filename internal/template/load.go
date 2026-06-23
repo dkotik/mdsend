@@ -7,17 +7,15 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/dkotik/mdsend"
-	"github.com/dkotik/mdsend/loader"
 )
 
 //go:embed html/*
 var templates embed.FS
 
-func loadTemplate(m loader.Message) (data []byte, err error) {
+func loadTemplate(m mdsend.Letter) (data []byte, err error) {
 	p, ok := m.Frontmatter[mdsend.FieldNameTemplates]
 	defer func() {
 		if err == nil {
@@ -34,10 +32,11 @@ func loadTemplate(m loader.Message) (data []byte, err error) {
 			p = strings.TrimSpace(p)
 			if p != "" {
 				data, err = os.ReadFile(
-					filepath.Join(
-						m.Directory,
-						p,
-					),
+					p,
+					// filepath.Join(
+					// 	m.Directory,
+					// 	p,
+					// ),
 				)
 				if err != nil {
 					if os.IsNotExist(err) {

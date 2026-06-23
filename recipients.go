@@ -1,12 +1,12 @@
-package loader
+package mdsend
 
 import (
 	"bytes"
-	"context"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
 	"iter"
 	"net/mail"
 	"path"
@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/cuecontext"
-	"github.com/dkotik/mdsend"
 	"github.com/pelletier/go-toml/v2"
 	"gopkg.in/yaml.v3"
 )
@@ -126,23 +125,15 @@ func eachEntryFromFileCue(data []byte) iter.Seq2[any, error] {
 	}
 }
 
-func (l loader) eachEntryFromFile(p string, cache Cache) iter.Seq2[any, error] {
+func eachEntryFromFile(p string, fs fs.FS) iter.Seq2[any, error] {
 	return func(yield func(any, error) bool) {
-		ctx := context.Background()
-		data, err := cache.Pull(ctx, p)
+		file, err := fs.Open(p)
 		if err != nil {
 			yield(nil, err)
 			return
 		}
-		if data != nil {
-			return // prevent circular imports
-		}
-		file, err := l.FS.Open(p)
+		data, err := io.ReadAll(file)
 		if err != nil {
-			yield(nil, err)
-			return
-		}
-		if data, err = io.ReadAll(file); err != nil {
 			yield(nil, err)
 			return
 		}
@@ -150,23 +141,6 @@ func (l loader) eachEntryFromFile(p string, cache Cache) iter.Seq2[any, error] {
 			yield(nil, err)
 			return
 		}
-		if err = cache.Push(ctx, p, data); err != nil {
-			yield(nil, err)
-			return
-		}
-		// b := &bytes.Buffer{}
-		// hash := xxhash.New()
-		// if _, err = io.Copy(io.MultiWriter(b, hash), file); err != nil {
-		// 	yield(nil, err)
-		// 	return
-		// }
-		// key := fmt.Sprintf("%x", hash.Sum64())
-		// data, ok := l.Cache[key]
-		// if ok {
-		// 	return // only process each file one
-		// }
-		// data = b.Bytes()
-		// l.Cache[key] = data
 
 		ext := strings.ToLower(filepath.Ext(p))
 		switch ext {
@@ -207,10 +181,10 @@ func (l loader) eachEntryFromFile(p string, cache Cache) iter.Seq2[any, error] {
 	}
 }
 
-func (l loader) eachRecipientFromEntry(
+func eachRecipientFromEntry(
 	entry any,
 	rootDirectory string,
-	cache Cache,
+	fs fs.FS,
 ) Recipients {
 	return func(yield func(map[string]any, error) bool) {
 		ok := false
@@ -224,12 +198,12 @@ func (l loader) eachRecipientFromEntry(
 			case '.':
 				v = path.Join(rootDirectory, v)
 				subRoot := path.Dir(v)
-				for entry, err := range l.eachEntryFromFile(v, cache) {
+				for entry, err := range eachEntryFromFile(v, fs) {
 					if err != nil {
 						yield(nil, err)
 						continue
 					}
-					for recipient, err := range l.eachRecipientFromEntry(entry, subRoot, cache) {
+					for recipient, err := range eachRecipientFromEntry(entry, subRoot, fs) {
 						if !yield(recipient, err) {
 							return
 						}
@@ -239,12 +213,12 @@ func (l loader) eachRecipientFromEntry(
 			case '/', '\\':
 				v = path.Clean(v)
 				subRoot := path.Dir(v)
-				for entry, err := range l.eachEntryFromFile(v, cache) {
+				for entry, err := range eachEntryFromFile(v, fs) {
 					if err != nil {
 						yield(nil, err)
 						continue
 					}
-					for recipient, err := range l.eachRecipientFromEntry(entry, subRoot, cache) {
+					for recipient, err := range eachRecipientFromEntry(entry, subRoot, fs) {
 						if !yield(recipient, err) {
 							return
 						}
@@ -260,14 +234,14 @@ func (l loader) eachRecipientFromEntry(
 			}
 			for _, address := range addresses {
 				if !yield(map[string]any{
-					mdsend.FieldNameName:  address.Name,
-					mdsend.FieldNameEmail: address.Address,
+					FieldNameName:  address.Name,
+					FieldNameEmail: address.Address,
 				}, nil) {
 					return
 				}
 			}
 		case map[string]any:
-			if _, ok = v[mdsend.FieldNameEmail]; !ok {
+			if _, ok = v[FieldNameEmail]; !ok {
 				yield(nil, fmt.Errorf("contact contains no electronic mail address: %s", v))
 				return
 			}
@@ -276,7 +250,7 @@ func (l loader) eachRecipientFromEntry(
 			}
 		case []any:
 			for _, v := range v {
-				for v, err := range l.eachRecipientFromEntry(v, rootDirectory, cache) {
+				for v, err := range eachRecipientFromEntry(v, rootDirectory, fs) {
 					if !yield(v, err) {
 						return
 					}
@@ -289,30 +263,33 @@ func (l loader) eachRecipientFromEntry(
 	}
 }
 
-func (l loader) eachRecipient(frontmatter map[string]any, rootDirectory string) Recipients {
+func eachRecipient(
+	frontmatter map[string]any,
+	rootDirectory string,
+	fs fs.FS,
+) Recipients {
 	return func(yield func(map[string]any, error) bool) {
-		cache := NewMapCache()
-		to, ok := frontmatter[mdsend.FieldNameTo]
+		to, ok := frontmatter[FieldNameTo]
 		if ok {
-			for recipient, err := range l.eachRecipientFromEntry(to, rootDirectory, cache) {
+			for recipient, err := range eachRecipientFromEntry(to, rootDirectory, fs) {
 				if !yield(recipient, err) {
 					return
 				}
 			}
 		}
 
-		cc, ok := frontmatter[mdsend.FieldNameCarbonCopy]
+		cc, ok := frontmatter[FieldNameCarbonCopy]
 		if ok {
-			for recipient, err := range l.eachRecipientFromEntry(cc, rootDirectory, cache) {
+			for recipient, err := range eachRecipientFromEntry(cc, rootDirectory, fs) {
 				if !yield(recipient, err) {
 					return
 				}
 			}
 		}
 
-		bcc, ok := frontmatter[mdsend.FieldNameBlindCarbonCopy]
+		bcc, ok := frontmatter[FieldNameBlindCarbonCopy]
 		if ok {
-			for recipient, err := range l.eachRecipientFromEntry(bcc, rootDirectory, cache) {
+			for recipient, err := range eachRecipientFromEntry(bcc, rootDirectory, fs) {
 				if !yield(recipient, err) {
 					return
 				}
