@@ -2,10 +2,14 @@ package mdsend
 
 import (
 	"bytes"
+	"errors"
 	"io"
+	"io/fs"
+	"path"
 
 	"github.com/btcsuite/btcd/btcutil/base58"
 	"github.com/cespare/xxhash/v2"
+	"github.com/dkotik/mdsend/internal/media"
 )
 
 type AttachmentError uint8
@@ -41,6 +45,33 @@ type Attachment struct {
 	ContentID   string
 	ContentType string
 	Content     []byte
+}
+
+func NewAttachment(b []byte, constraints media.Constraints) (a Attachment, err error) {
+	a.Content, a.ContentType, err = constraints.ApplyTo(b)
+	if err != nil {
+		return a, err
+	}
+	a.Hash = media.DeterministicHashStringOf(a.Content)
+	return a, nil
+}
+
+func NewAttachmentFromFile(fs fs.FS, p string, constraints media.Constraints) (a Attachment, err error) {
+	file, err := fs.Open(p)
+	if err != nil {
+		return a, err
+	}
+	defer func() { err = errors.Join(err, file.Close()) }()
+	b, err := io.ReadAll(file)
+	if err != nil {
+		return a, err
+	}
+	a, err = NewAttachment(b, constraints)
+	if err != nil {
+		return a, err
+	}
+	a.Name = path.Base(p)
+	return a, err
 }
 
 func (a Attachment) WithUpdatedHash() Attachment {

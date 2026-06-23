@@ -1,4 +1,4 @@
-package markdown
+package media
 
 import (
 	"bytes"

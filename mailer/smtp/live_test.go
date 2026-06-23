@@ -9,7 +9,6 @@ import (
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/internal"
 	"github.com/dkotik/mdsend/internal/media"
-	"github.com/dkotik/mdsend/internal/mime"
 )
 
 const testLetterID = "test-letter-id"
@@ -27,28 +26,21 @@ func TestSend(t *testing.T) {
 	}
 
 	ctx := t.Context()
-	constraints := mdsend.MediaConstraints{
+	constraints := media.Constraints{
 		Width:   100,
 		Height:  100,
 		Quality: 20,
 	}
-	cat, err := media.Compress(mdsend.Attachment{
-		LetterID:    testLetterID,
-		Content:     internal.Cat,
-		Name:        "cat.jpg",
-		ContentType: mime.ContentTypeImageJPEG,
-		Hash:        "cat",
-	}, constraints)
+
+	cat, err := mdsend.NewAttachment(internal.Cat, constraints)
+	cat.Name = "cat.jpg"
+	cat.LetterID = testLetterID
 	if err = config.Queue.CreateAttachment(ctx, cat); err != nil {
 		t.Fatal(err)
 	}
-	chamillion, err := media.Compress(mdsend.Attachment{
-		LetterID:    testLetterID,
-		Content:     internal.Chamillion,
-		Name:        "chamillion.jpg",
-		ContentType: mime.ContentTypeImageJPEG,
-		Hash:        "chamillion",
-	}, constraints)
+	chamillion, err := mdsend.NewAttachment(internal.Chamillion, constraints)
+	chamillion.Name = "chamillion.jpg"
+	chamillion.LetterID = testLetterID
 	if err = config.Queue.CreateAttachment(ctx, chamillion); err != nil {
 		t.Fatal(err)
 	}
@@ -66,7 +58,7 @@ func TestSend(t *testing.T) {
 		},
 		Subject: "live SMTP send test",
 		Text:    "test text",
-		HTML:    "<html><body><h1>test</h1><p>test paragraph</p><p>test paragraph 2</p><p><img src=\"cid:cat@testdomain.com\" alt=\"cat\" /></p></body></html>",
+		HTML:    "<html><body><h1>test</h1><p>test paragraph</p><p>test paragraph 2</p><p><img src=\"cid:" + cat.Hash + "@testdomain.com\" alt=\"cat\" /></p></body></html>",
 	})
 
 	if err != nil {

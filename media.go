@@ -3,27 +3,14 @@ package mdsend
 import (
 	"errors"
 	"fmt"
+
+	"github.com/dkotik/mdsend/internal/media"
 )
 
-type MediaConstraints struct {
-	Width   int
-	Height  int
-	Quality int
-}
-
-func (m MediaConstraints) WithResolution(resolution int) MediaConstraints {
-	const resolutionRatio = float32(1920 / 1080)
-	return MediaConstraints{
-		Width:   resolution,
-		Height:  int(float32(resolution) * resolutionRatio),
-		Quality: m.Quality,
-	}
-}
-
-func (l Letter) GetMediaConstraints() (m MediaConstraints, err error) {
+func (l Letter) GetMediaConstraints() (m media.Constraints, err error) {
 	switch media := l.Frontmatter[FieldNameMediaContraints].(type) {
 	case nil:
-		return MediaConstraints{}, nil
+		return m, nil
 	case map[string]any:
 		m.Quality, err = getPercentageFromMap(media, FieldNameMediaConstraintsQuality, 80)
 		if err != nil {
@@ -50,6 +37,6 @@ func (l Letter) GetMediaConstraints() (m MediaConstraints, err error) {
 		}
 		return m, nil
 	default:
-		return MediaConstraints{}, fmt.Errorf("invalid media constraints %T: %v", media, media)
+		return m, fmt.Errorf("invalid media constraints %T: %v", media, media)
 	}
 }

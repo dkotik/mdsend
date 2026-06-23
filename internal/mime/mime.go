@@ -60,14 +60,15 @@ const (
 	BEncodingSuffix = "?="
 	CRNL            = "\r\n"
 
-	ContentTypeTextPlain = "text/plain"
-	ContentTypeTextHTML  = "text/html"
-	ContentTypeImageJPEG = "image/jpeg"
-	ContentTypeImageBMP  = "image/bmp"
-	ContentTypeImagePNG  = "image/png"
-	ContentTypeImageGIF  = "image/gif"
-	ContentTypeImageWEBP = "image/webp"
-	ContentTypeZip       = "application/zip"
+	ContentTypeOctetStream = "application/octet-stream"
+	ContentTypeTextPlain   = "text/plain"
+	ContentTypeTextHTML    = "text/html"
+	ContentTypeImageJPEG   = "image/jpeg"
+	ContentTypeImageBMP    = "image/bmp"
+	ContentTypeImagePNG    = "image/png"
+	ContentTypeImageGIF    = "image/gif"
+	ContentTypeImageWEBP   = "image/webp"
+	ContentTypeZip         = "application/zip"
 )
 
 // NewEncoderBase64 encodes data to standard Base64 encoding

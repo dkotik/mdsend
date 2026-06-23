@@ -5,6 +5,7 @@ import (
 	"io"
 	"path"
 
+	"github.com/dkotik/mdsend/internal/media"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/text"
@@ -118,7 +119,7 @@ func CopyWithRelativePathPrefix(
 						return ast.WalkContinue, nil
 					}
 					p := bytes.TrimSpace(n.Destination)
-					if !IsPathLocalBytes(p) {
+					if !media.IsPathLocalBytes(p) {
 						return ast.WalkContinue, nil
 					}
 					index := n.Pos() + 3
@@ -140,7 +141,7 @@ func CopyWithRelativePathPrefix(
 						return ast.WalkContinue, nil
 					}
 					p := bytes.TrimSpace(n.Destination)
-					if !IsPathLocalBytes(p) {
+					if !media.IsPathLocalBytes(p) {
 						return ast.WalkContinue, nil
 					}
 					index := n.Pos() + 4
@@ -159,7 +160,7 @@ func CopyWithRelativePathPrefix(
 					written = index + len(n.Destination)
 				case *ast.LinkReferenceDefinition:
 					p := bytes.TrimSpace(n.Destination)
-					if !IsPathLocalBytes(p) {
+					if !media.IsPathLocalBytes(p) {
 						return ast.WalkContinue, nil
 					}
 					index := n.Pos() + 3 + len(n.Label)
