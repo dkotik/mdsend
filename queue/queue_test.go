@@ -8,7 +8,6 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/mailer"
@@ -27,12 +26,10 @@ func TestQueue(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() {
-		router.Close()
+		if err := router.Close(); err != nil {
+			t.Fatal(err)
+		}
 	})
-
-	// SignalsHandler will gracefully shutdown Router when SIGTERM is received.
-	// You can also close the router by just calling `r.Close()`.
-	router.AddPlugin(plugin.SignalsHandler)
 
 	pubSub := gochannel.NewGoChannel(gochannel.Config{
 		// Persistent: true,

@@ -3,9 +3,12 @@ package mdsend
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"io/fs"
+	"iter"
 	"path"
+	"strings"
 
 	"github.com/btcsuite/btcd/btcutil/base58"
 	"github.com/cespare/xxhash/v2"
@@ -28,6 +31,11 @@ func (err AttachmentError) Error() string {
 	default:
 		return ""
 	}
+}
+
+type AttachmentSource struct {
+	Name     string
+	Location string
 }
 
 type Attachment struct {
@@ -86,4 +94,78 @@ func (a Attachment) WithUpdatedHash() Attachment {
 	a.Hash = base58.Encode(hash.Sum(nil))
 	// a.Hash = hash.Sum64()
 	return a
+}
+
+func newAttachmentSourceFromMap(fm map[string]any) (a AttachmentSource, _ error) {
+	a.Location = strings.TrimSpace(fmt.Sprintf("%v", fm[FieldNameAttachmentLocation]))
+	switch name := fm[FieldNameAttachmentName].(type) {
+	case string:
+		a.Name = strings.TrimSpace(name)
+		if a.Name == "" {
+			a.Name = path.Base(a.Location)
+		}
+	case nil:
+		a.Name = path.Base(a.Location)
+	default:
+		a.Name = strings.TrimSpace(fmt.Sprintf("%v", name))
+		if a.Name == "" {
+			a.Name = path.Base(a.Location)
+		}
+	}
+	return a, nil
+}
+
+func newAttachmentSourceFromAny(fm any) (AttachmentSource, error) {
+	switch fm := fm.(type) {
+	case map[string]any:
+		return newAttachmentSourceFromMap(fm)
+	case string:
+		fm = strings.TrimSpace(fm)
+		return AttachmentSource{Name: path.Base(fm), Location: fm}, nil
+	default:
+		return AttachmentSource{}, fmt.Errorf("invalid attachment source: %T %+v", fm, fm)
+	}
+}
+
+func (l Letter) EachAttachmentSource() iter.Seq2[AttachmentSource, error] {
+	return func(yield func(AttachmentSource, error) bool) {
+		switch fm := l.Frontmatter[FieldNameAttachments].(type) {
+		case []any:
+			for _, a := range fm {
+				if !yield(newAttachmentSourceFromAny(a)) {
+					return
+				}
+			}
+		case map[string]any:
+			if !yield(newAttachmentSourceFromMap(fm)) {
+				return
+			}
+		case string:
+			yield(newAttachmentSourceFromAny(fm))
+		case nil:
+		default:
+			yield(AttachmentSource{}, fmt.Errorf("invalid attachment source: %T %+v", fm, fm))
+		}
+	}
+}
+
+func EachAttachmentSourceRelativeWithPathPrefix(prefix string, each iter.Seq2[AttachmentSource, error]) iter.Seq2[AttachmentSource, error] {
+	if each == nil {
+		panic("attachment source list is nil")
+	}
+	return func(yield func(AttachmentSource, error) bool) {
+		for a, err := range each {
+			if err != nil {
+				if !yield(AttachmentSource{}, err) {
+					return
+				}
+			}
+			if media.IsPathLocal(a.Location) {
+				a.Location = path.Join(prefix, a.Location)
+			}
+			if !yield(a, nil) {
+				return
+			}
+		}
+	}
 }

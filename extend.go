@@ -1,20 +1,34 @@
-package loader
+package mdsend
 
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"io/fs"
 	"path"
 	"strings"
 
 	"cuelang.org/go/cue/cuecontext"
-	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/markdown"
 	"github.com/pelletier/go-toml/v2"
 	"gopkg.in/yaml.v3"
 )
 
-func (l loader) extend(ctx context.Context, letter mdsend.Letter, rootDirectory string, known map[string]struct{}) (_ mdsend.Letter, err error) {
-	ext, ok := letter.Frontmatter[mdsend.FieldNameExtends]
+func extend(
+	ctx context.Context,
+	letter Letter,
+	rootDirectory string,
+	fs fs.FS,
+) (_ Letter, err error) {
+	select {
+	case <-ctx.Done():
+		return letter, ctx.Err()
+	default:
+	}
+
+	ext, ok := letter.Frontmatter[FieldNameExtends]
 	if !ok {
 		return letter, nil
 	}
@@ -41,12 +55,16 @@ func (l loader) extend(ctx context.Context, letter mdsend.Letter, rootDirectory 
 		} else {
 			p = path.Join(rootDirectory, p)
 		}
-		if _, ok := known[p]; ok {
-			return letter, fmt.Errorf("infinite import cycle detected: %s", p)
-		}
-		known[p] = struct{}{}
-		data, err := l.getFile(ctx, p)
+
+		file, err := fs.Open(p)
 		if err != nil {
+			return letter, err
+		}
+		data, err := io.ReadAll(file)
+		if err != nil {
+			return letter, errors.Join(err, file.Close())
+		}
+		if err = file.Close(); err != nil {
 			return letter, err
 		}
 
@@ -101,16 +119,15 @@ func (l loader) extend(ctx context.Context, letter mdsend.Letter, rootDirectory 
 			return letter, fmt.Errorf("unsupported extension file type: %s", ext)
 		}
 
-		subLetter, err := mdsend.NewLetter(data)
+		subLetter, err := NewLetter(data)
 		if err != nil {
 			return letter, err
 		}
-		subLetter, err = l.extend(ctx, subLetter, path.Dir(p), known)
+		subLetter, err = extend(ctx, subLetter, path.Dir(p), fs)
 		if err != nil {
 			return letter, err
 		}
-		most, tail, _ := SplitOnLastHorizontalRule([]byte(subLetter.Content))
-		// panic(tail)
+		most, tail, _ := markdown.SplitOnLastHorizontalRule([]byte(subLetter.Content))
 		letter.Content = string(most) + letter.Content + "\n\n" + string(tail)
 		if subLetter.Frontmatter != nil {
 			mergeLeft(subLetter.Frontmatter, letter.Frontmatter)
@@ -160,55 +177,4 @@ func mergeLeft(a, b map[string]any) {
 			a[k] = v
 		}
 	}
-}
-
-// var reHorizontalRule = regexp.MustCompile(`(?m)^[ \t]*(?:([-_*])\s*)\1\s*\1(?:\s*\1)*$`)
-
-const falseChar = byte('@')
-
-func SplitOnLastHorizontalRule(data []byte) (most, tail []byte, ok bool) {
-	first := falseChar
-	count := 0
-	lastLineIndex := 0
-	cutBegin := 0
-	cutEnd := 0
-	for i, c := range data {
-		switch c {
-		case ' ', '\t':
-		// ignore whitespace
-		case '-', '_', '*':
-			if count == 0 {
-				first = c
-			} else if c != first {
-				first = falseChar
-			}
-			count++
-		case '\n', '\r':
-			if first != falseChar && count >= 3 {
-				cutBegin = lastLineIndex + 1
-				cutEnd = i + 1
-			}
-			count = 0
-			first = falseChar
-			lastLineIndex = i
-		default:
-			first = falseChar
-		}
-	}
-
-	if cutBegin == 0 {
-		return data, nil, false
-	}
-	for _, c := range data[cutEnd:] {
-		// drain whitespace from the beginnig of the tail
-		switch c {
-		case ' ', '\t', '\n', '\r':
-			cutEnd++
-		default:
-			goto done
-		}
-	}
-
-done:
-	return data[:cutBegin], data[cutEnd:], true
 }

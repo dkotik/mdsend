@@ -65,6 +65,7 @@ func main() {
 				Aliases: []string{`s`},
 				Flags: []cli.Flag{
 					flagDatabase,
+					flagGraceTimeout,
 					verboseFlag,
 					&cli.DurationFlag{
 						Name:    `delay`,

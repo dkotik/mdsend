@@ -2,9 +2,31 @@ package media
 
 import (
 	"bytes"
+	"path"
 	"strings"
 	"unicode"
 )
+
+func IsRecipientEntryExternal(p string) bool {
+	return strings.IndexByte(p, '@') != -1
+}
+
+func AppendPathPrefixToExternalRecipientListEntries(prefix string, recipientEntry any) any {
+	switch v := recipientEntry.(type) {
+	case string:
+		if IsRecipientEntryExternal(v) {
+			return path.Join(prefix, v)
+		}
+		return v
+	case []any:
+		for i, s := range v {
+			v[i] = AppendPathPrefixToExternalRecipientListEntries(prefix, s)
+		}
+		return v
+	default:
+		return recipientEntry
+	}
+}
 
 func IsPathLocal(p string) bool {
 	if len(p) == 0 {
