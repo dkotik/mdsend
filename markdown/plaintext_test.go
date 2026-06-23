@@ -1,0 +1,33 @@
+package markdown
+
+import (
+	"bytes"
+	"os"
+	"path/filepath"
+	"testing"
+
+	"github.com/sebdah/goldie/v2"
+	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/renderer"
+	"github.com/yuin/goldmark/util"
+)
+
+func TestPlaintextRenderer(t *testing.T) {
+	source, err := os.ReadFile(filepath.Join("testdata", "links.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	md := goldmark.New(
+		goldmark.WithRendererOptions(
+			renderer.WithNodeRenderers(
+				util.Prioritized(NewPlaintextRenderer(), 1),
+			),
+		),
+	)
+
+	b := &bytes.Buffer{}
+	if err := md.Convert(source, b); err != nil {
+		t.Fatal(err)
+	}
+	goldie.New(t).Assert(t, "plaintext", b.Bytes())
+}

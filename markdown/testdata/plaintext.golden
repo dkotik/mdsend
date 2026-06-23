@@ -1,0 +1,13 @@
+![sm](perfect)
+
+
+# Title [](inTitle.jpg)
+Inside paragraph: ![](inParagraph.jpg) Tail of the paragraph. And just a reference [refLink](greatRefLink)!
+
+In List:
+
+
+- ![](inList.jpg "In List")![](inList.jpg)
+
+![flowing tail](finalMash1.txt)[flowing tail](finalMash2.txt)
+

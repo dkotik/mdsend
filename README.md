@@ -80,7 +80,8 @@ Any Markdown content below the last horizontal rule is added as a footer to the 
 ## Development Roadmap
 
 - [x] Anticipate circular imports for recipient lists and extensions.
-- [ ] Should write a better markdown renderer that recognizes single-line youtube and image paragraphs, centers them.
+- [ ] Write a better markdown renderer that recognizes single-line youtube and image paragraphs, centers them.
+- [ ] Deprecate test package at root.
 - [ ] https://github.com/charmbracelet/glamour
 - [ ] Beautify the default template. Add `dark.html` one.
 - [ ] Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
