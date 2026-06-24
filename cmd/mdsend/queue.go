@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
+	"net/mail"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/internal/media"
 	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
 	"github.com/urfave/cli/v3"
 	"zombiezen.com/go/sqlite"
@@ -52,17 +54,13 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 	if c.Args().Len() == 0 {
 		return errors.New(`no letters selected to add`)
 	}
+	fs := media.NewUnsafeUnconstrainedFileSystem()
 	letters := make([]mdsend.Letter, 0, c.Args().Len())
 	for _, arg := range c.Args().Slice() {
-		data, err := os.ReadFile(arg)
-		if err != nil {
-			return fmt.Errorf(`unable to read file %q: %w`, arg, err)
-		}
-		letter, err := mdsend.NewLetter(data)
+		letter, err := mdsend.NewLetterFromFile(ctx, fs, arg)
 		if err != nil {
 			return fmt.Errorf(`unable to parse letter from file %q: %w`, arg, err)
 		}
-		// TODO: expend letter!
 		letters = append(letters, letter)
 	}
 	p := c.String(flagDatabase.Name)
@@ -77,13 +75,16 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 			}
 		}
 	}
+	return addLetters(ctx, p, letters)
+}
 
+func addLetters(ctx context.Context, conntectionDSN string, letters []mdsend.Letter) (err error) {
 	conn, err := sqlite.OpenConn(
-		p,
-		sqlite.OpenCreate, sqlite.OpenReadWrite,
+		conntectionDSN,
+		// sqlite.OpenCreate, sqlite.OpenReadWrite,
 	)
 	if err != nil {
-		return fmt.Errorf("database %q inaccessible: %w", p, err)
+		return fmt.Errorf("database %q inaccessible: %w", conntectionDSN, err)
 	}
 	defer func() {
 		err = errors.Join(err, conn.Close())
@@ -98,20 +99,47 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 	}
 	defer tx.Close(&err)
 
-	if err = queue.CreateLetter(ctx, mdsend.Letter{}); err != nil {
-		return err
-	}
-	for range 3 {
-		err = queue.CreateAttachment(ctx, mdsend.Attachment{})
-		if err != nil {
+	for _, letter := range letters {
+		if err = queue.CreateLetter(ctx, letter); err != nil {
 			return err
 		}
-	}
-	for range 3 {
-		err = queue.CreateMessage(ctx, mdsend.Message{})
-		if err != nil {
-			return err
+		for range 1 {
+			err = queue.CreateAttachment(ctx, mdsend.Attachment{
+				LetterID:    letter.ID,
+				Name:        "random",
+				Source:      "",
+				Hash:        "",
+				ContentID:   "",
+				ContentType: "",
+				Content:     nil,
+			})
+			if err != nil {
+				return err
+			}
+		}
+		for i := range 100 {
+			err = queue.CreateMessage(ctx, mdsend.Message{
+				ID: fmt.Sprintf("testMessage%d", i),
+				From: mail.Address{
+					Name:    "random",
+					Address: fmt.Sprintf("testMessage%d@example.com", i),
+				},
+				To: mail.Address{
+					Name:    "random",
+					Address: fmt.Sprintf("testAddress%d@example.com", i),
+				},
+				LetterID:      letter.ID,
+				Subject:       fmt.Sprintf("testMessage%d", i),
+				Text:          "random",
+				HTML:          "",
+				ScheduleAfter: time.Time{},
+				ScheduledAt:   time.Time{},
+				SentAt:        time.Time{},
+			})
+			if err != nil {
+				return err
+			}
 		}
 	}
-	return
+	return err
 }

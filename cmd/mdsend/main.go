@@ -7,9 +7,13 @@ import (
 	"os/signal"
 	"runtime/debug"
 	"syscall"
+	"time"
 
 	"github.com/adrg/xdg"
+	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/mailer"
 	"github.com/urfave/cli/v3"
+	"golang.org/x/sync/errgroup"
 )
 
 func main() {
@@ -69,7 +73,39 @@ func main() {
 					flagWorkerCount,
 					flagVerbose,
 				},
-				Action: cmdSend,
+				Action: func(ctx context.Context, c *cli.Command) (err error) {
+					if c.Args().Len() > 0 {
+						if err = cmdQueueAdd(ctx, c); err != nil {
+							return err
+						}
+					}
+					logger := getLogger(c)
+
+					middleware := []func(mdsend.Mailer) mdsend.Mailer{
+						mailer.NewDelay(
+							c.Duration(flagDelay.Name)+time.Second*6,
+							c.Duration(flagFluctuate.Name)+time.Second,
+						),
+					}
+					if c.Bool(flagVerbose.Name) {
+						middleware = append(middleware, mailer.NewLogger(logger))
+					}
+					wg, ctx := errgroup.WithContext(ctx)
+					if err = send(
+						ctx,
+						wg,
+						c.String(flagDatabase.Name),
+						c.Duration(flagGraceTimeout.Name),
+						newSemaphoreMailer(
+							c.Int(flagWorkerCount.Name),
+							middleware...,
+						),
+						logger,
+					); err != nil {
+						return err
+					}
+					return wg.Wait()
+				},
 			},
 			{
 				Name:    `validate`,

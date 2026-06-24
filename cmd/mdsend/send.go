@@ -56,21 +56,35 @@ var (
 	}
 )
 
-func cmdSend(ctx context.Context, c *cli.Command) (err error) {
-	if c.Args().Len() > 0 {
-		if err = cmdQueueAdd(ctx, c); err != nil {
-			return err
+func newSemaphoreMailer(
+	size int,
+	middleware ...func(mdsend.Mailer) mdsend.Mailer,
+) mdsend.Mailer {
+	mailers := make([]mdsend.Mailer, size)
+	for i := range mailers {
+		m := mailer.NewVoid()
+		for _, mw := range middleware {
+			m = mw(m)
 		}
+		mailers[i] = m
 	}
-	logger := getLogger(c)
-	wg, ctx := errgroup.WithContext(ctx)
+	// mailers = mailers[:1]
+	return mailer.NewSemaphore(mailers...)
+}
 
+func send(
+	ctx context.Context,
+	wg *errgroup.Group,
+	connectionDSN string,
+	graceTimeOut time.Duration,
+	mailer mdsend.Mailer,
+	logger *slog.Logger,
+) (err error) {
 	wg.Go(func() error {
 		wmLogger := watermill.NewSlogLogger(logger)
-		connectionDSN := c.String(flagDatabase.Name)
 		queueConn, err := sqlite.OpenConn(
 			connectionDSN,
-			sqlite.OpenCreate, sqlite.OpenReadWrite,
+			// sqlite.OpenCreate, sqlite.OpenReadWrite,
 		)
 		if err != nil {
 			return fmt.Errorf("queue database %q inaccessible: %w", connectionDSN, err)
@@ -85,7 +99,7 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 
 		publisherConn, err := sqlite.OpenConn(
 			connectionDSN,
-			sqlite.OpenCreate, sqlite.OpenReadWrite,
+			// sqlite.OpenCreate, sqlite.OpenReadWrite,
 		)
 		if err != nil {
 			return fmt.Errorf("publisher database %q inaccessible: %w", connectionDSN, err)
@@ -110,7 +124,7 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 
 		router, err := message.NewRouter(
 			message.RouterConfig{
-				CloseTimeout: c.Duration(flagGraceTimeout.Name),
+				CloseTimeout: graceTimeOut,
 			},
 			wmLogger,
 		)
@@ -121,7 +135,7 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 			err = errors.Join(err, router.Close())
 		}()
 
-		mailer := queue.NewSender(newSemaphoreMailer(c, logger))
+		mailer := queue.NewSender(mailer)
 		schedulers := make([]queue.Scheduler, 12)
 		marshaler := queue.NewMarshalerJSON()
 		for i := 1; i <= 12; i++ {
@@ -139,7 +153,7 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 			// a separate queue with its own connection is needed for each scheduler
 			conn, err := sqlite.OpenConn(
 				connectionDSN,
-				sqlite.OpenCreate, sqlite.OpenReadWrite,
+				// sqlite.OpenCreate, sqlite.OpenReadWrite,
 			)
 			if err != nil {
 				return fmt.Errorf("outbox database %q inaccessible: %w", connectionDSN, err)
@@ -154,6 +168,7 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 			schedulers[i-1] = sqliteQ.NewScheduler(subQueue, marshaler, outbox)
 		}
 		scanner, progress := queue.NewScanner(
+			// time.Millisecond,
 			time.Second,
 			queue.Cursor{},
 			queue.ChildCursor{},
@@ -181,24 +196,5 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 		return router.Run(ctx)
 	})
 
-	return wg.Wait()
-}
-
-func newSemaphoreMailer(c *cli.Command, logger *slog.Logger) mdsend.Mailer {
-	mailers := make([]mdsend.Mailer, c.Int(flagWorkerCount.Name))
-	middleware := mailer.NewDelay(
-		c.Duration(flagDelay.Name)+time.Second*6,
-		c.Duration(flagFluctuate.Name)+time.Second,
-	)
-	if c.Bool(flagVerbose.Name) {
-		previous := middleware
-		middleware = func(m mdsend.Mailer) mdsend.Mailer {
-			return mailer.NewLogger(logger)(previous(m))
-		}
-	}
-	for i := range mailers {
-		mailers[i] = middleware(mailer.NewVoid())
-	}
-	mailers = mailers[:1]
-	return mailer.NewSemaphore(mailers...)
+	return nil
 }

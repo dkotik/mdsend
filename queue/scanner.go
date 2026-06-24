@@ -68,6 +68,16 @@ func (s *scanner) JoinErrorGroup(ctx context.Context, errGroup *errgroup.Group, 
 	})
 }
 
+func (s *scanner) MarkLetterAsSent(ctx context.Context, ID string) (err error) {
+	q, tx, err := s.Queue.BeginTransaction(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = q.MarkLetterAsSent(ctx, ID)
+	tx.Close(&err)
+	return err
+}
+
 func (s *scanner) LoadNextBatchOfUnsentLetters(ctx context.Context) (err error) {
 	s.LetterBatch = s.LetterBatch[:0]
 	letterPull, letterStop := iter.Pull2[mdsend.Letter, error](s.Queue.ListLetters(ctx, s.LetterCursor))
@@ -155,7 +165,7 @@ func (s *scanner) Scan(ctx context.Context) (err error) {
 			}
 
 			if foundUnsent == 0 {
-				if _, err = s.Queue.MarkLetterAsSent(ctx, letter.ID); err != nil {
+				if err = s.MarkLetterAsSent(ctx, letter.ID); err != nil {
 					return err
 				}
 			}
