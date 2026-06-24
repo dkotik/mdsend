@@ -12,6 +12,7 @@ require (
 	github.com/charmbracelet/bubbletea v0.19.3
 	github.com/charmbracelet/lipgloss v0.4.0
 	github.com/davecgh/go-spew v1.1.1
+	github.com/dkotik/watermillsqlite/wmsqlitezombiezen v0.0.5
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/mailgun/mailgun-go/v4 v4.0.0
@@ -34,6 +35,7 @@ require (
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cockroachdb/apd/v3 v3.2.1 // indirect
 	github.com/containerd/console v1.0.2 // indirect
+	github.com/dkotik/watermillsqlite/wmsqlitemodernc v0.0.5 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emicklei/proto v1.14.3 // indirect
 	github.com/go-chi/chi v4.0.0+incompatible // indirect

@@ -1,7 +1,13 @@
 ![sm](perfect)
 
 
-# Title [](inTitle.jpg)
+Subtitle
+--------
+
+
+Title [](inTitle.jpg)
+======
+
 Inside paragraph: ![](inParagraph.jpg) Tail of the paragraph. And just a reference [refLink](greatRefLink)!
 
 In List:

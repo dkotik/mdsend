@@ -80,6 +80,7 @@ Any Markdown content below the last horizontal rule is added as a footer to the 
 ## Development Roadmap
 
 - [x] Anticipate circular imports for recipient lists and extensions.
+- [ ] Add queue.Marshaler interface and a JSON implementation?
 - [ ] Write a better markdown renderer that recognizes single-line youtube and image paragraphs, centers them.
 - [ ] Deprecate test package at root.
 - [ ] https://github.com/charmbracelet/glamour

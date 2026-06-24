@@ -13,7 +13,7 @@ import (
 func TestSemaphore(t *testing.T) {
 	t.Parallel()
 
-	delay := NewDelay(time.Second)
+	delay := NewDelay(time.Second, time.Millisecond)
 	s := NewSemaphore(
 		delay(NewVoid()),
 		delay(NewVoid()),

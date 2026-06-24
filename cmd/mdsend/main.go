@@ -3,10 +3,8 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"os/signal"
-	"runtime"
 	"runtime/debug"
 	"syscall"
 
@@ -32,7 +30,7 @@ func main() {
 						Usage: `Adds a letter to the queue.`,
 						Flags: []cli.Flag{
 							flagDatabase,
-							verboseFlag,
+							flagVerbose,
 						},
 						Action: cmdQueueAdd,
 					},
@@ -41,7 +39,7 @@ func main() {
 						Usage: `Removes a letter from the queue.`,
 						Flags: []cli.Flag{
 							flagDatabase,
-							verboseFlag,
+							flagVerbose,
 						},
 						Action: func(ctx context.Context, c *cli.Command) error {
 							return errors.New(`not implemented, yet`)
@@ -66,32 +64,10 @@ func main() {
 				Flags: []cli.Flag{
 					flagDatabase,
 					flagGraceTimeout,
-					verboseFlag,
-					&cli.DurationFlag{
-						Name:    `delay`,
-						Aliases: []string{"d"},
-						Usage:   `The minimum time delay between sending each electronic mail message.`,
-					},
-					&cli.DurationFlag{
-						Name:    `fluctuate`,
-						Aliases: []string{"f"},
-						Usage:   `The time fluctuation in delay between sending each electronic mail message.`,
-					},
-					&cli.IntFlag{
-						Name:    `worker_count`,
-						Aliases: []string{"w"},
-						Usage:   `The maximum number of simultaneous workers for sending electronic mail messages.`,
-						Value:   max(1, runtime.NumCPU()),
-						Action: func(ctx context.Context, c *cli.Command, v int) error {
-							if v < 1 {
-								return fmt.Errorf(`worker_count must be at least one: %d`, v)
-							}
-							if v > 64 {
-								return fmt.Errorf(`worker_count exceeds 64: %d`, v)
-							}
-							return nil
-						},
-					},
+					flagDelay,
+					flagFluctuate,
+					flagWorkerCount,
+					flagVerbose,
 				},
 				Action: cmdSend,
 			},
@@ -101,7 +77,7 @@ func main() {
 				Aliases: []string{`t`},
 				Flags: []cli.Flag{
 					flagDatabase,
-					verboseFlag,
+					flagVerbose,
 				},
 				Action: cmdValidate,
 			},

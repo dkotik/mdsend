@@ -68,12 +68,46 @@ func (p *PlaintextRenderer) renderHeading(w util.BufWriter, source []byte, node 
 		// Add newline before heading if not at start
 		_ = w.WriteByte('\n')
 		// Render heading level with # symbols
-		for i := 0; i < h.Level; i++ {
-			_ = w.WriteByte('#')
+		switch h.Level {
+		case 1, 2:
+		default:
+			for i := 0; i < h.Level; i++ {
+				_ = w.WriteByte('#')
+			}
+			_, _ = w.WriteString(" ")
 		}
-		_, _ = w.WriteString(" ")
 	} else {
-		_, _ = w.WriteString("\n")
+		switch h.Level {
+		case 1:
+			_, _ = w.WriteString("\n")
+			lineLength := 40
+			_ = ast.Walk(node.FirstChild(), func(n ast.Node, entering bool) (ast.WalkStatus, error) {
+				text, ok := n.(*ast.Text)
+				if ok {
+					lineLength = max(len(text.Value(source)), 5)
+					return ast.WalkStop, nil
+				}
+				return ast.WalkContinue, nil
+			})
+			for i := 0; i < lineLength; i++ {
+				_ = w.WriteByte('=')
+			}
+		case 2:
+			_, _ = w.WriteString("\n")
+			lineLength := 40
+			_ = ast.Walk(node.FirstChild(), func(n ast.Node, entering bool) (ast.WalkStatus, error) {
+				text, ok := n.(*ast.Text)
+				if ok {
+					lineLength = max(len(text.Value(source)), 5)
+					return ast.WalkStop, nil
+				}
+				return ast.WalkContinue, nil
+			})
+			for i := 0; i < lineLength; i++ {
+				_ = w.WriteByte('-')
+			}
+		}
+		_, _ = w.WriteString("\n\n")
 	}
 	return ast.WalkContinue, nil
 }

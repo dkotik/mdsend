@@ -88,6 +88,7 @@ func NewSender(s mdsend.Mailer) message.HandlerFunc {
 	}
 }
 
+// TODO: deprecate?
 func MountSenders(
 	r *message.Router,
 	pub message.Publisher,

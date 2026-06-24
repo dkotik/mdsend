@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
+	"strings"
 
 	"github.com/dkotik/mdsend"
 	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
@@ -22,7 +24,28 @@ var flagDatabase = &cli.StringFlag{
 			xdgDataFile("queue.sqlite3"),
 		},
 	},
-	Value: "mdsend_queue.sqlite3",
+	Value: "mdsend_queue.sqlite3?cache=shared&foreign_keys=on",
+	Validator: func(p string) error {
+		if strings.TrimSpace(p) == "" {
+			return errors.New(`database path is empty`)
+		}
+		return nil
+	},
+	Action: func(ctx context.Context, c *cli.Command, p string) error {
+		p, params, _ := strings.Cut(p, "?")
+		paramValues := strings.Split(params, "&")
+		if !slices.Contains(paramValues, `cache=shared`) {
+			paramValues = append(paramValues, `cache=shared`)
+		}
+		if !slices.ContainsFunc(paramValues, func(v string) bool {
+			return strings.HasPrefix(strings.TrimSpace(v), `foreign_keys=`)
+		}) {
+			paramValues = append(paramValues, `foreign_keys=on`)
+		}
+		c.Set(`database`, fmt.Sprintf("%s?%s", p, strings.Join(paramValues, "&")))
+		// connectionDSN := "file:ephemeral?mode=memory&cache=shared"
+		return nil
+	},
 }
 
 func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
