@@ -1,27 +1,39 @@
-package test
+package queue
 
 import (
 	"errors"
-	"fmt"
 	"iter"
 	"net/mail"
 	"testing"
 	"time"
 
 	"github.com/dkotik/mdsend"
-	"github.com/dkotik/mdsend/internal"
-	"github.com/dkotik/mdsend/queue"
 )
 
-func Queue(q queue.Queue) func(*testing.T) {
+var MockTime = time.Date(2026, 5, 6, 7, 8, 9, 11, time.UTC)
+
+func IteratorIsEmpty[T any](
+	iterator iter.Seq2[T, error],
+) func(*testing.T) {
+	return func(t *testing.T) {
+		for _, err := range iterator {
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Fatal("found one item")
+		}
+	}
+}
+
+func TestQueue(q Queue) func(*testing.T) {
 	l1 := mdsend.Letter{
 		ID: "firstLetter",
 		Frontmatter: map[string]any{
 			"subject": "first letter",
 		},
 		Content:   "first letter",
-		CreatedAt: internal.MockTime,
-		SentAt:    internal.MockTime.Add(time.Hour * 70),
+		CreatedAt: MockTime,
+		SentAt:    MockTime.Add(time.Hour * 70),
 	}
 
 	l2 := mdsend.Letter{
@@ -30,8 +42,8 @@ func Queue(q queue.Queue) func(*testing.T) {
 			"subject": "second letter",
 		},
 		Content:   "second letter",
-		CreatedAt: internal.MockTime.Add(time.Hour * 50),
-		SentAt:    internal.MockTime.Add(time.Hour * 170),
+		CreatedAt: MockTime.Add(time.Hour * 50),
+		SentAt:    MockTime.Add(time.Hour * 170),
 	}
 
 	messages := []mdsend.Message{
@@ -99,16 +111,16 @@ func Queue(q queue.Queue) func(*testing.T) {
 			if err = q.DeleteLetter(ctx, l1.ID); err != nil {
 				t.Fatal("unable to delete the first letter:", err)
 			}
-			for l1, err = range q.ListLetters(ctx, queue.Cursor{Batch: 1}) {
+			for l1, err = range q.ListLetters(ctx, Cursor{Batch: 1}) {
 				if err != nil {
 					t.Fatal("unable to collect a list of letters:", err)
 				}
 				t.Fatal("There is still a letter left over:", l1)
 			}
 
-			t.Run("there are no messages left over", IteratorIsEmpty(q.ListMessages(ctx, queue.ChildCursor{
+			t.Run("there are no messages left over", IteratorIsEmpty(q.ListMessages(ctx, ChildCursor{
 				ParentID: l1.ID,
-				Cursor: queue.Cursor{
+				Cursor: Cursor{
 					ItemID: "",
 					Batch:  5,
 				},
@@ -121,7 +133,9 @@ func Queue(q queue.Queue) func(*testing.T) {
 		if err != nil {
 			t.Fatal("unable to retrieve first letter:", err)
 		}
-		t.Run("retrieved first letter matches", LettersAreEqual(l1, lcomp))
+		if err = l1.AssertEqualityTo(lcomp); err != nil {
+			t.Fatal("letters do not match:", err)
+		}
 
 		l1attachments := make([]mdsend.Attachment, 0, len(attachments))
 		for l1attachment, err := range q.ListAttachments(ctx, l1.ID) {
@@ -134,16 +148,15 @@ func Queue(q queue.Queue) func(*testing.T) {
 			t.Fatal("attachment count mismatch: expected", len(attachments), "got", len(l1attachments))
 		}
 		for i, a := range l1attachments {
-			t.Run(
-				fmt.Sprintf("attachment %d", i+1),
-				AttachmentsAreEqual(a, attachments[i]),
-			)
+			if err = a.AssertEqualityTo(attachments[i]); err != nil {
+				t.Fatal("attachments do not match:", err)
+			}
 		}
 
 		l1messages := make([]mdsend.Message, 0, 1)
-		for l1message, err := range q.ListMessages(ctx, queue.ChildCursor{
+		for l1message, err := range q.ListMessages(ctx, ChildCursor{
 			ParentID: l1.ID,
-			Cursor: queue.Cursor{
+			Cursor: Cursor{
 				ItemID: "",
 				Batch:  1,
 			},
@@ -158,7 +171,9 @@ func Queue(q queue.Queue) func(*testing.T) {
 		}
 		for i, d := range l1messages {
 			d.ID = messages[i].ID // copy the ID from the expected message
-			t.Run(fmt.Sprintf("message #%d is the same", i+1), MessagesAreEqual(d, messages[i]))
+			if err = d.AssertEqualityTo(messages[i]); err != nil {
+				t.Fatal("messages do not match:", err)
+			}
 			err := q.MarkMessagesAsQueued(ctx, d.ID)
 			if err != nil {
 				t.Fatalf("unable to complete message %d: %v", i+1, err)
@@ -180,9 +195,9 @@ func Queue(q queue.Queue) func(*testing.T) {
 				t.Fatal("unable to delete the second letter:", err)
 			}
 
-			t.Run("there are no messages left over", IteratorIsEmpty(q.ListMessages(ctx, queue.ChildCursor{
+			t.Run("there are no messages left over", IteratorIsEmpty(q.ListMessages(ctx, ChildCursor{
 				ParentID: l2.ID,
-				Cursor: queue.Cursor{
+				Cursor: Cursor{
 					ItemID: "",
 					Batch:  5,
 				},
@@ -195,11 +210,13 @@ func Queue(q queue.Queue) func(*testing.T) {
 		if err != nil {
 			t.Fatal("unable to retrieve second letter:", err)
 		}
-		t.Run("retrieved second letter matches", LettersAreEqual(l2, lcomp))
+		if err = l2.AssertEqualityTo(lcomp); err != nil {
+			t.Fatal("letters do not match:", err)
+		}
 
 		// test letter listing
 		ok := false
-		next, stop := iter.Pull2(q.ListLetters(ctx, queue.Cursor{Batch: 1}))
+		next, stop := iter.Pull2(q.ListLetters(ctx, Cursor{Batch: 1}))
 		if next == nil {
 			t.Fatal("no letters found")
 		}
@@ -210,7 +227,9 @@ func Queue(q queue.Queue) func(*testing.T) {
 		if err != nil {
 			t.Fatal("unable to retrieve the first letter:", err)
 		}
-		t.Run("retrieved first letter matches", LettersAreEqual(l1, lcomp))
+		if err = l1.AssertEqualityTo(lcomp); err != nil {
+			t.Fatal("letters do not match:", err)
+		}
 		lcomp, err, ok = next()
 		if !ok {
 			t.Fatal("no letters found, when the second letter was expected")
@@ -218,7 +237,9 @@ func Queue(q queue.Queue) func(*testing.T) {
 		if err != nil {
 			t.Fatal("unable to retrieve the second letter:", err)
 		}
-		t.Run("retrieved second letter matches", LettersAreEqual(l2, lcomp))
+		if err = l2.AssertEqualityTo(lcomp); err != nil {
+			t.Fatal("letters do not match:", err)
+		}
 		stop()
 
 		t.Run("queue recognizes duplicates", QueueRecognizesDuplicates(q))
@@ -246,5 +267,60 @@ func Queue(q queue.Queue) func(*testing.T) {
 				t.Fatal("letter should not be retrievable after transaction failure")
 			}
 		})
+	}
+}
+
+func QueueRecognizesDuplicates(q Queue) func(*testing.T) {
+	return func(t *testing.T) {
+		ctx := t.Context()
+		l1 := mdsend.Letter{
+			ID: "duplicationTestLetter",
+			Frontmatter: map[string]any{
+				"subject": "first letter",
+			},
+			Content:   "first letter",
+			CreatedAt: MockTime.Add(time.Hour * 170),
+			SentAt:    MockTime.Add(time.Hour * 270),
+		}
+		if err := q.CreateLetter(ctx, l1); err != nil {
+			t.Fatal(err)
+		}
+		defer func() {
+			if err := q.DeleteLetter(ctx, l1.ID); err != nil {
+				t.Fatal(err)
+			}
+		}()
+
+		d := mdsend.Message{
+			LetterID: "testLetter",
+			From:     mail.Address{},
+			To: mail.Address{
+				Name:    "First Last",
+				Address: "first.last@example.com",
+			},
+			Subject: "",
+			Text:    "",
+			HTML:    "",
+		}
+		if err := q.CreateMessage(ctx, d); err != nil {
+			t.Fatal(err)
+		}
+		if err := q.CreateMessage(ctx, d); !errors.Is(err, mdsend.ErrDuplicateMessage) {
+			t.Fatalf("expected duplicate message error, got: %v", err)
+		}
+
+		a := mdsend.Attachment{
+			Hash:        "testAttachmentForDuplicates",
+			LetterID:    "testLetter",
+			Name:        "test.txt",
+			ContentType: "text/plain",
+			Content:     []byte("test"),
+		}
+		if err := q.CreateAttachment(ctx, a); err != nil {
+			t.Fatal(err)
+		}
+		if err := q.CreateAttachment(ctx, a); !errors.Is(err, mdsend.ErrDuplicateAttachment) {
+			t.Fatalf("expected duplicate attachment error, got: %v", err)
+		}
 	}
 }

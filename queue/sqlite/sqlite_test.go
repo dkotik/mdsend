@@ -3,7 +3,7 @@ package sqlite
 import (
 	"testing"
 
-	"github.com/dkotik/mdsend/test"
+	"github.com/dkotik/mdsend/queue"
 	"zombiezen.com/go/sqlite"
 )
 
@@ -17,5 +17,5 @@ func TestCompliance(t *testing.T) {
 	if err != nil {
 		t.Fatal("unable to create queue:", err)
 	}
-	test.Queue(q)(t)
+	queue.TestQueue(q)(t)
 }

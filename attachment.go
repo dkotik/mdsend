@@ -96,6 +96,49 @@ func (a Attachment) WithUpdatedHash() Attachment {
 	return a
 }
 
+func (a Attachment) AssertEqualityTo(b Attachment) error {
+	if a.LetterID != b.LetterID {
+		return FieldComparisonMismatchError{
+			FieldName:     "LetterID",
+			ExpectedValue: a.LetterID,
+			ActualValue:   b.LetterID,
+		}
+	}
+	if a.Name != b.Name {
+		return FieldComparisonMismatchError{
+			FieldName:     "Name",
+			ExpectedValue: a.Name,
+			ActualValue:   b.Name,
+		}
+	}
+	if a.ContentID != b.ContentID {
+		return FieldComparisonMismatchError{
+			FieldName:     "ContentID",
+			ExpectedValue: a.ContentID,
+			ActualValue:   b.ContentID,
+		}
+	}
+	if a.ContentType != b.ContentType {
+		return FieldComparisonMismatchError{
+			FieldName:     "Name",
+			ExpectedValue: a.ContentType,
+			ActualValue:   b.ContentType,
+		}
+	}
+	if !bytes.Equal(a.Content, b.Content) {
+		return FieldComparisonMismatchError{
+			FieldName:     "Name",
+			ExpectedValue: a.Content,
+			ActualValue:   b.Content,
+		}
+	}
+	return nil
+}
+
+func (a Attachment) IsEqualTo(b Attachment) bool {
+	return a.AssertEqualityTo(b) == nil
+}
+
 func newAttachmentSourceFromMap(fm map[string]any) (a AttachmentSource, _ error) {
 	a.Location = strings.TrimSpace(fmt.Sprintf("%v", fm[FieldNameAttachmentLocation]))
 	switch name := fm[FieldNameAttachmentName].(type) {

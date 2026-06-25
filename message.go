@@ -80,3 +80,104 @@ type Message struct {
 	ScheduledAt   time.Time
 	SentAt        time.Time
 }
+
+func (m Message) AssertEqualityTo(b Message) error {
+	if m.ID != b.ID {
+		return FieldComparisonMismatchError{
+			FieldName:     "ID",
+			ExpectedValue: m.ID,
+			ActualValue:   b.ID,
+		}
+	}
+	if m.LetterID != b.LetterID {
+		return FieldComparisonMismatchError{
+			FieldName:     "LetterID",
+			ExpectedValue: m.LetterID,
+			ActualValue:   b.LetterID,
+		}
+	}
+	if m.From.String() != b.From.String() {
+		return FieldComparisonMismatchError{
+			FieldName:     "From",
+			ExpectedValue: m.From.String(),
+			ActualValue:   b.From.String(),
+		}
+	}
+	if m.To.String() != b.To.String() {
+		return FieldComparisonMismatchError{
+			FieldName:     "To",
+			ExpectedValue: m.To.String(),
+			ActualValue:   b.To.String(),
+		}
+	}
+	if len(m.Headers) != len(b.Headers) {
+		return FieldComparisonMismatchError{
+			FieldName:     "Headers",
+			ExpectedValue: fmt.Sprintf("%+v", m.Headers),
+			ActualValue:   fmt.Sprintf("%+v", b.Headers),
+		}
+	}
+	for i, header := range m.Headers {
+		if header.Name != b.Headers[i].Name {
+			return FieldComparisonMismatchError{
+				FieldName:     "Headers[" + header.Name + "]",
+				ExpectedValue: header.Name,
+				ActualValue:   header.Name,
+			}
+		}
+		if header.Value != b.Headers[i].Value {
+			return FieldComparisonMismatchError{
+				FieldName:     "Headers[" + header.Name + "]",
+				ExpectedValue: header.Value,
+				ActualValue:   header.Value,
+			}
+		}
+		if m.Subject != b.Subject {
+			return FieldComparisonMismatchError{
+				FieldName:     "Subject",
+				ExpectedValue: m.Subject,
+				ActualValue:   b.Subject,
+			}
+		}
+		if m.Text != b.Text {
+			return FieldComparisonMismatchError{
+				FieldName:     "Text",
+				ExpectedValue: m.Text,
+				ActualValue:   b.Text,
+			}
+		}
+		if m.HTML != b.HTML {
+			return FieldComparisonMismatchError{
+				FieldName:     "HTML",
+				ExpectedValue: m.HTML,
+				ActualValue:   b.HTML,
+			}
+		}
+		if !m.ScheduleAfter.Truncate(time.Second).Equal(b.ScheduleAfter.Truncate(time.Second)) {
+			return FieldComparisonMismatchError{
+				FieldName:     "SentAt",
+				ExpectedValue: m.ScheduleAfter.Format(time.RFC3339),
+				ActualValue:   b.ScheduleAfter.Format(time.RFC3339),
+			}
+		}
+		if !m.ScheduledAt.Truncate(time.Second).Equal(b.SentAt.Truncate(time.Second)) {
+			return FieldComparisonMismatchError{
+				FieldName:     "SentAt",
+				ExpectedValue: m.ScheduledAt.Format(time.RFC3339),
+				ActualValue:   b.ScheduledAt.Format(time.RFC3339),
+			}
+		}
+		if !m.SentAt.Truncate(time.Second).Equal(b.SentAt.Truncate(time.Second)) {
+			return FieldComparisonMismatchError{
+				FieldName:     "SentAt",
+				ExpectedValue: m.SentAt.Format(time.RFC3339),
+				ActualValue:   b.SentAt.Format(time.RFC3339),
+			}
+		}
+	}
+	return nil
+}
+
+func (m Message) IsEqualTo(b Message) bool {
+	return m.AssertEqualityTo(b) == nil
+}

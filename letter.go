@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"maps"
 	"net/mail"
 	"path"
 	"strings"
@@ -156,4 +157,47 @@ func (l Letter) GetFrom() (mail.Address, error) {
 	default:
 		return mail.Address{}, ErrNoFromAddress
 	}
+}
+
+func (l Letter) AssertEqualityTo(b Letter) error {
+	if l.ID != b.ID {
+		return FieldComparisonMismatchError{
+			FieldName:     "ID",
+			ExpectedValue: l.ID,
+			ActualValue:   b.ID,
+		}
+	}
+	if !maps.Equal(l.Frontmatter, b.Frontmatter) {
+		return FieldComparisonMismatchError{
+			FieldName:     "Frontmatter",
+			ExpectedValue: fmt.Sprintf("%+v", l.Frontmatter),
+			ActualValue:   fmt.Sprintf("%+v", b.Frontmatter),
+		}
+	}
+	if l.Content != b.Content {
+		return FieldComparisonMismatchError{
+			FieldName:     "Content",
+			ExpectedValue: l.Content,
+			ActualValue:   b.Content,
+		}
+	}
+	if !l.CreatedAt.Truncate(time.Second).Equal(b.CreatedAt.Truncate(time.Second)) {
+		return FieldComparisonMismatchError{
+			FieldName:     "CreatedAt",
+			ExpectedValue: l.CreatedAt.Format(time.RFC3339),
+			ActualValue:   b.CreatedAt.Format(time.RFC3339),
+		}
+	}
+	if !l.SentAt.Truncate(time.Second).Equal(b.SentAt.Truncate(time.Second)) {
+		return FieldComparisonMismatchError{
+			FieldName:     "SentAt",
+			ExpectedValue: l.SentAt.Format(time.RFC3339),
+			ActualValue:   b.SentAt.Format(time.RFC3339),
+		}
+	}
+	return nil
+}
+
+func (l Letter) IsEqualTo(b Letter) bool {
+	return l.AssertEqualityTo(b) == nil
 }

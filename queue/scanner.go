@@ -111,6 +111,13 @@ func (s *scanner) LoadNextBatchOfUnsentLetters(ctx context.Context) (err error) 
 
 func (s *scanner) Scan(ctx context.Context) (err error) {
 	foundUnsent := 0
+	batchSize := s.MessageCursor.Batch
+	if batchSize < 0 {
+		batchSize = -batchSize
+	}
+	batch := make([]string, 0, batchSize)
+	messages := make([]mdsend.Message, 0, batchSize)
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -123,9 +130,9 @@ func (s *scanner) Scan(ctx context.Context) (err error) {
 
 		for _, letter := range s.LetterBatch {
 			s.MessageCursor.ParentID = letter.ID
-
+			batch = batch[:0]
+			messages = messages[:0]
 			for {
-				batch := make([]string, 0, s.MessageCursor.Batch) // TODO: batch is negative!
 				messagePull, messageStop := iter.Pull2[mdsend.Message, error](s.Queue.ListMessages(ctx, s.MessageCursor))
 				for range s.MessageCursor.Batch {
 					message, err, ok := messagePull()
@@ -140,11 +147,15 @@ func (s *scanner) Scan(ctx context.Context) (err error) {
 					s.MessageCursor.Cursor.ItemID = message.ID
 					if message.SentAt.IsZero() {
 						batch = append(batch, message.ID)
+						messages = append(messages, message)
 					}
 				}
 				messageStop()
 
 				if len(batch) > 0 {
+					if err = s.Scheduler.ScheduleForDelivery(ctx, messages); err != nil {
+						return err
+					}
 					foundUnsent += len(batch)
 					select {
 					case <-ctx.Done():
