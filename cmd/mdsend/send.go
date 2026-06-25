@@ -167,20 +167,16 @@ func send(
 			}
 			schedulers[i-1] = sqliteQ.NewScheduler(subQueue, marshaler, outbox)
 		}
-		scanner, progress := queue.NewScanner(
-			// time.Millisecond,
-			time.Second,
-			queue.Cursor{},
-			queue.ChildCursor{},
-			queue.NewRoundRobinScheduler(schedulers...),
-		)
-		scanner.JoinErrorGroup(ctx, wg, q)
-		wg.Go(func() error {
-			for ids := range progress {
-				logger.Info("progress", slog.Any("ids", ids))
-			}
-			return nil
+		queue.NewContinuousScanner(ctx, wg, q, queue.NewRoundRobinScheduler(schedulers...), queue.ContinuousScannerOptions{
+			Frequency: time.Millisecond * 30,
+			// BeginWithOlderLetters: true,
 		})
+		// wg.Go(func() error {
+		// 	for ids := range progress {
+		// 		logger.Info("progress", slog.Any("ids", ids))
+		// 	}
+		// 	return nil
+		// })
 
 		confirmed := 0
 		router.AddConsumerHandler(

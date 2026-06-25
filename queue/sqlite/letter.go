@@ -232,10 +232,14 @@ func (q sqliteQueue) ListLetters(ctx context.Context, cursor queue.Cursor) iter.
 				yield(letter, err)
 				return
 			}
-			letter.SentAt, err = decodeTime(stmt.ColumnText(4))
-			if err != nil {
-				yield(letter, err)
-				return
+			if stmt.ColumnIsNull(4) {
+				letter.SentAt = time.Time{}
+			} else {
+				letter.SentAt, err = decodeTime(stmt.ColumnText(4))
+				if err != nil {
+					yield(letter, err)
+					return
+				}
 			}
 			if !yield(letter, nil) {
 				return

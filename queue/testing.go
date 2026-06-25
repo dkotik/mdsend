@@ -10,7 +10,7 @@ import (
 	"github.com/dkotik/mdsend"
 )
 
-var MockTime = time.Date(2026, 5, 6, 7, 8, 9, 11, time.UTC)
+var mockTime = time.Date(2026, 5, 6, 7, 8, 9, 11, time.FixedZone("PST", -8*60*60))
 
 func IteratorIsEmpty[T any](
 	iterator iter.Seq2[T, error],
@@ -32,8 +32,8 @@ func TestQueue(q Queue) func(*testing.T) {
 			"subject": "first letter",
 		},
 		Content:   "first letter",
-		CreatedAt: MockTime,
-		SentAt:    MockTime.Add(time.Hour * 70),
+		CreatedAt: mockTime,
+		SentAt:    mockTime.Add(time.Hour * 70),
 	}
 
 	l2 := mdsend.Letter{
@@ -42,8 +42,8 @@ func TestQueue(q Queue) func(*testing.T) {
 			"subject": "second letter",
 		},
 		Content:   "second letter",
-		CreatedAt: MockTime.Add(time.Hour * 50),
-		SentAt:    MockTime.Add(time.Hour * 170),
+		CreatedAt: mockTime.Add(time.Hour * 50),
+		SentAt:    mockTime.Add(time.Hour * 170),
 	}
 
 	messages := []mdsend.Message{
@@ -279,8 +279,8 @@ func QueueRecognizesDuplicates(q Queue) func(*testing.T) {
 				"subject": "first letter",
 			},
 			Content:   "first letter",
-			CreatedAt: MockTime.Add(time.Hour * 170),
-			SentAt:    MockTime.Add(time.Hour * 270),
+			CreatedAt: mockTime.Add(time.Hour * 170),
+			SentAt:    mockTime.Add(time.Hour * 270),
 		}
 		if err := q.CreateLetter(ctx, l1); err != nil {
 			t.Fatal(err)

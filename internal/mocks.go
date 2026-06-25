@@ -2,10 +2,7 @@ package internal
 
 import (
 	"net/mail"
-	"time"
 )
-
-var MockTime = time.Date(2026, 5, 6, 7, 8, 9, 11, time.UTC)
 
 var MockAddresses = []mail.Address{
 	mail.Address{Name: "Joe Crazy", Address: "crazyjoe@test.com"},

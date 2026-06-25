@@ -9,66 +9,72 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type scanner struct {
-	Frequency        time.Duration
-	LetterLimit      int
-	LetterBatch      []mdsend.Letter
-	LetterCursor     Cursor
-	MessageCursor    ChildCursor
-	Queue            Queue
-	QueuedMessageIDs chan []string
-	Scheduler        Scheduler
+type ContinuousScannerOptions struct {
+	Frequency             time.Duration
+	LetterBatchSize       uint8
+	MessageBatchSize      uint16
+	BeginWithOlderLetters bool
 }
 
-func NewScanner(
-	frequency time.Duration,
-	letterCursor Cursor,
-	messageCursor ChildCursor,
-	scheduler Scheduler,
-) (Process, <-chan []string) {
-	if scheduler == nil {
-		panic("scheduler is nil")
-	}
-	s := &scanner{
-		Frequency:        frequency,
-		LetterCursor:     letterCursor,
-		MessageCursor:    messageCursor,
-		Scheduler:        scheduler,
-		QueuedMessageIDs: make(chan []string),
-	}
-	if s.Frequency == 0 {
-		s.Frequency = time.Second
-	}
-	if s.LetterCursor.Batch == 0 {
-		s.LetterCursor.Batch = -5
-	}
-	if s.MessageCursor.Batch == 0 {
-		s.MessageCursor.Batch = -200
-	}
-	if s.LetterCursor.Batch > 0 {
-		s.LetterLimit = int(s.LetterCursor.Batch)
-	} else {
-		s.LetterLimit = int(-s.LetterCursor.Batch)
-	}
-	s.LetterBatch = make([]mdsend.Letter, 0, s.LetterLimit)
-	return s, s.QueuedMessageIDs
+type continuousScanner struct {
+	Queue     Queue
+	Scheduler Scheduler
 }
 
-func (s *scanner) JoinErrorGroup(ctx context.Context, errGroup *errgroup.Group, q Queue) {
+func NewContinuousScanner(
+	ctx context.Context,
+	wg *errgroup.Group,
+	q Queue,
+	s Scheduler,
+	options ContinuousScannerOptions,
+) {
+	if ctx == nil {
+		panic("context is nil")
+	}
+	if wg == nil {
+		panic("error group is nil")
+	}
 	if q == nil {
 		panic("queue is nil")
 	}
-	if s.Queue != nil {
-		panic("scanner is already bound to an error group")
+	if s == nil {
+		panic("scheduler is nil")
 	}
-	s.Queue = q
-	errGroup.Go(func() error {
-		defer close(s.QueuedMessageIDs)
-		return s.Scan(ctx)
+	if options.Frequency < time.Millisecond*20 {
+		options.Frequency = time.Second
+	}
+	if options.LetterBatchSize == 0 {
+		options.LetterBatchSize = 10
+	}
+	if options.MessageBatchSize == 0 {
+		options.MessageBatchSize = 200
+	}
+	letterCursor := Cursor{
+		ItemID: "",
+		Batch:  -int64(options.LetterBatchSize),
+	}
+	messageCursor := ChildCursor{
+		ParentID: "",
+		Cursor: Cursor{
+			ItemID: "",
+			Batch:  -int64(options.MessageBatchSize),
+		},
+	}
+	if options.BeginWithOlderLetters {
+		letterCursor.Batch *= -1
+		messageCursor.Batch *= -1
+	}
+	cs := continuousScanner{
+		Queue:     q,
+		Scheduler: s,
+	}
+	pulse := time.NewTicker(options.Frequency).C
+	wg.Go(func() error {
+		return cs.Scan(ctx, letterCursor, messageCursor, pulse)
 	})
 }
 
-func (s *scanner) MarkLetterAsSent(ctx context.Context, ID string) (err error) {
+func (s continuousScanner) MarkLetterAsSent(ctx context.Context, ID string) (err error) {
 	q, tx, err := s.Queue.BeginTransaction(ctx)
 	if err != nil {
 		return err
@@ -78,109 +84,108 @@ func (s *scanner) MarkLetterAsSent(ctx context.Context, ID string) (err error) {
 	return err
 }
 
-func (s *scanner) LoadNextBatchOfUnsentLetters(ctx context.Context) (err error) {
-	s.LetterBatch = s.LetterBatch[:0]
-	letterPull, letterStop := iter.Pull2[mdsend.Letter, error](s.Queue.ListLetters(ctx, s.LetterCursor))
-	for range s.LetterLimit {
-		letter, err, ok := letterPull()
-		if err != nil {
-			letterStop()
-			return err
-		}
-		if !ok {
-			break
-		}
-		if !letter.SentAt.IsZero() {
-			// skip letters that have already been sent
-			// TODO: try to expire the letter according to schedule
-			continue
-		}
-		s.LetterBatch = append(s.LetterBatch, letter)
+func (s continuousScanner) Scan(
+	ctx context.Context,
+	lc Cursor,
+	mc ChildCursor,
+	pulse <-chan time.Time,
+) (err error) {
+	letterBatchSize := lc.Batch
+	if letterBatchSize < 0 {
+		letterBatchSize = -letterBatchSize
 	}
-	found := len(s.LetterBatch)
-	if found == 0 {
-		// wrap the cursor to the beginning
-		s.LetterCursor.ItemID = ""
-	} else {
-		// aim cursor to the next batch
-		s.LetterCursor.ItemID = s.LetterBatch[found-1].ID
+	messageBatchSize := mc.Batch
+	if messageBatchSize < 0 {
+		messageBatchSize = -messageBatchSize
 	}
-	letterStop()
-	return nil
-}
-
-func (s *scanner) Scan(ctx context.Context) (err error) {
-	foundUnsent := 0
-	batchSize := s.MessageCursor.Batch
-	if batchSize < 0 {
-		batchSize = -batchSize
-	}
-	batch := make([]string, 0, batchSize)
-	messages := make([]mdsend.Message, 0, batchSize)
+	letters := make([]mdsend.Letter, 0, letterBatchSize)
+	messages := make([]mdsend.Message, 0, messageBatchSize)
+	foundUnsentInLetter := 0
+	foundUnsentInBatch := 0
+	letter := mdsend.Letter{}
+	message := mdsend.Message{}
+	ok := false
 
 	for {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case <-time.After(s.Frequency):
-		}
-		if err = s.LoadNextBatchOfUnsentLetters(ctx); err != nil {
-			return err
+		case <-pulse:
 		}
 
-		for _, letter := range s.LetterBatch {
-			s.MessageCursor.ParentID = letter.ID
-			batch = batch[:0]
+		letters = letters[:0]
+		letterPull, letterStop := iter.Pull2[mdsend.Letter, error](s.Queue.ListLetters(ctx, lc))
+		for range letterBatchSize {
+			letter, err, ok = letterPull()
+			if err != nil {
+				// panic(fmt.Sprintf("%s: %+v", letter.ID, lc))
+				letterStop()
+				return err
+			}
+			if !ok {
+				// wrap the cursor to the beginning
+				lc.ItemID = ""
+				break
+			}
+			if !letter.SentAt.IsZero() {
+				// skip letters that have already been sent
+				// TODO: try to expire the letter according to schedule
+				continue
+			}
+			letters = append(letters, letter)
+		}
+		letterStop()
+		if ok {
+			// aim cursor to the next batch
+			lc.ItemID = letter.ID
+		}
+
+		for _, letter := range letters {
+			mc.ParentID = letter.ID
 			messages = messages[:0]
+			mc.Cursor.ItemID = ""
+			foundUnsentInLetter = 0
+
 			for {
-				messagePull, messageStop := iter.Pull2[mdsend.Message, error](s.Queue.ListMessages(ctx, s.MessageCursor))
-				for range s.MessageCursor.Batch {
-					message, err, ok := messagePull()
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				case <-pulse:
+				}
+
+				messagePull, messageStop := iter.Pull2[mdsend.Message, error](s.Queue.ListMessages(ctx, mc))
+				for range messageBatchSize {
+					message, err, ok = messagePull()
 					if err != nil {
 						messageStop()
 						return err
 					}
 					if !ok {
-						s.MessageCursor.Cursor.ItemID = ""
 						break
 					}
-					s.MessageCursor.Cursor.ItemID = message.ID
 					if message.SentAt.IsZero() {
-						batch = append(batch, message.ID)
 						messages = append(messages, message)
 					}
 				}
 				messageStop()
 
-				if len(batch) > 0 {
+				if foundUnsentInBatch = len(messages); foundUnsentInBatch > 0 {
 					if err = s.Scheduler.ScheduleForDelivery(ctx, messages); err != nil {
 						return err
 					}
-					foundUnsent += len(batch)
-					select {
-					case <-ctx.Done():
-						return ctx.Err()
-					case s.QueuedMessageIDs <- batch:
-						// delivered a batch of discovered messages that were not yet sent
-					}
+					foundUnsentInLetter += foundUnsentInBatch
 				}
-
-				if s.MessageCursor.Cursor.ItemID == "" {
+				if !ok {
 					break
 				}
-				select {
-				case <-ctx.Done():
-					return ctx.Err()
-				case <-time.After(s.Frequency):
-				}
+				mc.Cursor.ItemID = message.ID
 			}
 
-			if foundUnsent == 0 {
+			if foundUnsentInLetter == 0 {
 				if err = s.MarkLetterAsSent(ctx, letter.ID); err != nil {
 					return err
 				}
 			}
-			foundUnsent = 0
 		}
 	}
 }

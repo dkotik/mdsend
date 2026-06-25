@@ -32,6 +32,12 @@ type Scheduler interface {
 	ScheduleForDelivery(context.Context, []mdsend.Message) error
 }
 
+type SchedulerFunc func(context.Context, []mdsend.Message) error
+
+func (f SchedulerFunc) ScheduleForDelivery(ctx context.Context, batch []mdsend.Message) error {
+	return f(ctx, batch)
+}
+
 type basicScheduler struct {
 	Queue     Queue
 	Publisher message.Publisher
