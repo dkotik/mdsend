@@ -2,24 +2,22 @@ package queue
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"time"
+	"iter"
+	"sync"
 
-	"github.com/ThreeDotsLabs/watermill/message"
-	"golang.org/x/sync/errgroup"
+	"github.com/dkotik/mdsend"
 )
 
-type Confirmation struct {
-	LetterID       string
-	MessageID      string
-	ConfirmationID string
-	SentAt         time.Time
-}
+var _ Queue = (*progressTracker)(nil)
 
 type Progress struct {
-	Sent  int
-	Total int
+	Sent  int64
+	Total int64
+}
+
+type ProgressTracker interface {
+	TrackProgress(context.Context, Progress)
 }
 
 func (p Progress) OfOne() float64 {
@@ -31,83 +29,118 @@ func (p Progress) String() string {
 }
 
 type progressTracker struct {
-	Queue      Queue
-	Discovered <-chan []string
-	Sent       chan string
-	Progress   chan Progress
+	Queue
+	Report ProgressTracker
+
+	mu                  *sync.Mutex
+	pendingLetterIDs    map[string]struct{}
+	pendingMessages     map[string]string
+	pendingMessageCount int64
+	sentMessageCount    int64
 }
 
 func NewProgressTracker(
-	pendingMessageIDs <-chan []string,
-) (Process, message.NoPublishHandlerFunc, <-chan Progress) {
-	tracker := &progressTracker{
-		Discovered: pendingMessageIDs,
-		Sent:       make(chan string),
-		Progress:   make(chan Progress), // closed by Run
+	q Queue,
+	report ProgressTracker,
+) Queue {
+	return &progressTracker{
+		Queue:            q,
+		Report:           report,
+		mu:               &sync.Mutex{},
+		pendingLetterIDs: make(map[string]struct{}),
+		pendingMessages:  make(map[string]string),
 	}
-	return tracker, tracker.Handle, tracker.Progress
 }
 
-func (t *progressTracker) JoinErrorGroup(ctx context.Context, eg *errgroup.Group, q Queue) {
-	if q == nil {
-		panic("queue is nil")
-	}
-	if t.Queue != nil {
-		panic("tracker is already bound to an error group")
-	}
-	t.Queue = q
-	eg.Go(func() error {
-		defer close(t.Progress)
-		return t.Run(ctx)
-	})
-}
-
-func (t *progressTracker) Run(ctx context.Context) (err error) {
-	progress := Progress{}
-	known := make(map[string]bool)
-	update, ok := false, false
-	id := ""
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case batch := <-t.Discovered:
-			for _, id = range batch {
-				if _, ok = known[id]; !ok {
-					known[id] = false
-					update = true
-				}
+func (p *progressTracker) ListLetters(
+	ctx context.Context,
+	cursor Cursor,
+) iter.Seq2[mdsend.Letter, error] {
+	return func(yield func(mdsend.Letter, error) bool) {
+		var (
+			pending             []string
+			sent                []string
+			letter              mdsend.Letter
+			messageID, letterID string
+			err                 error
+			ID                  string
+			ok                  bool
+		)
+		for letter, err = range p.Queue.ListLetters(ctx, cursor) {
+			if letter.SentAt.IsZero() {
+				pending = append(pending, letter.ID)
+			} else {
+				sent = append(sent, letter.ID)
 			}
-		case id = <-t.Sent:
-			known[id] = true
-			update = true
-		case t.Progress <- progress:
-			if update {
-				update = false
-				progress.Total = len(known)
-				progress.Sent = 0
-				for _, ok = range known {
-					if ok {
-						progress.Sent++
+			if !yield(letter, err) {
+				return
+			}
+		}
+
+		p.mu.Lock()
+		for _, ID = range sent {
+			if _, ok = p.pendingLetterIDs[ID]; ok {
+				delete(p.pendingLetterIDs, ID)
+				for messageID, letterID = range p.pendingMessages {
+					if letterID == ID {
+						delete(p.pendingMessages, messageID)
+						p.sentMessageCount++
 					}
 				}
 			}
 		}
+		for _, ID = range pending {
+			p.pendingLetterIDs[ID] = struct{}{}
+		}
+		p.mu.Unlock()
 	}
 }
 
-func (t *progressTracker) Handle(msg *message.Message) (err error) {
-	var confirmation Confirmation
-	if err = json.Unmarshal(msg.Payload, &confirmation); err == nil {
-		ctx := msg.Context()
-		if _, err = t.Queue.MarkMessageAsSent(ctx, confirmation.MessageID); err != nil {
-			return err
+func (p progressTracker) ListMessages(
+	ctx context.Context,
+	cursor ChildCursor,
+) iter.Seq2[mdsend.Message, error] {
+	return func(yield func(mdsend.Message, error) bool) {
+		var (
+			pending  []string
+			sent     []string
+			message  mdsend.Message
+			letterID string
+			ID       string
+			ok       bool
+			err      error
+		)
+		for message, err = range p.Queue.ListMessages(ctx, cursor) {
+			if message.SentAt.IsZero() {
+				pending = append(pending, message.ID)
+			} else {
+				sent = append(sent, message.ID)
+			}
+			if !yield(message, err) {
+				return
+			}
 		}
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case t.Sent <- confirmation.MessageID:
+		p.mu.Lock()
+		for _, ID = range sent {
+			if _, ok = p.pendingMessages[ID]; ok {
+				delete(p.pendingMessages, ID)
+				p.sentMessageCount++
+			}
 		}
+		if len(pending) > 0 {
+			letterID = cursor.ParentID
+			p.pendingLetterIDs[letterID] = struct{}{}
+			for _, ID = range pending {
+				if _, ok = p.pendingMessages[ID]; !ok {
+					p.pendingMessages[ID] = letterID
+					p.pendingMessageCount++
+				}
+			}
+		}
+		p.Report.TrackProgress(ctx, Progress{
+			Sent:  p.sentMessageCount,
+			Total: p.pendingMessageCount,
+		})
+		p.mu.Unlock()
 	}
-	return nil
 }

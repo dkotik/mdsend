@@ -42,6 +42,13 @@ type Transaction interface {
 	Close(*error)
 }
 
+type Confirmation struct {
+	LetterID       string
+	MessageID      string
+	ConfirmationID string
+	SentAt         time.Time
+}
+
 type Queue interface {
 	CreateLetter(context.Context, mdsend.Letter) error
 	RetrieveLetter(context.Context, string) (mdsend.Letter, error)
