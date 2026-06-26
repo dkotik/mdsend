@@ -169,6 +169,11 @@ func send(
 		}
 		queue.NewContinuousScanner(ctx, wg, q, queue.NewRoundRobinScheduler(schedulers...), queue.ContinuousScannerOptions{
 			Frequency: time.Millisecond * 30,
+			ProgressTracker: queue.ProgressTrackerFunc(
+				func(ctx context.Context, p queue.Progress) {
+					logger.Info("progress", slog.Any("report", p))
+				},
+			),
 			// BeginWithOlderLetters: true,
 		})
 		// wg.Go(func() error {

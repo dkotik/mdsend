@@ -29,13 +29,17 @@ func (m marshalerJSON) MarshalMessage(v any) (*message.Message, error) {
 }
 
 type Scheduler interface {
-	ScheduleForDelivery(context.Context, []mdsend.Message) error
+	ScheduleForDelivery(context.Context, mdsend.Letter, []mdsend.Message) error
 }
 
-type SchedulerFunc func(context.Context, []mdsend.Message) error
+type SchedulerFunc func(context.Context, mdsend.Letter, []mdsend.Message) error
 
-func (f SchedulerFunc) ScheduleForDelivery(ctx context.Context, batch []mdsend.Message) error {
-	return f(ctx, batch)
+func (f SchedulerFunc) ScheduleForDelivery(
+	ctx context.Context,
+	letter mdsend.Letter,
+	batch []mdsend.Message,
+) error {
+	return f(ctx, letter, batch)
 }
 
 type basicScheduler struct {
@@ -75,6 +79,7 @@ func NewSchedulerForPublisher(q Queue, m Marshaler, pub message.Publisher, topic
 
 func (s basicScheduler) ScheduleForDelivery(
 	ctx context.Context,
+	l mdsend.Letter,
 	m []mdsend.Message,
 ) (err error) {
 	if len(m) == 0 {
@@ -92,7 +97,7 @@ func (s basicScheduler) ScheduleForDelivery(
 		ids = append(ids, d.ID)
 	}
 	forPublisher[0].SetContext(ctx)
-	if err = s.Queue.MarkMessagesAsQueued(ctx, ids...); err != nil {
+	if err = s.Queue.MarkMessagesAsScheduled(ctx, l.ID, ids...); err != nil {
 		return err
 	}
 	if err = s.Publisher.Publish(s.Topic, forPublisher...); err != nil {
@@ -124,8 +129,9 @@ func NewRoundRobinScheduler(schedulers ...Scheduler) Scheduler {
 
 func (s roundRobinScheduler) ScheduleForDelivery(
 	ctx context.Context,
+	l mdsend.Letter,
 	m []mdsend.Message,
 ) error {
 	s.Cursor = (s.Cursor + 1) % len(s.Schedulers)
-	return s.Schedulers[s.Cursor].ScheduleForDelivery(ctx, m)
+	return s.Schedulers[s.Cursor].ScheduleForDelivery(ctx, l, m)
 }

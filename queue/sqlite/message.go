@@ -149,12 +149,13 @@ func (q sqliteQueue) ListMessages(ctx context.Context, cursor queue.ChildCursor)
 	}
 }
 
-func (q sqliteQueue) MarkMessagesAsQueued(ctx context.Context, IDs ...string) (err error) {
+func (q sqliteQueue) MarkMessagesAsScheduled(ctx context.Context, letterID string, IDs ...string) (err error) {
 	ids, err := json.Marshal(IDs)
 	if err != nil {
 		return err
 	}
 	defer q.BindContext(ctx)()
+	// TODO: letterID should also be bound
 	if err = q.stmtMarkMessagesAsQueued.Reset(); err != nil {
 		return err
 	}

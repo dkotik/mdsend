@@ -35,6 +35,7 @@ func NewScheduler(q queue.Queue, m queue.Marshaler, topic string) queue.Schedule
 
 func (s scheduler) ScheduleForDelivery(
 	ctx context.Context,
+	l mdsend.Letter,
 	m []mdsend.Message,
 ) (err error) {
 	if len(m) == 0 {
@@ -54,7 +55,7 @@ func (s scheduler) ScheduleForDelivery(
 	forPublisher[0].SetContext(ctx)
 	q, tx, err := s.Queue.BeginTransaction(ctx)
 	defer tx.Close(&err)
-	if err = q.MarkMessagesAsQueued(ctx, ids...); err != nil {
+	if err = q.MarkMessagesAsScheduled(ctx, l.ID, ids...); err != nil {
 		return err
 	}
 	if err = s.Publisher.Publish(s.Topic, forPublisher...); err != nil {

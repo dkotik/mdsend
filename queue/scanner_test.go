@@ -79,7 +79,7 @@ func TestContinuousScanner(t *testing.T) {
 		defer cancel()
 		eg, ctx := errgroup.WithContext(ctx)
 		found := 0
-		queue.NewContinuousScanner(ctx, eg, q, queue.SchedulerFunc(func(ctx context.Context, m []mdsend.Message) error {
+		queue.NewContinuousScanner(ctx, eg, q, queue.SchedulerFunc(func(ctx context.Context, l mdsend.Letter, m []mdsend.Message) error {
 			found++
 			return nil
 		}), queue.ContinuousScannerOptions{
