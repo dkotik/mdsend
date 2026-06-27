@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -28,10 +30,13 @@ func (m mockMailer) SendMail(ctx context.Context, letter mdsend.Message) (string
 func TestSend(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), time.Second)
 	defer cancel()
-	dsn := "file:testSendCommand?mode=memory&cache=shared"
+	dsn := fmt.Sprintf("%s?cache=shared&foreign_keys=on", filepath.Join(t.TempDir(), "testSend.sqlite3"))
+	// dsn := "file:/test/sendCommand?vfs=memdb"
 	// dsn := "testdata/testSendCommand?cache=shared"
 	err := addLetters(ctx, dsn, []mdsend.Letter{
-		mdsend.Letter{},
+		mdsend.Letter{
+			ID: "firstTestLetter",
+		},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -67,7 +72,10 @@ func TestSend(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// if len(mailer.sentLetters) != 1 || true {
-	// 	t.Fatalf("expected 1 sent message, got %d", len(mailer.sentLetters))
-	// }
+	if len(mailer.sentLetters) != 1 || true {
+		for _, line := range bytes.Split(b.Bytes(), []byte("\n")) {
+			t.Log(string(line))
+		}
+		t.Fatalf("expected 1 sent message, got %d", len(mailer.sentLetters))
+	}
 }

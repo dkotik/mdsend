@@ -9,6 +9,7 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/queue"
+	lib "modernc.org/sqlite/lib"
 	"zombiezen.com/go/sqlite"
 )
 
@@ -35,10 +36,14 @@ func (q sqliteQueue) CreateLetter(
 		q.stmtInsertLetter.BindText(5, encodeTime(l.SentAt))
 	}
 	_, err = q.stmtInsertLetter.Step()
-	if err != nil {
+	switch code := sqlite.ErrCode(err); code {
+	case lib.SQLITE_OK:
+		return nil
+	case lib.SQLITE_CONSTRAINT_PRIMARYKEY:
+		return mdsend.ErrDuplicateLetter
+	default:
 		return err
 	}
-	return err
 }
 
 func (q sqliteQueue) RetrieveLetter(ctx context.Context, ID string) (result mdsend.Letter, err error) {

@@ -82,10 +82,7 @@ func send(
 ) (err error) {
 	wg.Go(func() error {
 		wmLogger := watermill.NewSlogLogger(logger)
-		queueConn, err := sqlite.OpenConn(
-			connectionDSN,
-			// sqlite.OpenCreate, sqlite.OpenReadWrite,
-		)
+		queueConn, err := newDatabaseConnection(connectionDSN)
 		if err != nil {
 			return fmt.Errorf("queue database %q inaccessible: %w", connectionDSN, err)
 		}
@@ -97,10 +94,7 @@ func send(
 			return fmt.Errorf("unable to setup queue: %w", err)
 		}
 
-		publisherConn, err := sqlite.OpenConn(
-			connectionDSN,
-			// sqlite.OpenCreate, sqlite.OpenReadWrite,
-		)
+		publisherConn, err := newDatabaseConnection(connectionDSN)
 		if err != nil {
 			return fmt.Errorf("publisher database %q inaccessible: %w", connectionDSN, err)
 		}
@@ -151,10 +145,7 @@ func send(
 			)
 
 			// a separate queue with its own connection is needed for each scheduler
-			conn, err := sqlite.OpenConn(
-				connectionDSN,
-				// sqlite.OpenCreate, sqlite.OpenReadWrite,
-			)
+			conn, err := newDatabaseConnection(connectionDSN)
 			if err != nil {
 				return fmt.Errorf("outbox database %q inaccessible: %w", connectionDSN, err)
 			}

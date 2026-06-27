@@ -24,6 +24,7 @@ type LetterError uint
 const (
 	ErrNoSubject LetterError = iota + 1
 	// ErrNoQueue
+	ErrDuplicateLetter
 	ErrNoFromAddress
 	ErrNoContent
 	ErrLetterNotFound
@@ -33,6 +34,8 @@ func (l LetterError) Error() string {
 	switch l {
 	case ErrNoSubject:
 		return "there is no subject in frontmatter"
+	case ErrDuplicateLetter:
+		return "duplicate letter"
 	case ErrNoFromAddress:
 		return "there is no from address in frontmatter"
 	case ErrNoContent:

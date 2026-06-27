@@ -37,12 +37,15 @@ func (q sqliteQueue) CreateMessage(
 	q.stmtInsertMessage.BindText(8, d.Subject)
 	q.stmtInsertMessage.BindText(9, d.Text)
 	q.stmtInsertMessage.BindText(10, d.HTML)
-	q.stmtInsertMessage.BindText(11, d.ScheduleAfter.Format(time.RFC3339))
+	if !d.ScheduleAfter.IsZero() {
+		q.stmtInsertMessage.BindText(11, d.ScheduleAfter.Format(time.RFC3339))
+	}
 	_, err = q.stmtInsertMessage.Step()
 	switch code := sqlite.ErrCode(err); code {
 	case lib.SQLITE_OK:
 		return nil
-	case lib.SQLITE_CONSTRAINT_UNIQUE:
+	case lib.SQLITE_CONSTRAINT_PRIMARYKEY, lib.SQLITE_CONSTRAINT_UNIQUE:
+		// same id or same combination of letter_id and recipient address
 		return mdsend.ErrDuplicateMessage
 	default:
 		return err

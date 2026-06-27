@@ -5,50 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"net/mail"
-	"slices"
-	"strings"
 	"time"
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/internal/media"
 	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
 	"github.com/urfave/cli/v3"
-	"zombiezen.com/go/sqlite"
 )
-
-var flagDatabase = &cli.StringFlag{
-	Name:    `database`,
-	Usage:   `Path to the queue database file or data source name.`,
-	Aliases: []string{`db`},
-	Sources: cli.ValueSourceChain{
-		Chain: []cli.ValueSource{
-			cli.EnvVar("MDSEND_DATABASE"),
-			xdgDataFile("queue.sqlite3"),
-		},
-	},
-	Value: "mdsend_queue.sqlite3?cache=shared&foreign_keys=on",
-	Validator: func(p string) error {
-		if strings.TrimSpace(p) == "" {
-			return errors.New(`database path is empty`)
-		}
-		return nil
-	},
-	Action: func(ctx context.Context, c *cli.Command, p string) error {
-		p, params, _ := strings.Cut(p, "?")
-		paramValues := strings.Split(params, "&")
-		if !slices.Contains(paramValues, `cache=shared`) {
-			paramValues = append(paramValues, `cache=shared`)
-		}
-		if !slices.ContainsFunc(paramValues, func(v string) bool {
-			return strings.HasPrefix(strings.TrimSpace(v), `foreign_keys=`)
-		}) {
-			paramValues = append(paramValues, `foreign_keys=on`)
-		}
-		c.Set(`database`, fmt.Sprintf("%s?%s", p, strings.Join(paramValues, "&")))
-		// connectionDSN := "file:ephemeral?mode=memory&cache=shared"
-		return nil
-	},
-}
 
 func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 	if c.Args().Len() == 0 {
@@ -78,13 +41,10 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 	return addLetters(ctx, p, letters)
 }
 
-func addLetters(ctx context.Context, conntectionDSN string, letters []mdsend.Letter) (err error) {
-	conn, err := sqlite.OpenConn(
-		conntectionDSN,
-		// sqlite.OpenCreate, sqlite.OpenReadWrite,
-	)
+func addLetters(ctx context.Context, connectionDSN string, letters []mdsend.Letter) (err error) {
+	conn, err := newDatabaseConnection(connectionDSN)
 	if err != nil {
-		return fmt.Errorf("database %q inaccessible: %w", conntectionDSN, err)
+		return fmt.Errorf("database %q inaccessible: %w", connectionDSN, err)
 	}
 	defer func() {
 		err = errors.Join(err, conn.Close())
@@ -101,6 +61,10 @@ func addLetters(ctx context.Context, conntectionDSN string, letters []mdsend.Let
 
 	for _, letter := range letters {
 		if err = queue.CreateLetter(ctx, letter); err != nil {
+			if errors.Is(err, mdsend.ErrDuplicateLetter) {
+				err = nil
+				continue // already populated
+			}
 			return err
 		}
 		for range 1 {

@@ -328,6 +328,7 @@ func TestQueue(q Queue) func(*testing.T) {
 func QueueRecognizesDuplicates(q Queue) func(*testing.T) {
 	return func(t *testing.T) {
 		ctx := t.Context()
+		var err error
 		l1 := mdsend.Letter{
 			ID: "duplicationTestLetter",
 			Frontmatter: map[string]any{
@@ -337,14 +338,17 @@ func QueueRecognizesDuplicates(q Queue) func(*testing.T) {
 			CreatedAt: mockTime.Add(time.Hour * 170),
 			SentAt:    mockTime.Add(time.Hour * 270),
 		}
-		if err := q.CreateLetter(ctx, l1); err != nil {
+		if err = q.CreateLetter(ctx, l1); err != nil {
 			t.Fatal(err)
 		}
 		defer func() {
-			if err := q.DeleteLetter(ctx, l1.ID); err != nil {
+			if err = q.DeleteLetter(ctx, l1.ID); err != nil {
 				t.Fatal(err)
 			}
 		}()
+		if err = q.CreateLetter(ctx, l1); !errors.Is(err, mdsend.ErrDuplicateLetter) {
+			t.Fatalf("expected duplicate letter error, got: %v", err)
+		}
 
 		d := mdsend.Message{
 			LetterID: "testLetter",
@@ -357,8 +361,15 @@ func QueueRecognizesDuplicates(q Queue) func(*testing.T) {
 			Text:    "",
 			HTML:    "",
 		}
-		if err := q.CreateMessage(ctx, d); err != nil {
+		if err = q.CreateMessage(ctx, d); err != nil {
 			t.Fatal(err)
+		}
+		if err = q.CreateMessage(ctx, d); !errors.Is(err, mdsend.ErrDuplicateMessage) {
+			t.Fatalf("expected duplicate message error, got: %v", err)
+		}
+		d.To = mail.Address{ // change into order to avoid triggering Unique constraint
+			Name:    "First Last2",
+			Address: "first.last2@example.com",
 		}
 		if err := q.CreateMessage(ctx, d); !errors.Is(err, mdsend.ErrDuplicateMessage) {
 			t.Fatalf("expected duplicate message error, got: %v", err)

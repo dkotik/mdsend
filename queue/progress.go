@@ -27,14 +27,23 @@ func (p Progress) EstimateRemaining() time.Duration {
 }
 
 func (p Progress) MessagesPerSecond() int64 {
+	if p.Average == 0 {
+		return 0
+	}
 	return int64(time.Second / p.Average)
 }
 
 func (p Progress) MessagesPerMinute() int64 {
+	if p.Average == 0 {
+		return 0
+	}
 	return int64(time.Minute / p.Average)
 }
 
 func (p Progress) OfOne() float64 {
+	if p.Total == 0 {
+		return 0
+	}
 	return float64(p.Sent) / float64(p.Total)
 }
 
@@ -126,7 +135,7 @@ func (p *progressTracker) ListLetters(
 				sent = append(sent, letter.ID)
 			}
 			if !yield(letter, err) {
-				return
+				break
 			}
 		}
 
@@ -180,9 +189,10 @@ func (p progressTracker) ListMessages(
 				durationsCount++
 			}
 			if !yield(message, err) {
-				return
+				break
 			}
 		}
+
 		p.mu.Lock()
 		for _, ID = range sent {
 			if _, ok = p.pendingMessages[ID]; ok {
@@ -200,7 +210,9 @@ func (p progressTracker) ListMessages(
 				}
 			}
 		}
-		p.LastAverage = durations / durationsCount
+		if durationsCount > 0 {
+			p.LastAverage = durations / durationsCount
+		}
 		p.Report.TrackProgress(ctx, Progress{
 			Sent:    p.sentMessageCount,
 			Total:   p.pendingMessageCount,
