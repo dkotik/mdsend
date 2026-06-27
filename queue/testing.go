@@ -4,6 +4,7 @@ import (
 	"errors"
 	"iter"
 	"net/mail"
+	"slices"
 	"testing"
 	"time"
 
@@ -153,6 +154,7 @@ func TestQueue(q Queue) func(*testing.T) {
 			}
 		}
 
+		// list messages forward
 		l1messages := make([]mdsend.Message, 0, 1)
 		for l1message, err := range q.ListMessages(ctx, ChildCursor{
 			ParentID: l1.ID,
@@ -187,6 +189,31 @@ func TestQueue(q Queue) func(*testing.T) {
 			}
 		}
 
+		// list messages backwards
+		l1messages = l1messages[:0]
+		for l1message, err := range q.ListMessages(ctx, ChildCursor{
+			ParentID: l1.ID,
+			Cursor: Cursor{
+				ItemID: "",
+				Batch:  -1,
+			},
+		}) {
+			if err != nil {
+				t.Fatal("unable to list messages for first letter:", err)
+			}
+			l1messages = append(l1messages, l1message)
+		}
+		if len(l1messages) != len(messages) {
+			t.Fatal("message count mismatch on backwards listing: expected", len(messages), "got", len(l1messages))
+		}
+		slices.Reverse(messages)
+		for i, d := range l1messages {
+			d.ID = messages[i].ID // copy the ID from the expected message
+			if err = d.AssertEqualityTo(messages[i]); err != nil {
+				t.Fatal("messages do not match:", err)
+			}
+		}
+
 		if err = q.CreateLetter(ctx, l2); err != nil {
 			t.Fatal("unable to create the second letter:", err)
 		}
@@ -214,7 +241,7 @@ func TestQueue(q Queue) func(*testing.T) {
 			t.Fatal("letters do not match:", err)
 		}
 
-		// test letter listing
+		// test letter listing forwards
 		ok := false
 		next, stop := iter.Pull2(q.ListLetters(ctx, Cursor{Batch: 1}))
 		if next == nil {
@@ -238,6 +265,34 @@ func TestQueue(q Queue) func(*testing.T) {
 			t.Fatal("unable to retrieve the second letter:", err)
 		}
 		if err = l2.AssertEqualityTo(lcomp); err != nil {
+			t.Fatal("letters do not match:", err)
+		}
+		stop()
+
+		// test letter listing backwards
+		ok = false
+		next, stop = iter.Pull2(q.ListLetters(ctx, Cursor{Batch: -1}))
+		if next == nil {
+			t.Fatal("no letters found")
+		}
+		lcomp, err, ok = next()
+		if !ok {
+			t.Fatal("no letters found, when the second letter was expected")
+		}
+		if err != nil {
+			t.Fatal("unable to retrieve the second letter:", err)
+		}
+		if err = l2.AssertEqualityTo(lcomp); err != nil {
+			t.Fatal("letters do not match:", err)
+		}
+		lcomp, err, ok = next()
+		if !ok {
+			t.Fatal("no letters found, when the first letter was expected")
+		}
+		if err != nil {
+			t.Fatal("unable to retrieve the first letter:", err)
+		}
+		if err = l1.AssertEqualityTo(lcomp); err != nil {
 			t.Fatal("letters do not match:", err)
 		}
 		stop()

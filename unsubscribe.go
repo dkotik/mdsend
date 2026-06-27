@@ -1,10 +1,19 @@
 package mdsend
 
-import "net/mail"
+import (
+	"log/slog"
+	"net/mail"
+)
+
+var _ slog.LogValuer = (*Unsubscribe)(nil)
 
 type Unsubscribe struct {
 	mail.Address
 	URL string
+}
+
+func (u Unsubscribe) LogValue() slog.Value {
+	return slog.StringValue(u.URL)
 }
 
 func (l Letter) GetListID() (listID string, err error) {

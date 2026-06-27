@@ -2,12 +2,15 @@ package mdsend
 
 import (
 	"fmt"
+	"log/slog"
 	"net/mail"
 	"net/textproto"
 	"sort"
 	"strings"
 	"time"
 )
+
+var _ slog.LogValuer = (*Message)(nil)
 
 type MessageError uint8
 
@@ -180,4 +183,12 @@ func (m Message) AssertEqualityTo(b Message) error {
 
 func (m Message) IsEqualTo(b Message) bool {
 	return m.AssertEqualityTo(b) == nil
+}
+
+func (m Message) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("id", m.ID),
+		slog.String("letter_id", m.LetterID),
+		slog.String("subject", m.Subject),
+	)
 }

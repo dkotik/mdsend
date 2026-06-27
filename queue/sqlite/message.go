@@ -49,33 +49,46 @@ func (q sqliteQueue) CreateMessage(
 	}
 }
 
+func (q sqliteQueue) selectResetBindListMessagesStatement(letterID, ID string, batch int64) (stmt *sqlite.Stmt, err error) {
+	if batch < 0 {
+		if ID == "" {
+			stmt = q.stmtListMessagesBackwardHead
+			if err = stmt.Reset(); err != nil {
+				return stmt, err
+			}
+			stmt.BindText(1, letterID)
+			stmt.BindInt64(2, -batch)
+			return stmt, nil
+		}
+		stmt = q.stmtListMessagesBackward
+		if err = stmt.Reset(); err != nil {
+			return stmt, err
+		}
+		stmt.BindText(1, letterID)
+		stmt.BindText(2, ID)
+		stmt.BindInt64(3, -batch)
+		return stmt, nil
+	}
+	stmt = q.stmtLisMessagesForward
+	if err = stmt.Reset(); err != nil {
+		return stmt, err
+	}
+	stmt.BindText(1, letterID)
+	stmt.BindText(2, ID)
+	stmt.BindInt64(3, batch)
+	return stmt, nil
+}
+
 func (q sqliteQueue) ListMessages(ctx context.Context, cursor queue.ChildCursor) iter.Seq2[mdsend.Message, error] {
 	return func(yield func(mdsend.Message, error) bool) {
 		defer q.BindContext(ctx)()
-		limit := cursor.Batch
 		var m mdsend.Message
-		m.LetterID = cursor.ParentID
-
-		stmt := q.stmtLisMessagesForward
-		if limit < 0 {
-			limit = -limit
-			stmt = q.stmtListMessagesBackward
-		}
-
-		// nextPage:
-		err := stmt.Reset()
+		m.LetterID = cursor.ParentID // propagate parent to all returned rows
+		stmt, err := q.selectResetBindListMessagesStatement(cursor.ParentID, cursor.ItemID, cursor.Batch)
 		if err != nil {
 			yield(m, err)
 			return
 		}
-
-		stmt.BindText(1, cursor.ParentID)
-		if cursor.ItemID == "" {
-			stmt.BindText(2, "0")
-		} else {
-			stmt.BindText(2, cursor.ItemID)
-		}
-		stmt.BindInt64(3, limit)
 
 		for {
 			ok, err := stmt.Step()
@@ -85,14 +98,11 @@ func (q sqliteQueue) ListMessages(ctx context.Context, cursor queue.ChildCursor)
 			}
 			if !ok {
 				if m.ID != "" {
-					// could be more pages
-					if err = stmt.Reset(); err != nil {
+					stmt, err = q.selectResetBindListMessagesStatement(cursor.ParentID, m.ID, cursor.Batch)
+					if err != nil {
 						yield(m, err)
 						return
 					}
-					stmt.BindText(1, cursor.ParentID)
-					stmt.BindText(2, m.ID)
-					stmt.BindInt64(3, limit)
 					// prevent infinite loop
 					m.ID = ""
 					// goto nextPage

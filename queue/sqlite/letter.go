@@ -9,6 +9,7 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/queue"
+	"zombiezen.com/go/sqlite"
 )
 
 func (q sqliteQueue) CreateLetter(
@@ -175,30 +176,43 @@ func (q sqliteQueue) DeleteLetter(ctx context.Context, ID string) (err error) {
 	return nil
 }
 
+func (q sqliteQueue) selectResetBindListLettersStatement(ID string, batch int64) (stmt *sqlite.Stmt, err error) {
+	if batch < 0 {
+		if ID == "" {
+			stmt = q.stmtListLettersBackwardHead
+			if err = stmt.Reset(); err != nil {
+				return stmt, err
+			}
+			stmt.BindInt64(1, -batch)
+			return stmt, nil
+		}
+		stmt = q.stmtListLettersBackward
+		if err = stmt.Reset(); err != nil {
+			return stmt, err
+		}
+		stmt.BindText(1, ID)
+		stmt.BindInt64(2, -batch)
+		return stmt, nil
+	}
+	stmt = q.stmtListLettersForward
+	if err = stmt.Reset(); err != nil {
+		return stmt, err
+	}
+	stmt.BindText(1, ID)
+	stmt.BindInt64(2, batch)
+	return stmt, nil
+}
+
 func (q sqliteQueue) ListLetters(ctx context.Context, cursor queue.Cursor) iter.Seq2[mdsend.Letter, error] {
 	return func(yield func(mdsend.Letter, error) bool) {
 		defer q.BindContext(ctx)()
-		limit := cursor.Batch
 		var letter mdsend.Letter
-		// lastID := cursor.ItemID
-
-		stmt := q.stmtListLettersForward
-		if limit < 0 {
-			limit = -limit
-			stmt = q.stmtListLettersBackward
-		}
-		err := stmt.Reset()
+		stmt, err := q.selectResetBindListLettersStatement(cursor.ItemID, cursor.Batch)
 		if err != nil {
 			yield(letter, err)
 			return
 		}
 
-		if cursor.ItemID == "" {
-			stmt.BindText(1, "0")
-		} else {
-			stmt.BindText(1, cursor.ItemID)
-		}
-		stmt.BindInt64(2, limit)
 		for {
 			ok, err := stmt.Step()
 			if err != nil {
@@ -207,13 +221,11 @@ func (q sqliteQueue) ListLetters(ctx context.Context, cursor queue.Cursor) iter.
 			}
 			if !ok {
 				if letter.ID != "" {
-					// could be more pages
-					if err = stmt.Reset(); err != nil {
+					stmt, err = q.selectResetBindListLettersStatement(letter.ID, cursor.Batch)
+					if err != nil {
 						yield(letter, err)
 						return
 					}
-					stmt.BindText(1, letter.ID)
-					stmt.BindInt64(2, limit)
 					// prevent infinite loop
 					letter.ID = ""
 					continue

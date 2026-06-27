@@ -20,22 +20,24 @@ func (t transaction) Close(err *error) {
 type sqliteQueue struct {
 	DB *sqlite.Conn
 
-	stmtInsertLetter            *sqlite.Stmt
-	stmtInsertMessage           *sqlite.Stmt
-	stmtInsertAttachment        *sqlite.Stmt
-	stmtRetrieveLetter          *sqlite.Stmt
-	stmtUpdateLetter            *sqlite.Stmt
-	stmtMarkLetterAsSent        *sqlite.Stmt
-	stmtDeleteLetter            *sqlite.Stmt
-	stmtDeleteLetterAttachments *sqlite.Stmt
-	stmtDeleteLetterMessages    *sqlite.Stmt
-	stmtListLettersForward      *sqlite.Stmt
-	stmtListLettersBackward     *sqlite.Stmt
-	stmtListAttachments         *sqlite.Stmt
-	stmtLisMessagesForward      *sqlite.Stmt
-	stmtListMessagesBackward    *sqlite.Stmt
-	stmtMarkMessagesAsQueued    *sqlite.Stmt
-	stmtMarkMessageAsSent       *sqlite.Stmt
+	stmtInsertLetter             *sqlite.Stmt
+	stmtInsertMessage            *sqlite.Stmt
+	stmtInsertAttachment         *sqlite.Stmt
+	stmtRetrieveLetter           *sqlite.Stmt
+	stmtUpdateLetter             *sqlite.Stmt
+	stmtMarkLetterAsSent         *sqlite.Stmt
+	stmtDeleteLetter             *sqlite.Stmt
+	stmtDeleteLetterAttachments  *sqlite.Stmt
+	stmtDeleteLetterMessages     *sqlite.Stmt
+	stmtListLettersForward       *sqlite.Stmt
+	stmtListLettersBackwardHead  *sqlite.Stmt
+	stmtListLettersBackward      *sqlite.Stmt
+	stmtListAttachments          *sqlite.Stmt
+	stmtLisMessagesForward       *sqlite.Stmt
+	stmtListMessagesBackwardHead *sqlite.Stmt
+	stmtListMessagesBackward     *sqlite.Stmt
+	stmtMarkMessagesAsQueued     *sqlite.Stmt
+	stmtMarkMessageAsSent        *sqlite.Stmt
 }
 
 // New creates an SQLite3 queue at the location.
@@ -160,8 +162,11 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 	if q.stmtListLettersForward, err = conn.Prepare(`SELECT id, frontmatter, content, created_at, sent_at FROM ` + lettersTable + ` WHERE id>? ORDER BY id ASC LIMIT ?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list letters statement: %w", err)
 	}
-	if q.stmtListLettersBackward, err = conn.Prepare(`SELECT id, frontmatter, content, created_at, sent_at FROM ` + lettersTable + ` WHERE id>? ORDER BY id DESC LIMIT ?`); err != nil {
-		return nil, fmt.Errorf("unable to prepare list letters statement: %w", err)
+	if q.stmtListLettersBackwardHead, err = conn.Prepare(`SELECT id, frontmatter, content, created_at, sent_at FROM ` + lettersTable + ` ORDER BY id DESC LIMIT ?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare list letters backward head statement: %w", err)
+	}
+	if q.stmtListLettersBackward, err = conn.Prepare(`SELECT id, frontmatter, content, created_at, sent_at FROM ` + lettersTable + ` WHERE id<? ORDER BY id DESC LIMIT ?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare list letters backward statement: %w", err)
 	}
 	if q.stmtListAttachments, err = conn.Prepare(`SELECT name, content_hash, content_id, content_type, content FROM ` + attachmentsTable + ` WHERE letter_id=?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list attachments statement: %w", err)
@@ -169,7 +174,10 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 	if q.stmtLisMessagesForward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id>? ORDER BY id ASC LIMIT ?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list messages statement: %w", err)
 	}
-	if q.stmtListMessagesBackward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id>? ORDER BY id DESC LIMIT ?`); err != nil {
+	if q.stmtListMessagesBackwardHead, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? ORDER BY id DESC LIMIT ?`); err != nil {
+		return nil, fmt.Errorf("unable to prepare list messages backwards head statement: %w", err)
+	}
+	if q.stmtListMessagesBackward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id<? ORDER BY id DESC LIMIT ?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list messages statement: %w", err)
 	}
 	if q.stmtMarkMessagesAsQueued, err = conn.Prepare(`UPDATE ` + messagesTable + ` SET queued_at=? WHERE id IN (SELECT value FROM json_each(?))`); err != nil {

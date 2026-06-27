@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/fs"
 	"iter"
+	"log/slog"
 	"path"
 	"strings"
 
@@ -14,6 +15,8 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/dkotik/mdsend/internal/media"
 )
+
+var _ slog.LogValuer = (*Attachment)(nil)
 
 type AttachmentError uint8
 
@@ -94,6 +97,14 @@ func (a Attachment) WithUpdatedHash() Attachment {
 	a.Hash = base58.Encode(hash.Sum(nil))
 	// a.Hash = hash.Sum64()
 	return a
+}
+
+func (a Attachment) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("name", a.Name),
+		slog.String("content_type", a.ContentType),
+		slog.String("hash", a.Hash),
+	)
 }
 
 func (a Attachment) AssertEqualityTo(b Attachment) error {
