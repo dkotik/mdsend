@@ -16,12 +16,12 @@ type scheduler struct {
 	Marshaler queue.Marshaler
 }
 
-func NewScheduler(q queue.Queue, m queue.Marshaler, topic string) queue.Scheduler {
+func NewScheduler(q queue.Queue, m queue.Marshaler, topic string, options wmsqlitezombiezen.PublisherOptions) queue.Scheduler {
 	sq, ok := q.(sqliteQueue)
 	if !ok {
 		panic("queue is not an sqliteQueue")
 	}
-	pub, err := wmsqlitezombiezen.NewPublisher(sq.DB, wmsqlitezombiezen.PublisherOptions{})
+	pub, err := wmsqlitezombiezen.NewPublisher(sq.DB, options)
 	if err != nil {
 		panic(err)
 	}

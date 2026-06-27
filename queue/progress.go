@@ -176,17 +176,16 @@ func (p progressTracker) ListMessages(
 			err            error
 		)
 		for message, err = range p.Queue.ListMessages(ctx, cursor) {
-			if message.ScheduledAt.IsZero() {
-				continue // skip messages that are not yet scheduled
-			}
-			if message.SentAt.IsZero() {
-				pending = append(pending, message.ID)
-				durations = durations + estDuration.Sub(message.ScheduledAt)
-				durationsCount++
-			} else {
-				sent = append(sent, message.ID)
-				durations = durations + message.SentAt.Sub(message.ScheduledAt)
-				durationsCount++
+			if !message.ScheduledAt.IsZero() { // skip messages that are not yet scheduled
+				if message.SentAt.IsZero() {
+					pending = append(pending, message.ID)
+					durations = durations + estDuration.Sub(message.ScheduledAt)
+					durationsCount++
+				} else {
+					sent = append(sent, message.ID)
+					durations = durations + message.SentAt.Sub(message.ScheduledAt)
+					durationsCount++
+				}
 			}
 			if !yield(message, err) {
 				break

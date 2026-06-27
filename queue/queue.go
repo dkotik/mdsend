@@ -82,6 +82,7 @@ func NewSender(s mdsend.Mailer) message.HandlerFunc {
 			LetterID:  m.LetterID,
 			MessageID: m.ID,
 		}
+		// panic("sending")
 		confirmation.ConfirmationID, err = s.SendMail(msg.Context(), m)
 		if err != nil {
 			return nil, err

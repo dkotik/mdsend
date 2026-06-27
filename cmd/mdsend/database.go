@@ -58,14 +58,19 @@ var flagDatabase = &cli.StringFlag{
 	},
 }
 
-func newDatabaseConnection(p string) (*sqlite.Conn, error) {
-	userDir, err := os.UserHomeDir()
-	if err != nil {
-		return nil, err
-	}
-	p = "file:" + filepath.Join(userDir, "Downloads", "mdsend.sqlite3?cache=shared&wal=on")
-	return sqlite.OpenConn(
+func newDatabaseConnection(p string) (conn *sqlite.Conn, err error) {
+	// userDir, err := os.UserHomeDir()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// p = "file:" + filepath.Join(userDir, "Downloads", "mdsend.sqlite3?cache=shared&wal=on")
+	conn, err = sqlite.OpenConn(
 		p,
 		// flags ...sqlite.OpenFlags
 	)
+	if err != nil {
+		return nil, err
+	}
+	// conn.SetBlockOnBusy()
+	return conn, nil
 }

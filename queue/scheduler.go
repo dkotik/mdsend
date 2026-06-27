@@ -121,13 +121,13 @@ func NewRoundRobinScheduler(schedulers ...Scheduler) Scheduler {
 			panic("nil scheduler provided")
 		}
 	}
-	return roundRobinScheduler{
+	return &roundRobinScheduler{
 		Cursor:     -1,
 		Schedulers: schedulers,
 	}
 }
 
-func (s roundRobinScheduler) ScheduleForDelivery(
+func (s *roundRobinScheduler) ScheduleForDelivery(
 	ctx context.Context,
 	l mdsend.Letter,
 	m []mdsend.Message,

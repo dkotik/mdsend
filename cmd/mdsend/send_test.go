@@ -20,7 +20,7 @@ type mockMailer struct {
 	mu          *sync.Mutex
 }
 
-func (m mockMailer) SendMail(ctx context.Context, letter mdsend.Message) (string, error) {
+func (m *mockMailer) SendMail(ctx context.Context, letter mdsend.Message) (string, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.sentLetters = append(m.sentLetters, letter.ID)
@@ -30,10 +30,16 @@ func (m mockMailer) SendMail(ctx context.Context, letter mdsend.Message) (string
 func TestSend(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), time.Second)
 	defer cancel()
-	dsn := fmt.Sprintf("%s?cache=shared&foreign_keys=on", filepath.Join(t.TempDir(), "testSend.sqlite3"))
+	var err error
+	// userDir, err := os.UserHomeDir()
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+	// dsn := "file:" + filepath.Join(userDir, "Downloads", "mdsend.sqlite3?cache=shared&wal=on")
+	dsn := fmt.Sprintf("%s?cache=shared&foreign_keys=on&wal=on", filepath.Join(t.TempDir(), "testSend.sqlite3"))
 	// dsn := "file:/test/sendCommand?vfs=memdb"
-	// dsn := "testdata/testSendCommand?cache=shared"
-	err := addLetters(ctx, dsn, []mdsend.Letter{
+	// dsn := "file:sendTest?mode=memory&cache=shared&foreign_keys=on"
+	err = addLetters(ctx, dsn, []mdsend.Letter{
 		mdsend.Letter{
 			ID: "firstTestLetter",
 		},
@@ -47,7 +53,7 @@ func TestSend(t *testing.T) {
 		Level: slog.Level(slog.LevelDebug - 100),
 	}))
 
-	mailer := mockMailer{
+	mailer := &mockMailer{
 		sentLetters: []string{},
 		mu:          &sync.Mutex{},
 	}
@@ -72,7 +78,7 @@ func TestSend(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(mailer.sentLetters) != 1 || true {
+	if len(mailer.sentLetters) < 1000 {
 		for _, line := range bytes.Split(b.Bytes(), []byte("\n")) {
 			t.Log(string(line))
 		}

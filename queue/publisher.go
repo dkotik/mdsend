@@ -39,7 +39,7 @@ func NewRoundRobinPublisher(publisher message.Publisher, prefix string, count ui
 		Publisher: publisher,
 		Topics:    topics,
 		Buffer:    &bytes.Buffer{},
-		Current:   0,
+		Current:   -1,
 	}
 }
 

@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill-sqlite/wmsqlitezombiezen"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/mailer"
 	"github.com/dkotik/mdsend/queue"
 	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
-	"github.com/dkotik/watermillsqlite/wmsqlitezombiezen"
 	"github.com/urfave/cli/v3"
 	"golang.org/x/sync/errgroup"
 	"zombiezen.com/go/sqlite"
@@ -82,17 +82,6 @@ func send(
 ) (err error) {
 	wg.Go(func() error {
 		wmLogger := watermill.NewSlogLogger(logger)
-		queueConn, err := newDatabaseConnection(connectionDSN)
-		if err != nil {
-			return fmt.Errorf("queue database %q inaccessible: %w", connectionDSN, err)
-		}
-		defer func(conn *sqlite.Conn) {
-			err = errors.Join(err, conn.Close())
-		}(queueConn)
-		q, err := sqliteQ.New(queueConn, "")
-		if err != nil {
-			return fmt.Errorf("unable to setup queue: %w", err)
-		}
 
 		publisherConn, err := newDatabaseConnection(connectionDSN)
 		if err != nil {
@@ -109,6 +98,7 @@ func send(
 			return fmt.Errorf("unable to setup database publisher: %w", err)
 		}
 		subscriber, err := wmsqlitezombiezen.NewSubscriber(connectionDSN, wmsqlitezombiezen.SubscriberOptions{
+			PollInterval:     time.Millisecond * 30,
 			InitializeSchema: true,
 			Logger:           wmLogger,
 		})
@@ -142,6 +132,9 @@ func send(
 				publisher,
 				// TODO: add retry
 				mailer,
+				// message.HandlerFunc(func(msg *message.Message) ([]*message.Message, error) {
+				// 	panic("djkflsjd")
+				// }),
 			)
 
 			// a separate queue with its own connection is needed for each scheduler
@@ -156,7 +149,21 @@ func send(
 			if err != nil {
 				return fmt.Errorf("unable to setup queue: %w", err)
 			}
-			schedulers[i-1] = sqliteQ.NewScheduler(subQueue, marshaler, outbox)
+			schedulers[i-1] = sqliteQ.NewScheduler(subQueue, marshaler, outbox, wmsqlitezombiezen.PublisherOptions{
+				InitializeSchema: true,
+			})
+		}
+
+		queueConn, err := newDatabaseConnection(connectionDSN)
+		if err != nil {
+			return fmt.Errorf("queue database %q inaccessible: %w", connectionDSN, err)
+		}
+		defer func(conn *sqlite.Conn) {
+			err = errors.Join(err, conn.Close())
+		}(queueConn)
+		q, err := sqliteQ.New(queueConn, "")
+		if err != nil {
+			return fmt.Errorf("unable to setup queue: %w", err)
 		}
 		queue.NewContinuousScanner(ctx, wg, q, queue.NewRoundRobinScheduler(schedulers...), queue.ContinuousScannerOptions{
 			Frequency: time.Millisecond * 30,
@@ -165,14 +172,9 @@ func send(
 					logger.Info("progress", slog.Any("report", p))
 				},
 			),
+			MessageBatchSize: 10,
 			// BeginWithOlderLetters: true,
 		})
-		// wg.Go(func() error {
-		// 	for ids := range progress {
-		// 		logger.Info("progress", slog.Any("ids", ids))
-		// 	}
-		// 	return nil
-		// })
 
 		confirmed := 0
 		router.AddConsumerHandler(

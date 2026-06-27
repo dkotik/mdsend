@@ -172,6 +172,7 @@ func (s continuousScanner) Scan(
 					}
 				}
 				messageStop()
+				// fmt.Println("---------- found messages:", messages, mc)
 
 				if foundUnsentInBatch = len(messages); foundUnsentInBatch > 0 {
 					if err = s.Scheduler.ScheduleForDelivery(ctx, letter, messages); err != nil {

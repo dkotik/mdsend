@@ -55,10 +55,6 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/decred/dcrd/crypto/blake256 v1.0.0/go.mod h1:sQl2p6Y26YV+ZOcSTP6thNdn47hh8kt6rqSlvmrXFAc=
 github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1/go.mod h1:hyedUtir6IdtD/7lIxGeCxkaw7y45JueMRL4DIyJDKs=
 github.com/decred/dcrd/lru v1.0.0/go.mod h1:mxKOwFd7lFjN2GZYsiz/ecgqR6kkYAl+0pz0tEMk218=
-github.com/dkotik/watermillsqlite/wmsqlitemodernc v0.0.5 h1:Uxag/zPbOVedj5yX8fBxHYZspCJkBz60dr803szIqic=
-github.com/dkotik/watermillsqlite/wmsqlitemodernc v0.0.5/go.mod h1:6BNC5EaHcLRqNeSpMgpXudyMoBVCzOW5fmXh0OcRPcA=
-github.com/dkotik/watermillsqlite/wmsqlitezombiezen v0.0.5 h1:eVEv4OccAlg3XRE2F1uQhAUG5gKA9TOkuBgYuR+3XIs=
-github.com/dkotik/watermillsqlite/wmsqlitezombiezen v0.0.5/go.mod h1:kv6g40JlVexlm44xH2lVQWKzYkLtzP10G6T+74GQHp4=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/emicklei/proto v1.14.3 h1:zEhlzNkpP8kN6utonKMzlPfIvy82t5Kb9mufaJxSe1Q=
