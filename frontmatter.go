@@ -26,7 +26,7 @@ const (
 const (
 	FieldNameID                 = "id"
 	FieldNameExtends            = "extends"
-	FieldNameQueue              = "queue"
+	FieldNameDatabase           = "queue"
 	FieldNameSubject            = "subject"
 	FieldNameFrom               = "from"
 	FieldNameReplyTo            = "reply_to"

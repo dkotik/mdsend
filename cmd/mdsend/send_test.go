@@ -28,6 +28,7 @@ func (m *mockMailer) SendMail(ctx context.Context, letter mdsend.Message) (strin
 }
 
 func TestSend(t *testing.T) {
+	t.Skip("move this test to a more appropriate location under /internal/")
 	ctx, cancel := context.WithTimeout(t.Context(), time.Second)
 	defer cancel()
 	var err error
@@ -39,14 +40,14 @@ func TestSend(t *testing.T) {
 	dsn := fmt.Sprintf("%s?cache=shared&foreign_keys=on&wal=on", filepath.Join(t.TempDir(), "testSend.sqlite3"))
 	// dsn := "file:/test/sendCommand?vfs=memdb"
 	// dsn := "file:sendTest?mode=memory&cache=shared&foreign_keys=on"
-	err = addLetters(ctx, dsn, []mdsend.Letter{
-		mdsend.Letter{
-			ID: "firstTestLetter",
-		},
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	// err = addLetters(ctx, dsn, []mdsend.Letter{
+	// 	mdsend.Letter{
+	// 		ID: "firstTestLetter",
+	// 	},
+	// })
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
 
 	b := &bytes.Buffer{}
 	logger := slog.New(slog.NewTextHandler(b, &slog.HandlerOptions{

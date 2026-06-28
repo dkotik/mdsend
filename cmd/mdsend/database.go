@@ -52,7 +52,7 @@ var flagDatabase = &cli.StringFlag{
 		}) {
 			paramValues = append(paramValues, `foreign_keys=on`)
 		}
-		c.Set(`database`, fmt.Sprintf("%s?%s", p, strings.Join(paramValues, "&")))
+		c.Set(`database`, fmt.Sprintf("file:%s?%s", p, strings.Join(paramValues, "&")))
 		// connectionDSN := "file:ephemeral?mode=memory&cache=shared"
 		return nil
 	},

@@ -167,7 +167,7 @@ func (s continuousScanner) Scan(
 					if !ok {
 						break
 					}
-					if message.SentAt.IsZero() {
+					if message.ScheduledAt.IsZero() {
 						messages = append(messages, message)
 					}
 				}

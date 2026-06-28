@@ -83,7 +83,7 @@ func main() {
 
 					middleware := []func(mdsend.Mailer) mdsend.Mailer{
 						mailer.NewDelay(
-							c.Duration(flagDelay.Name)+time.Second*6,
+							c.Duration(flagDelay.Name)+time.Second,
 							c.Duration(flagFluctuate.Name)+time.Second,
 						),
 					}

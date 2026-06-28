@@ -80,8 +80,17 @@ func send(
 	mailer mdsend.Mailer,
 	logger *slog.Logger,
 ) (err error) {
-	wg.Go(func() error {
+	wg.Go(func() (err error) {
+		// if err = addLetters(ctx, connectionDSN, []mdsend.Letter{
+		// 	mdsend.Letter{
+		// 		ID: "firstTestLetter",
+		// 	},
+		// }); err != nil {
+		// 	return err
+		// }
+		logger.Info("using database file", slog.String("path", connectionDSN))
 		wmLogger := watermill.NewSlogLogger(logger)
+		marshaler := queue.NewMarshalerJSON()
 
 		publisherConn, err := newDatabaseConnection(connectionDSN)
 		if err != nil {
@@ -121,7 +130,6 @@ func send(
 
 		mailer := queue.NewSender(mailer)
 		schedulers := make([]queue.Scheduler, 12)
-		marshaler := queue.NewMarshalerJSON()
 		for i := 1; i <= 12; i++ {
 			outbox := fmt.Sprintf("mdsendOutbox%d", i)
 			router.AddHandler(
@@ -176,16 +184,27 @@ func send(
 			// BeginWithOlderLetters: true,
 		})
 
-		confirmed := 0
+		confirmationConn, err := newDatabaseConnection(connectionDSN)
+		if err != nil {
+			return fmt.Errorf("confirmation connection %q inaccessible: %w", connectionDSN, err)
+		}
+		defer func(conn *sqlite.Conn) {
+			err = errors.Join(err, conn.Close())
+		}(confirmationConn)
+		confirmationQueue, err := sqliteQ.New(confirmationConn, "")
+		if err != nil {
+			return fmt.Errorf("unable to setup confirmation queue: %w", err)
+		}
 		router.AddConsumerHandler(
 			"confirmation",
 			"mdsendSent",
 			subscriber,
-			func(msg *message.Message) error {
-				confirmed++
-				logger.Info("confirmation", slog.String("msg", msg.UUID), slog.Int("confirmed", confirmed))
-				return nil
-			},
+			queue.NewConfirmationHandler(
+				confirmationQueue,
+				queue.ConfirmerFunc(func(ctx context.Context, c queue.Confirmation) error {
+					logger.Info("confirmation", slog.String("msg", c.MessageID), slog.String("confirmed", c.ID))
+					return nil
+				}), marshaler),
 		)
 		return router.Run(ctx)
 	})

@@ -12,6 +12,7 @@ import (
 
 type Marshaler interface {
 	MarshalMessage(any) (*message.Message, error)
+	UnmarshalMessage(*message.Message, any) error
 }
 
 type marshalerJSON struct{}
@@ -26,6 +27,10 @@ func (m marshalerJSON) MarshalMessage(v any) (*message.Message, error) {
 		return nil, err
 	}
 	return message.NewMessage(uuid.NewString(), payload), nil
+}
+
+func (m marshalerJSON) UnmarshalMessage(msg *message.Message, v any) error {
+	return json.Unmarshal(msg.Payload, v)
 }
 
 type Scheduler interface {

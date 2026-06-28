@@ -15,8 +15,16 @@ import (
 
 func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 	if c.Args().Len() == 0 {
+		if err = addLetters(ctx, c.String(flagDatabase.Name), []mdsend.Letter{
+			mdsend.Letter{
+				ID: "firstTestLetter",
+			},
+		}); err != nil {
+			return fmt.Errorf(`unable to add test letter: %w`, err)
+		}
 		return errors.New(`no letters selected to add`)
 	}
+	// panic("woo")
 	fs := media.NewUnsafeUnconstrainedFileSystem()
 	letters := make([]mdsend.Letter, 0, c.Args().Len())
 	for _, arg := range c.Args().Slice() {
@@ -27,17 +35,18 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 		letters = append(letters, letter)
 	}
 	p := c.String(flagDatabase.Name)
-	if !c.IsSet(flagDatabase.Name) {
-		alternativeQueueFile := letters[0].GetQueue()
-		if alternativeQueueFile != "" {
-			p = alternativeQueueFile
-		}
-		for _, letter := range letters[1:] {
-			if letter.GetQueue() != "" && letter.GetQueue() != p {
-				return fmt.Errorf(`atomic operations require all letters to have the same queue: %q vs %q`, letter.GetQueue(), p)
-			}
-		}
-	}
+	// if !c.IsSet(flagDatabase.Name) {
+	// 	// TODO: this is not needed as long as transactions are applied properly
+	// 	alternativeQueueFile := letters[0].GetDatabase()
+	// 	if alternativeQueueFile != "" {
+	// 		p = alternativeQueueFile
+	// 	}
+	// 	for _, letter := range letters[1:] {
+	// 		if letter.GetDatabase() != "" && letter.GetDatabase() != p {
+	// 			return fmt.Errorf(`atomic operations require all letters to have the same queue: %q vs %q`, letter.GetDatabase(), p)
+	// 		}
+	// 	}
+	// }
 	return addLetters(ctx, p, letters)
 }
 

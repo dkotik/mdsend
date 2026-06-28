@@ -158,7 +158,7 @@ func (p *progressTracker) ListLetters(
 	}
 }
 
-func (p progressTracker) ListMessages(
+func (p *progressTracker) ListMessages(
 	ctx context.Context,
 	cursor ChildCursor,
 ) iter.Seq2[mdsend.Message, error] {

@@ -112,8 +112,8 @@ func NewLetter(b []byte) (letter Letter, err error) {
 	}, nil
 }
 
-func (l Letter) GetQueue() string {
-	switch queue := l.Frontmatter[FieldNameQueue].(type) {
+func (l Letter) GetDatabase() string {
+	switch queue := l.Frontmatter[FieldNameDatabase].(type) {
 	case string:
 		queue = strings.TrimSpace(queue)
 		if len(queue) == 0 {

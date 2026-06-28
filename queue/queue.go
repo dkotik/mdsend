@@ -42,13 +42,6 @@ type Transaction interface {
 	Close(*error)
 }
 
-type Confirmation struct {
-	LetterID       string
-	MessageID      string
-	ConfirmationID string
-	SentAt         time.Time
-}
-
 type Queue interface {
 	CreateLetter(context.Context, mdsend.Letter) error
 	RetrieveLetter(context.Context, string) (mdsend.Letter, error)
@@ -83,7 +76,7 @@ func NewSender(s mdsend.Mailer) message.HandlerFunc {
 			MessageID: m.ID,
 		}
 		// panic("sending")
-		confirmation.ConfirmationID, err = s.SendMail(msg.Context(), m)
+		confirmation.ID, err = s.SendMail(msg.Context(), m)
 		if err != nil {
 			return nil, err
 		}
