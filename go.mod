@@ -14,6 +14,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
+	github.com/lmittmann/tint v1.1.3
 	github.com/mailgun/mailgun-go/v4 v4.0.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
@@ -22,6 +23,7 @@ require (
 	github.com/sebdah/goldie/v2 v2.8.0
 	github.com/urfave/cli/v3 v3.10.0
 	github.com/yuin/goldmark v1.8.2
+	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0
 	golang.org/x/image v0.41.0
 	golang.org/x/sync v0.21.0
 	golang.org/x/text v0.38.0
@@ -56,7 +58,6 @@ require (
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/sony/gobreaker v1.0.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
 	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/term v0.44.0 // indirect

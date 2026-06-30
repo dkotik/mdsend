@@ -173,16 +173,22 @@ func send(
 		if err != nil {
 			return fmt.Errorf("unable to setup queue: %w", err)
 		}
-		queue.NewContinuousScanner(ctx, wg, q, queue.NewRoundRobinScheduler(schedulers...), queue.ContinuousScannerOptions{
-			Frequency: time.Millisecond * 30,
-			ProgressTracker: queue.ProgressTrackerFunc(
-				func(ctx context.Context, p queue.Progress) {
-					logger.Info("progress", slog.Any("report", p))
-				},
-			),
-			MessageBatchSize: 10,
-			// BeginWithOlderLetters: true,
-		})
+		progressTracker := queue.NewProgressTracker(q, queue.ProgressTrackerFunc(
+			func(ctx context.Context, p queue.Progress) {
+				logger.Info("progress", slog.Any("report", p))
+			},
+		))
+		queue.NewContinuousScanner(
+			ctx,
+			wg,
+			progressTracker,
+			queue.NewRoundRobinScheduler(schedulers...),
+			queue.ContinuousScannerOptions{
+				Frequency:        time.Millisecond * 30,
+				MessageBatchSize: 10,
+				// BeginWithOlderLetters: true,
+			},
+		)
 
 		confirmationConn, err := newDatabaseConnection(connectionDSN)
 		if err != nil {
@@ -202,8 +208,8 @@ func send(
 			queue.NewConfirmationHandler(
 				confirmationQueue,
 				queue.ConfirmerFunc(func(ctx context.Context, c queue.Confirmation) error {
-					logger.Info("confirmation", slog.String("msg", c.MessageID), slog.String("confirmed", c.ID))
-					return nil
+					// logger.Info("confirmation", slog.String("msg", c.MessageID), slog.String("confirmed", c.ID))
+					return progressTracker.ConfirmScheduling(ctx, c)
 				}), marshaler),
 		)
 		return router.Run(ctx)

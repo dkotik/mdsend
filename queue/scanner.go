@@ -11,7 +11,6 @@ import (
 
 type ContinuousScannerOptions struct {
 	Frequency             time.Duration
-	ProgressTracker       ProgressTracker
 	LetterBatchSize       uint8
 	MessageBatchSize      uint16
 	BeginWithOlderLetters bool
@@ -37,9 +36,6 @@ func NewContinuousScanner(
 	}
 	if q == nil {
 		panic("queue is nil")
-	}
-	if options.ProgressTracker != nil {
-		q = NewProgressTracker(q, options.ProgressTracker)
 	}
 	if s == nil {
 		panic("scheduler is nil")

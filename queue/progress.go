@@ -9,10 +9,12 @@ import (
 	"time"
 
 	"github.com/dkotik/mdsend"
+	"golang.org/x/exp/maps"
 )
 
 var (
 	_ Queue          = (*progressTracker)(nil)
+	_ Confirmer      = (*progressTracker)(nil)
 	_ slog.LogValuer = (*Progress)(nil)
 )
 
@@ -53,10 +55,10 @@ func (p Progress) String() string {
 
 func (p Progress) LogValue() slog.Value {
 	return slog.GroupValue(
-		slog.Int64("sent", p.Sent),
-		slog.Int64("pending", p.Total),
-		slog.String("speed", fmt.Sprintf("%dm/min", p.MessagesPerMinute())),
-		slog.String("average", fmt.Sprintf("%.2fs", p.Average.Seconds())),
+		slog.String("sent", fmt.Sprintf("%d/%d", p.Sent, p.Total)),
+		slog.String("speed", fmt.Sprintf("%dm/s", p.MessagesPerSecond())),
+		// slog.String("average", fmt.Sprintf("%.2fs", p.Average.Seconds())),
+		slog.String("estimate_remaining", fmt.Sprintf("%.2fs", p.EstimateRemaining().Seconds())),
 	)
 }
 
@@ -72,28 +74,50 @@ func (f ProgressTrackerFunc) TrackProgress(ctx context.Context, p Progress) {
 
 type progressTracker struct {
 	Queue
-	Report      ProgressTracker
-	LastAverage time.Duration
+	Report ProgressTracker
 
-	mu                  *sync.Mutex
-	pendingLetterIDs    map[string]struct{}
-	pendingMessages     map[string]string
-	pendingMessageCount int64
-	sentMessageCount    int64
+	mu               *sync.Mutex
+	pendingLetterIDs map[string]struct{}
+	pendingMessages  map[string]string
+	sentMessages     map[string]struct{}
+	lastReportTime   time.Time
+	lastReportCount  int64
+	fullScanCount    int
 }
 
 func NewProgressTracker(
 	q Queue,
 	report ProgressTracker,
-) Queue {
+) interface {
+	Queue
+	Confirmer
+} {
 	return &progressTracker{
 		Queue:            q,
 		Report:           report,
-		LastAverage:      time.Second,
 		mu:               &sync.Mutex{},
 		pendingLetterIDs: make(map[string]struct{}),
 		pendingMessages:  make(map[string]string),
+		sentMessages:     make(map[string]struct{}),
+		lastReportTime:   time.Now(),
 	}
+}
+
+func (p *progressTracker) announceProgress(ctx context.Context) {
+	fresh := int64(len(p.sentMessages))
+	if fresh == p.lastReportCount {
+		return // there is no new progress to report
+	}
+	t := time.Now()
+	delta := t.Sub(p.lastReportTime)
+	report := Progress{
+		Sent:    fresh,
+		Total:   int64(len(p.pendingMessages)) + fresh,
+		Average: delta / time.Duration(fresh-p.lastReportCount),
+	}
+	p.lastReportTime = t
+	p.lastReportCount = fresh
+	p.Report.TrackProgress(ctx, report)
 }
 
 func (p *progressTracker) MarkMessagesAsScheduled(
@@ -107,11 +131,33 @@ func (p *progressTracker) MarkMessagesAsScheduled(
 	p.mu.Lock()
 	for _, ID := range IDs {
 		p.pendingMessages[ID] = letterID
-		p.pendingMessageCount++
+		// p.pendingMessageCount++
 	}
 	p.pendingLetterIDs[letterID] = struct{}{}
 	p.mu.Unlock()
 	return nil
+}
+
+func (p *progressTracker) ConfirmScheduling(ctx context.Context, c Confirmation) (err error) {
+	p.mu.Lock()
+	delete(p.pendingMessages, c.MessageID)
+	p.sentMessages[c.MessageID] = struct{}{}
+	p.mu.Unlock()
+	return nil
+}
+
+func (p *progressTracker) MarkMessageAsSent(
+	ctx context.Context,
+	ID string,
+) (ok bool, err error) {
+	if ok, err = p.Queue.MarkMessageAsSent(ctx, ID); err != nil {
+		return false, err
+	}
+	p.mu.Lock()
+	delete(p.pendingMessages, ID)
+	p.sentMessages[ID] = struct{}{}
+	p.mu.Unlock()
+	return ok, nil
 }
 
 func (p *progressTracker) ListLetters(
@@ -146,7 +192,7 @@ func (p *progressTracker) ListLetters(
 				for messageID, letterID = range p.pendingMessages {
 					if letterID == ID {
 						delete(p.pendingMessages, messageID)
-						p.sentMessageCount++
+						p.sentMessages[messageID] = struct{}{}
 					}
 				}
 			}
@@ -154,6 +200,15 @@ func (p *progressTracker) ListLetters(
 		for _, ID = range pending {
 			p.pendingLetterIDs[ID] = struct{}{}
 		}
+		if cursor.ItemID == "" && len(p.pendingMessages) == 0 {
+			p.fullScanCount++
+			if p.fullScanCount > 6 {
+				maps.Clear(p.sentMessages)
+				p.fullScanCount = 0
+				p.lastReportCount = 0
+			}
+		}
+		p.announceProgress(ctx)
 		p.mu.Unlock()
 	}
 }
@@ -164,27 +219,27 @@ func (p *progressTracker) ListMessages(
 ) iter.Seq2[mdsend.Message, error] {
 	return func(yield func(mdsend.Message, error) bool) {
 		var (
-			pending        []string
-			sent           []string
-			durations      time.Duration
-			durationsCount time.Duration
-			estDuration    = time.Now().Add(p.LastAverage)
-			message        mdsend.Message
-			letterID       string
-			ID             string
-			ok             bool
-			err            error
+			pending []string
+			sent    []string
+			// durations      time.Duration
+			// durationsCount time.Duration
+			// estDuration    = time.Now().Add(p.LastAverage)
+			message  mdsend.Message
+			letterID string
+			ID       string
+			ok       bool
+			err      error
 		)
 		for message, err = range p.Queue.ListMessages(ctx, cursor) {
 			if !message.ScheduledAt.IsZero() { // skip messages that are not yet scheduled
 				if message.SentAt.IsZero() {
 					pending = append(pending, message.ID)
-					durations = durations + estDuration.Sub(message.ScheduledAt)
-					durationsCount++
+					// durations = durations + estDuration.Sub(message.ScheduledAt)
+					// durationsCount++
 				} else {
 					sent = append(sent, message.ID)
-					durations = durations + message.SentAt.Sub(message.ScheduledAt)
-					durationsCount++
+					// durations = durations + message.SentAt.Sub(message.ScheduledAt)
+					// durationsCount++
 				}
 			}
 			if !yield(message, err) {
@@ -196,27 +251,19 @@ func (p *progressTracker) ListMessages(
 		for _, ID = range sent {
 			if _, ok = p.pendingMessages[ID]; ok {
 				delete(p.pendingMessages, ID)
-				p.sentMessageCount++
+				p.sentMessages[ID] = struct{}{}
 			}
 		}
 		if len(pending) > 0 {
 			letterID = cursor.ParentID
 			p.pendingLetterIDs[letterID] = struct{}{}
 			for _, ID = range pending {
-				if _, ok = p.pendingMessages[ID]; !ok {
-					p.pendingMessages[ID] = letterID
-					p.pendingMessageCount++
-				}
+				p.pendingMessages[ID] = letterID
 			}
 		}
-		if durationsCount > 0 {
-			p.LastAverage = durations / durationsCount
-		}
-		p.Report.TrackProgress(ctx, Progress{
-			Sent:    p.sentMessageCount,
-			Total:   p.pendingMessageCount,
-			Average: p.LastAverage,
-		})
+		// if durationsCount > 0 {
+		// 	p.LastAverage = durations / durationsCount
+		// }
 		p.mu.Unlock()
 	}
 }

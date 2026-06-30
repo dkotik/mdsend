@@ -17,7 +17,7 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 	if c.Args().Len() == 0 {
 		if err = addLetters(ctx, c.String(flagDatabase.Name), []mdsend.Letter{
 			mdsend.Letter{
-				ID: "firstTestLetter",
+				ID: "firstTestLetter" + fmt.Sprintf("%d", time.Now().UnixNano()),
 			},
 		}); err != nil {
 			return fmt.Errorf(`unable to add test letter: %w`, err)
@@ -92,7 +92,7 @@ func addLetters(ctx context.Context, connectionDSN string, letters []mdsend.Lett
 		}
 		for i := range 100 {
 			err = queue.CreateMessage(ctx, mdsend.Message{
-				ID: fmt.Sprintf("testMessage%d", i),
+				ID: fmt.Sprintf("testMessage%d%s", i, letter.ID),
 				From: mail.Address{
 					Name:    "random",
 					Address: fmt.Sprintf("testMessage%d@example.com", i),
