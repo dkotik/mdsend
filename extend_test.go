@@ -33,5 +33,9 @@ func TestLetterExtensions(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	if len(letter.Templates) != 2 {
+		t.Fatalf("expected 2 templates, got %d", len(letter.Templates))
+	}
+
 	goldie.New(t).Assert(t, "extend/extended", b.Bytes())
 }

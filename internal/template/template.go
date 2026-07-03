@@ -13,6 +13,10 @@ import (
 )
 
 type Template interface {
+	Render(mdsend.Letter, Context) (mdsend.Message, error)
+}
+
+type Renderer interface {
 	Render(plainText, HTML io.Writer, recipient map[string]any) error
 }
 
@@ -31,12 +35,12 @@ type messageTemplate struct {
 	HTML *bytes.Buffer
 }
 
-// New creates a [Template]. It is not safe for asynchronous
+// New creates a [Renderer]. It is not safe for asynchronous
 // rendering.
 func New(
 	m mdsend.Letter,
 	r goldmark.Markdown,
-) (Template, error) {
+) (Renderer, error) {
 	if r == nil {
 		return nil, errors.New("renderer for Markdown is nil")
 	}

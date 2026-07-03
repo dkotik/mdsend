@@ -18,6 +18,40 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+func injectPathPrefix(
+	frontmatter map[string]any,
+	rootDirectory string,
+) (err error) {
+	templates, err := getTemplates(frontmatter)
+	if err != nil {
+		return err
+	}
+	updated := false
+	for i, t := range templates {
+		if media.IsPathLocal(t) {
+			updated = true
+			templates[i] = path.Join(rootDirectory, t)
+		}
+	}
+	if updated {
+		frontmatter[FieldNameTemplates] = any(templates).([]any)
+	}
+
+	if attachments, ok := frontmatter[FieldNameAttachments]; ok {
+		frontmatter[FieldNameAttachments] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, attachments)
+	}
+	if to, ok := frontmatter[FieldNameTo]; ok {
+		frontmatter[FieldNameTo] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, to)
+	}
+	if cc, ok := frontmatter[FieldNameCarbonCopy]; ok {
+		frontmatter[FieldNameCarbonCopy] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, cc)
+	}
+	if bcc, ok := frontmatter[FieldNameBlindCarbonCopy]; ok {
+		frontmatter[FieldNameBlindCarbonCopy] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, bcc)
+	}
+	return nil
+}
+
 // use [media.NewCyclicalImportPreventingFileSystem] only
 func extend(
 	ctx context.Context,
@@ -80,6 +114,11 @@ func extend(
 			if frontmatter == nil {
 				continue
 			}
+			if rootDirectory != "" && rootDirectory != "." {
+				if err = injectPathPrefix(frontmatter, rootDirectory); err != nil {
+					return letter, err
+				}
+			}
 			mergeLeft(frontmatter, letter.Frontmatter)
 			letter.Frontmatter = frontmatter
 			continue
@@ -90,6 +129,11 @@ func extend(
 			}
 			if frontmatter == nil {
 				continue
+			}
+			if rootDirectory != "" && rootDirectory != "." {
+				if err = injectPathPrefix(frontmatter, rootDirectory); err != nil {
+					return letter, err
+				}
 			}
 			mergeLeft(frontmatter, letter.Frontmatter)
 			letter.Frontmatter = frontmatter
@@ -102,6 +146,11 @@ func extend(
 			if frontmatter == nil {
 				continue
 			}
+			if rootDirectory != "" && rootDirectory != "." {
+				if err = injectPathPrefix(frontmatter, rootDirectory); err != nil {
+					return letter, err
+				}
+			}
 			mergeLeft(frontmatter, letter.Frontmatter)
 			letter.Frontmatter = frontmatter
 			continue
@@ -112,6 +161,11 @@ func extend(
 			}
 			if frontmatter == nil {
 				continue
+			}
+			if rootDirectory != "" && rootDirectory != "." {
+				if err = injectPathPrefix(frontmatter, rootDirectory); err != nil {
+					return letter, err
+				}
 			}
 			mergeLeft(frontmatter, letter.Frontmatter)
 			letter.Frontmatter = frontmatter
@@ -136,18 +190,8 @@ func extend(
 			if err = markdown.CopyWithRelativePathPrefix(b, []byte(subLetter.Content), rootDirectory); err != nil {
 				return letter, err
 			}
-
-			if attachments, ok := subLetter.Frontmatter[FieldNameAttachments]; ok {
-				subLetter.Frontmatter[FieldNameAttachments] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, attachments)
-			}
-			if to, ok := subLetter.Frontmatter[FieldNameTo]; ok {
-				subLetter.Frontmatter[FieldNameTo] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, to)
-			}
-			if cc, ok := subLetter.Frontmatter[FieldNameCarbonCopy]; ok {
-				subLetter.Frontmatter[FieldNameCarbonCopy] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, cc)
-			}
-			if bcc, ok := subLetter.Frontmatter[FieldNameBlindCarbonCopy]; ok {
-				subLetter.Frontmatter[FieldNameBlindCarbonCopy] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, bcc)
+			if err = injectPathPrefix(subLetter.Frontmatter, rootDirectory); err != nil {
+				return letter, err
 			}
 		}
 
@@ -173,6 +217,7 @@ func extend(
 		letter.Content = b.String()
 		if subLetter.Frontmatter != nil {
 			mergeLeft(subLetter.Frontmatter, letter.Frontmatter)
+			letter.Frontmatter = subLetter.Frontmatter
 		}
 	}
 

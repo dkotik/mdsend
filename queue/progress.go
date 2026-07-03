@@ -200,13 +200,28 @@ func (p *progressTracker) ListLetters(
 		for _, ID = range pending {
 			p.pendingLetterIDs[ID] = struct{}{}
 		}
-		if cursor.ItemID == "" && len(p.pendingMessages) == 0 {
+		if cursor.ItemID == "" && len(pending) == 0 && len(p.pendingMessages) == 0 && len(p.sentMessages) > 0 {
 			p.fullScanCount++
-			if p.fullScanCount > 6 {
+			if p.fullScanCount > 1 {
 				maps.Clear(p.sentMessages)
+				maps.Clear(p.pendingMessages)
+				maps.Clear(p.pendingLetterIDs)
 				p.fullScanCount = 0
 				p.lastReportCount = 0
+				// fmt.Println("========== clear ============")
 			}
+			defer func() {
+				// take a pause to allow
+				// pending messages to be scheduled and confirmed before the next full scan
+				// fmt.Println("========== pause ============")
+				for range max(4, p.fullScanCount) {
+					select {
+					case <-ctx.Done():
+						return
+					case <-time.After(time.Second * 5):
+					}
+				}
+			}()
 		}
 		p.announceProgress(ctx)
 		p.mu.Unlock()
@@ -219,11 +234,8 @@ func (p *progressTracker) ListMessages(
 ) iter.Seq2[mdsend.Message, error] {
 	return func(yield func(mdsend.Message, error) bool) {
 		var (
-			pending []string
-			sent    []string
-			// durations      time.Duration
-			// durationsCount time.Duration
-			// estDuration    = time.Now().Add(p.LastAverage)
+			pending  []string
+			sent     []string
 			message  mdsend.Message
 			letterID string
 			ID       string
@@ -234,12 +246,8 @@ func (p *progressTracker) ListMessages(
 			if !message.ScheduledAt.IsZero() { // skip messages that are not yet scheduled
 				if message.SentAt.IsZero() {
 					pending = append(pending, message.ID)
-					// durations = durations + estDuration.Sub(message.ScheduledAt)
-					// durationsCount++
 				} else {
 					sent = append(sent, message.ID)
-					// durations = durations + message.SentAt.Sub(message.ScheduledAt)
-					// durationsCount++
 				}
 			}
 			if !yield(message, err) {
@@ -261,9 +269,6 @@ func (p *progressTracker) ListMessages(
 				p.pendingMessages[ID] = letterID
 			}
 		}
-		// if durationsCount > 0 {
-		// 	p.LastAverage = durations / durationsCount
-		// }
 		p.mu.Unlock()
 	}
 }

@@ -3,3 +3,4 @@ map = {
   mapKey1 = "mapValue1",
   mapKey2 = "mapValue2",
 }
+templates = ["templates/one.html"]

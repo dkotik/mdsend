@@ -1,10 +1,12 @@
 ---
 extends:
+    - sixth.md
     - first.yaml
     - second.toml
     - third.json
     - fourth.cue
     - fifth.md
+fifth: true
 first: true
 fourth: true
 list:
@@ -15,7 +17,11 @@ map:
     mapKey1: mapValue1
     mapKey2: mapValue2
 second: true
+sixth: true
 subject: Test Letter Extensions
+templates:
+    - templates/two.html
+    - templates/one.html
 third: true
 ---
 

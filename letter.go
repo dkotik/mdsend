@@ -50,6 +50,7 @@ func (l LetterError) Error() string {
 type Letter struct {
 	ID          string
 	Frontmatter map[string]any
+	Templates   []Attachment
 	Content     string
 	CreatedAt   time.Time
 	SentAt      time.Time
@@ -77,7 +78,35 @@ func NewLetterFromFile(
 		return letter, err
 	}
 	letter, err = extend(ctx, letter, path.Dir(p), media.NewCyclicalImportPreventingFileSystem(fs))
-	return letter, err
+	if err != nil {
+		return letter, err
+	}
+	templates, err := getTemplates(letter.Frontmatter)
+	if err != nil {
+		return letter, err
+	}
+	for _, t := range templates {
+		// if media.IsPathLocal(t) {
+		// 	t = path.Join(path.Dir(p), t)
+		// }
+		file, err := fs.Open(t)
+		if err != nil {
+			return letter, err
+		}
+		data, err := io.ReadAll(file)
+		if err != nil {
+			return letter, errors.Join(err, file.Close())
+		}
+		if err = file.Close(); err != nil {
+			return letter, err
+		}
+		letter.Templates = append(letter.Templates, Attachment{
+			Name:        t,
+			Content:     data,
+			ContentType: media.ContentTypeTextHTML,
+		})
+	}
+	return letter, nil
 }
 
 func NewLetter(b []byte) (letter Letter, err error) {
@@ -163,6 +192,89 @@ func (l Letter) GetFrom() (mail.Address, error) {
 	default:
 		return mail.Address{}, ErrNoFromAddress
 	}
+}
+
+func getTemplates(frontmatter map[string]any) (templates []string, err error) {
+	switch t := frontmatter[FieldNameTemplates].(type) {
+	case nil:
+	case string:
+		t = strings.TrimSpace(t)
+		if len(t) > 0 {
+			templates = append(templates, t)
+		}
+	case []any:
+		for _, v := range t {
+			switch s := v.(type) {
+			case string:
+				s = strings.TrimSpace(s)
+				if len(s) > 0 {
+					templates = append(templates, s)
+				}
+			default:
+				continue
+			}
+		}
+	default:
+		return templates, fmt.Errorf(
+			"invalid templates type: %+v (%T)",
+			t, t,
+		)
+	}
+	return templates, nil
+}
+
+func (l Letter) GetHeaders() (headers []Header, err error) {
+	switch h := l.Frontmatter[FieldNameHeaders].(type) {
+	case nil:
+		return headers, nil
+	case map[string]any:
+		for name, value := range h {
+			switch value := value.(type) {
+			case int64, uint64, int32, uint32, int16, uint16, int8, uint8:
+				headers = append(headers, Header{
+					Name:  name,
+					Value: fmt.Sprintf("%d", value),
+				})
+			case float64, float32:
+				headers = append(headers, Header{
+					Name:  name,
+					Value: fmt.Sprintf("%v", value),
+				})
+			case string:
+				value = strings.TrimSpace(value)
+				if value == "" {
+					continue
+				}
+				headers = append(headers, Header{
+					Name:  name,
+					Value: value,
+				})
+			default:
+				return headers, fmt.Errorf(
+					"header %q has invalid value type: %+v (%T)",
+					name, value, value,
+				)
+			}
+		}
+		return headers, nil
+	default:
+		return headers, fmt.Errorf("letter headers are of wrong type: %+v (%T)", h, h)
+	}
+}
+
+func (l Letter) GetLanguage() (lang string, err error) {
+	switch language := l.Frontmatter[FieldNameLanguage].(type) {
+	case nil:
+		return lang, nil
+	case string:
+		language = strings.TrimSpace(language)
+		if len(language) > 0 {
+			lang = language
+		}
+	default:
+		return lang, fmt.Errorf("invalid language type: %T", language)
+	}
+	return lang, nil
 }
 
 func (l Letter) GetMediaConstraints() (m media.Constraints, err error) {
