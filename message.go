@@ -1,6 +1,7 @@
 package mdsend
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/mail"
@@ -36,6 +37,16 @@ func (err MessageError) Error() string {
 type Header struct {
 	Name  string
 	Value string
+}
+
+func (h Header) Validate() (err error) {
+	if h.Name == "" {
+		return errors.New("empty header name")
+	}
+	if h.Value == "" {
+		return fmt.Errorf("empty header value: %s", h.Name)
+	}
+	return nil
 }
 
 func MergeHeaders(ms ...map[string]any) (result []Header) {
@@ -82,6 +93,36 @@ type Message struct {
 	ScheduleAfter time.Time
 	ScheduledAt   time.Time
 	SentAt        time.Time
+}
+
+func (m Message) Validate() (err error) {
+	// if m.ID == "" {
+	// 	return errors.New("empty ID")
+	// }
+	if m.LetterID == "" {
+		return errors.New("empty letter ID")
+	}
+	for _, h := range m.Headers {
+		if err = h.Validate(); err != nil {
+			return err
+		}
+	}
+	if m.From.Address == "" {
+		return errors.New("empty from address")
+	}
+	if m.To.Address == "" {
+		return errors.New("empty recipient address")
+	}
+	if m.Subject == "" {
+		return errors.New("empty subject")
+	}
+	if m.Text == "" {
+		return errors.New("empty plain text content")
+	}
+	if m.HTML == "" {
+		return errors.New("empty HTML content")
+	}
+	return nil
 }
 
 func (m Message) AssertEqualityTo(b Message) error {

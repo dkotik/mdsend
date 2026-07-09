@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/cuecontext"
+	"github.com/dkotik/mdsend/internal"
 	"github.com/dkotik/mdsend/internal/media"
 	"github.com/dkotik/mdsend/markdown"
 	"github.com/pelletier/go-toml/v2"
@@ -119,7 +120,7 @@ func extend(
 					return letter, err
 				}
 			}
-			mergeLeft(frontmatter, letter.Frontmatter)
+			internal.MergeLeft(frontmatter, letter.Frontmatter)
 			letter.Frontmatter = frontmatter
 			continue
 		case ".yaml", ".yml":
@@ -135,7 +136,7 @@ func extend(
 					return letter, err
 				}
 			}
-			mergeLeft(frontmatter, letter.Frontmatter)
+			internal.MergeLeft(frontmatter, letter.Frontmatter)
 			letter.Frontmatter = frontmatter
 			continue
 		case ".toml":
@@ -151,7 +152,7 @@ func extend(
 					return letter, err
 				}
 			}
-			mergeLeft(frontmatter, letter.Frontmatter)
+			internal.MergeLeft(frontmatter, letter.Frontmatter)
 			letter.Frontmatter = frontmatter
 			continue
 		case ".cue":
@@ -167,7 +168,7 @@ func extend(
 					return letter, err
 				}
 			}
-			mergeLeft(frontmatter, letter.Frontmatter)
+			internal.MergeLeft(frontmatter, letter.Frontmatter)
 			letter.Frontmatter = frontmatter
 			continue
 		case ".md", ".markdown":
@@ -216,52 +217,10 @@ func extend(
 		}
 		letter.Content = b.String()
 		if subLetter.Frontmatter != nil {
-			mergeLeft(subLetter.Frontmatter, letter.Frontmatter)
+			internal.MergeLeft(subLetter.Frontmatter, letter.Frontmatter)
 			letter.Frontmatter = subLetter.Frontmatter
 		}
 	}
 
 	return letter, nil
-}
-
-func mergeLeft(a, b map[string]any) {
-	var (
-		existing any
-		ok       bool
-	)
-	for k, v := range b {
-		// k = strings.ToLower(k)
-		existing, ok = a[k]
-		if !ok { // simplest
-			a[k] = v
-			continue
-		}
-
-		switch existing := existing.(type) {
-		case []any:
-			switch v := v.(type) {
-			case nil:
-				continue // skip nil values
-			case []any:
-				a[k] = append(existing, v...)
-			default:
-				a[k] = append(existing, v)
-			}
-		case map[string]any:
-			switch v := v.(type) {
-			case nil:
-				continue // skip nil values
-			case map[string]any:
-				mergeLeft(existing, v)
-				// a[k] = mergeLeft(existing, v)
-			default:
-				a[k] = v
-			}
-		default:
-			if v == nil {
-				continue // skip nil values
-			}
-			a[k] = v
-		}
-	}
 }

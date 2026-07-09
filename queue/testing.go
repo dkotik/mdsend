@@ -31,6 +31,7 @@ func TestQueue(q Queue) func(*testing.T) {
 		ID: "firstLetter",
 		Frontmatter: map[string]any{
 			"subject": "first letter",
+			"from":    "Test From <from@test.com>",
 		},
 		Content:   "first letter",
 		CreatedAt: mockTime,
@@ -41,6 +42,10 @@ func TestQueue(q Queue) func(*testing.T) {
 		ID: "secondLetter",
 		Frontmatter: map[string]any{
 			"subject": "second letter",
+			"from": map[string]any{
+				mdsend.FieldNameName:  "Test From2",
+				mdsend.FieldNameEmail: "from5@test.com",
+			},
 		},
 		Content:   "second letter",
 		CreatedAt: mockTime.Add(time.Hour * 50),
@@ -51,7 +56,10 @@ func TestQueue(q Queue) func(*testing.T) {
 		{
 			ID:       "firstMessage",
 			LetterID: l1.ID,
-			From:     mail.Address{},
+			From: mail.Address{
+				Name:    "Test From",
+				Address: "testfrom1@test.com",
+			},
 			To: mail.Address{
 				Name:    "First Last",
 				Address: "first.last@example.com",
@@ -63,7 +71,10 @@ func TestQueue(q Queue) func(*testing.T) {
 		{
 			ID:       "secondMessage",
 			LetterID: l1.ID,
-			From:     mail.Address{},
+			From: mail.Address{
+				Name:    "Test From",
+				Address: "testfrom2@test.com",
+			},
 			To: mail.Address{
 				Name:    "Second",
 				Address: "second@example.com",
@@ -134,6 +145,9 @@ func TestQueue(q Queue) func(*testing.T) {
 		if err != nil {
 			t.Fatal("unable to retrieve first letter:", err)
 		}
+		if err = lcomp.Validate(); err != nil {
+			t.Fatal("retrieved invalid letter:", err)
+		}
 		if err = l1.AssertEqualityTo(lcomp); err != nil {
 			t.Fatal("letters do not match:", err)
 		}
@@ -173,6 +187,9 @@ func TestQueue(q Queue) func(*testing.T) {
 		}
 		for i, d := range l1messages {
 			d.ID = messages[i].ID // copy the ID from the expected message
+			if err = d.Validate(); err != nil {
+				t.Fatal("retrieved invalid message:", err)
+			}
 			if err = d.AssertEqualityTo(messages[i]); err != nil {
 				t.Fatal("messages do not match:", err)
 			}
@@ -236,6 +253,9 @@ func TestQueue(q Queue) func(*testing.T) {
 		lcomp, err = q.RetrieveLetter(ctx, l2.ID)
 		if err != nil {
 			t.Fatal("unable to retrieve second letter:", err)
+		}
+		if err = lcomp.Validate(); err != nil {
+			t.Fatal("retrieved invalid letter:", err)
 		}
 		if err = l2.AssertEqualityTo(lcomp); err != nil {
 			t.Fatal("letters do not match:", err)

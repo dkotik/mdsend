@@ -47,7 +47,7 @@ func newAddressFromMap(m map[string]any) (result mail.Address, err error) {
 		return result, errors.New("invalid name format")
 	}
 
-	switch emailRaw := m[FieldNameName].(type) {
+	switch emailRaw := m[FieldNameEmail].(type) {
 	case nil:
 		return result, errors.New("no electronic email address specified")
 	case string:

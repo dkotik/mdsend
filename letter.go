@@ -7,9 +7,9 @@ import (
 	"io"
 	"io/fs"
 	"log/slog"
-	"maps"
 	"net/mail"
 	"path"
+	"reflect"
 	"strings"
 	"time"
 
@@ -319,7 +319,7 @@ func (l Letter) AssertEqualityTo(b Letter) error {
 			ActualValue:   b.ID,
 		}
 	}
-	if !maps.Equal(l.Frontmatter, b.Frontmatter) {
+	if !reflect.DeepEqual(l.Frontmatter, b.Frontmatter) {
 		return FieldComparisonMismatchError{
 			FieldName:     "Frontmatter",
 			ExpectedValue: fmt.Sprintf("%+v", l.Frontmatter),
@@ -331,6 +331,22 @@ func (l Letter) AssertEqualityTo(b Letter) error {
 			FieldName:     "Content",
 			ExpectedValue: l.Content,
 			ActualValue:   b.Content,
+		}
+	}
+	if len(l.Templates) != len(b.Templates) {
+		return FieldComparisonMismatchError{
+			FieldName:     "Templates",
+			ExpectedValue: fmt.Sprintf("%d templates", len(l.Templates)),
+			ActualValue:   fmt.Sprintf("%d templates", len(b.Templates)),
+		}
+	}
+	for i := range l.Templates {
+		if err := l.Templates[i].AssertEqualityTo(b.Templates[i]); err != nil {
+			return FieldComparisonMismatchError{
+				FieldName:     fmt.Sprintf("Templates[%d]", i),
+				ExpectedValue: fmt.Sprintf("%+v", l.Templates[i]),
+				ActualValue:   fmt.Sprintf("%+v", b.Templates[i]),
+			}
 		}
 	}
 	if !l.CreatedAt.Truncate(time.Second).Equal(b.CreatedAt.Truncate(time.Second)) {

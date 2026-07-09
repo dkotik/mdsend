@@ -117,7 +117,7 @@ func ValidateMessageStructure(r io.Reader, m partDefinition) func(*testing.T) {
 }
 
 func TestFileEncoding(t *testing.T) {
-	cat, err := os.ReadFile("../testdata/cat.jpg")
+	cat, err := os.ReadFile("testdata/image/cat.jpg")
 	if err != nil {
 		t.Fatal(err)
 	}

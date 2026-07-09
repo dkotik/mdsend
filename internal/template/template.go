@@ -1,104 +1,142 @@
 package template
 
 import (
-	"bytes"
+	"embed"
 	"errors"
 	"fmt"
 	"html/template"
-	"io"
+	"net/mail"
+	"strings"
+	"sync"
+	ttemplate "text/template"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/internal"
 	"github.com/dkotik/mdsend/markdown"
 	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/parser"
+	"github.com/yuin/goldmark/renderer"
 )
 
+//go:embed html/*
+var defaultTemplates embed.FS
+
 type Template interface {
-	Render(mdsend.Letter, Context) (mdsend.Message, error)
+	RenderLetterForRecipient(map[string]any) (mdsend.Message, error)
 }
 
-type Renderer interface {
-	Render(plainText, HTML io.Writer, recipient map[string]any) error
+type tmpl struct {
+	LetterID        string
+	From            mail.Address
+	Subject         *ttemplate.Template
+	Headers         []headerTemplate
+	Text            *ttemplate.Template
+	HTML            *template.Template
+	ContentParser   parser.Parser
+	RendererForText renderer.Renderer
+	RendererForHTML renderer.Renderer
+
+	mu      *sync.Mutex
+	context Context
 }
 
-func Parse(text string) (*template.Template, error) {
-	return template.New("").Funcs(Functions()).Parse(text)
+type Options struct {
+	ContentParser   parser.Parser
+	RendererForText renderer.Renderer
+	RendererForHTML renderer.Renderer
+	Frontmatter     map[string]any
 }
 
-type messageTemplate struct {
-	MarkdownRenderer goldmark.Markdown
-	Frontmatter      map[string]any
-	Template         *template.Template
-	Content          *template.Template
-
-	// mu *sync.Mutex
-	Text *bytes.Buffer
-	HTML *bytes.Buffer
+func (o Options) withDefaults() Options {
+	if o.ContentParser == nil {
+		o.ContentParser = goldmark.DefaultParser()
+	}
+	if o.RendererForText == nil {
+		o.RendererForText = markdown.NewPlaintextRenderer()
+	}
+	if o.RendererForHTML == nil {
+		o.RendererForHTML = markdown.New().Renderer()
+	}
+	if o.Frontmatter == nil {
+		o.Frontmatter = make(map[string]any)
+	}
+	return o
 }
 
-// New creates a [Renderer]. It is not safe for asynchronous
-// rendering.
+// New creates a [Template]. The result is safe for asynchronous rendering.
 func New(
-	m mdsend.Letter,
-	r goldmark.Markdown,
-) (Renderer, error) {
-	if r == nil {
-		return nil, errors.New("renderer for Markdown is nil")
+	l mdsend.Letter,
+	options Options,
+) (_ Template, err error) {
+	options = options.withDefaults()
+	internal.MergeLeft(options.Frontmatter, l.Frontmatter)
+	t := &tmpl{
+		LetterID:        l.ID,
+		mu:              &sync.Mutex{},
+		ContentParser:   options.ContentParser,
+		RendererForText: options.RendererForText,
+		RendererForHTML: options.RendererForHTML,
+		context: Context{
+			Frontmatter: options.Frontmatter,
+		},
 	}
-	content, err := Parse(m.Content)
+	if t.context.Frontmatter == nil {
+		t.context.Frontmatter = make(map[string]any)
+	}
+	t.From, err = l.GetFrom()
 	if err != nil {
-		return messageTemplate{}, fmt.Errorf("unable to parse template fields in message content: %w", err)
+		return nil, err
 	}
-	raw, err := loadTemplate(m)
+	subject, err := l.GetSubject()
 	if err != nil {
-		return messageTemplate{}, fmt.Errorf("unable to load message template: %w", err)
+		return nil, err
 	}
-	template, err := Parse(string(raw))
+	t.Subject, err = ttemplate.New("").Funcs(Functions()).Parse(subject)
 	if err != nil {
-		return messageTemplate{}, fmt.Errorf("unable to parse message template: %w", err)
+		return nil, fmt.Errorf("invalid subject template: %w", err)
 	}
-	frontmatter := m.Frontmatter
-	if frontmatter == nil {
-		frontmatter = make(map[string]any)
+	headers, err := l.GetHeaders()
+	if err != nil {
+		return nil, err
 	}
-	return messageTemplate{
-		MarkdownRenderer: r,
-		Frontmatter:      frontmatter,
-		Template:         template,
-		Content:          content,
-
-		Text: &bytes.Buffer{},
-		HTML: &bytes.Buffer{},
-	}, nil
-}
-
-func (t messageTemplate) Render(
-	plainText, HTML io.Writer,
-	recipient map[string]any,
-) (err error) {
-	context := Context{
-		Frontmatter: t.Frontmatter,
-		Recipient:   recipient,
+	t.Headers = make([]headerTemplate, len(headers))
+	for i, header := range headers {
+		value, err := ttemplate.New("").Funcs(Functions()).Parse(header.Value)
+		if err != nil {
+			return nil, fmt.Errorf("unable to parse header %q as template: %w", header.Name, err)
+		}
+		t.Headers[i] = headerTemplate{
+			Name:     header.Name,
+			Template: value,
+		}
 	}
 
-	t.Text.Reset()
-	if err = t.Content.Execute(
-		io.MultiWriter(plainText, t.Text),
-		context,
-	); err != nil {
-		return fmt.Errorf("unable to execute content template: %w", err)
+	l.Content = strings.TrimSpace(l.Content)
+	if l.Content == "" {
+		return nil, errors.New("empty letter content")
+	}
+	t.Text, err = ttemplate.New("").Funcs(Functions()).Parse(l.Content)
+	if err != nil {
+		return nil, fmt.Errorf("unable to parse letter content as a template: %w", err)
 	}
 
-	t.HTML.Reset()
-	if err = markdown.New().Convert(
-		t.Text.Bytes(),
-		t.HTML,
-	); err != nil {
-		return err
+	t.HTML = template.New("").Funcs(Functions())
+	for _, subTemplate := range l.Templates {
+		t.HTML, err = t.HTML.Parse(string(subTemplate.Content))
+		if err != nil {
+			return nil, fmt.Errorf("unable to parse template %q: %w", subTemplate.Name, err)
+		}
 	}
-	context.Content = template.HTML(t.HTML.String())
 
-	if err = t.Template.Execute(HTML, context); err != nil {
-		return fmt.Errorf("unable to execute message template: %w", err)
+	if len(l.Templates) == 0 {
+		defaultTemplate, err := defaultTemplates.ReadFile("html/default.html")
+		if err != nil {
+			return nil, fmt.Errorf("unable to load default template: %w", err)
+		}
+		t.HTML, err = t.HTML.Parse(string(defaultTemplate))
+		if err != nil {
+			return nil, fmt.Errorf("unable to parse default template: %w", err)
+		}
 	}
-	return nil
+	return t, nil
 }

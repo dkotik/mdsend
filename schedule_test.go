@@ -29,5 +29,4 @@ func TestScheduleParsing(t *testing.T) {
 	if s.Fluctuate != 10*time.Minute {
 		t.Fatalf("expected fluctuate to be 10m, got %d", s.Fluctuate)
 	}
-
 }

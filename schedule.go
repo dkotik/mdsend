@@ -2,7 +2,6 @@ package mdsend
 
 import (
 	"fmt"
-	"iter"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -11,7 +10,6 @@ import (
 
 type Schedule struct {
 	After     time.Time     `json:"after"`
-	Delay     time.Duration `json:"delay"`
 	Step      time.Duration `json:"step"`
 	Fluctuate time.Duration `json:"fluctuate"`
 	Expire    time.Duration `json:"expire"`
@@ -24,24 +22,11 @@ func fluctuateDuration(d time.Duration) time.Duration {
 	return time.Duration(rand.NormFloat64() * float64(d))
 }
 
-func (s Schedule) Each() iter.Seq[time.Time] {
-	return func(yield func(time.Time) bool) {
-		if s.After.IsZero() {
-			s.After = time.Now()
-		}
-		next := s.After.Add(s.Delay)
-		fluctuate := s.Fluctuate
-		if !yield(next.Add(fluctuateDuration(fluctuate))) {
-			return
-		}
-		step := s.Step
-		for {
-			next = next.Add(step)
-			if !yield(next.Add(fluctuateDuration(fluctuate))) {
-				return
-			}
-		}
-	}
+func (s Schedule) Next() Schedule {
+	s.After = s.After.Add(
+		s.Step + fluctuateDuration(s.Fluctuate),
+	)
+	return s
 }
 
 func (l Letter) GetSchedule() (s Schedule, err error) {
@@ -62,10 +47,14 @@ func (l Letter) GetSchedule() (s Schedule, err error) {
 		}
 		delay, ok := m[FieldNameScheduleDelay]
 		if ok {
-			s.Delay, err = parseDuration(delay)
+			delayParsed, err := parseDuration(delay)
 			if err != nil {
 				return s, err
 			}
+			if s.After.IsZero() {
+				s.After = time.Now()
+			}
+			s.After = s.After.Add(delayParsed)
 		}
 		step, ok := m[FieldNameScheduleStep]
 		if ok {
@@ -73,17 +62,23 @@ func (l Letter) GetSchedule() (s Schedule, err error) {
 			if err != nil {
 				return s, err
 			}
-		}
-		expire, ok := m[FieldNameScheduleExpire]
-		if ok {
-			s.Expire, err = parseDuration(expire)
-			if err != nil {
-				return s, err
+			if s.After.IsZero() {
+				s.After = time.Now()
 			}
 		}
 		fluctuate, ok := m[FieldNameScheduleFluctuate]
 		if ok {
 			s.Fluctuate, err = parseDuration(fluctuate)
+			if err != nil {
+				return s, err
+			}
+			if s.After.IsZero() {
+				s.After = time.Now()
+			}
+		}
+		expire, ok := m[FieldNameScheduleExpire]
+		if ok {
+			s.Expire, err = parseDuration(expire)
 			if err != nil {
 				return s, err
 			}

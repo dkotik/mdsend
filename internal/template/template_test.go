@@ -1,28 +1,53 @@
 package template
 
 import (
+	"bytes"
+	"html/template"
 	"testing"
+
+	"github.com/dkotik/mdsend"
+	"github.com/sebdah/goldie/v2"
 )
 
+func TestValidMessageFromTemplate(t *testing.T) {
+	tmpl, err := New(
+		mdsend.Letter{
+			ID: "valid message test",
+			Frontmatter: map[string]any{
+				mdsend.FieldNameFrom: map[string]any{
+					mdsend.FieldNameName:  "Test Name From",
+					mdsend.FieldNameEmail: "from2from@test.com",
+				},
+				mdsend.FieldNameSubject: "test letter subject for {{ .Recipient.Name }}",
+			},
+			Content: "test letter for {{ .Recipient.Name }}",
+		},
+		Options{},
+	)
+	if err != nil {
+		t.Fatal("unable to create template:", err)
+	}
+	if tmpl == nil {
+		t.Fatal("nil template returned")
+	}
+	t.Run("interface conformity", NewTemplateTest(tmpl))
+}
+
 func TestTemplateRendering(t *testing.T) {
-	// m, err := loader.NewMessage("../testdata/pass/a.md")
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-	// template, err := New(m, markdown.New())
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-	// plainText, HTML := &bytes.Buffer{}, &bytes.Buffer{}
-	// if err = template.Render(plainText, HTML, nil); err != nil {
-	// 	t.Fatal(err)
-	// }
-	// if plainText.Len() == 0 {
-	// 	t.Fatal("no plain text content was rendered")
-	// }
-	// if HTML.Len() == 0 {
-	// 	t.Fatal("no HTML content was rendered")
-	// }
-	// t.Fatal(plainText.String())
-	// t.Fatal(HTML.String())
+	defaultTemplate, err := defaultTemplates.ReadFile("html/default.html")
+	if err != nil {
+		t.Fatal(err)
+	}
+	tmpl, err := template.New("").Parse(string(defaultTemplate))
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := &bytes.Buffer{}
+	if err = tmpl.Execute(b, Context{
+		Content: template.HTML("[test content]"),
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	goldie.New(t).Assert(t, "default", b.Bytes())
 }

@@ -6,11 +6,11 @@ import (
 	"github.com/yuin/goldmark/util"
 )
 
-// PlaintextRenderer renders markdown nodes to plain text without any HTML or HTML comments.
-type PlaintextRenderer struct{}
+// plaintextRenderer renders markdown nodes to plain text without any HTML or HTML comments.
+type plaintextRenderer struct{}
 
 // RegisterFuncs registers all node rendering functions.
-func (p *PlaintextRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
+func (p *plaintextRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 	// Document and root
 	reg.Register(ast.KindDocument, p.renderDocument)
 	reg.Register(ast.KindBlockquote, p.renderBlockquote)
@@ -49,12 +49,12 @@ func (p *PlaintextRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegistere
 
 }
 
-func (p *PlaintextRenderer) renderDocument(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderDocument(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	// For documents, we just continue traversing children
 	return ast.WalkContinue, nil
 }
 
-func (p *PlaintextRenderer) renderBlockquote(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderBlockquote(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		// Blockquotes are rendered with indentation
 		_, _ = w.WriteString("> ")
@@ -62,7 +62,7 @@ func (p *PlaintextRenderer) renderBlockquote(w util.BufWriter, source []byte, no
 	return ast.WalkContinue, nil
 }
 
-func (p *PlaintextRenderer) renderHeading(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderHeading(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	h := node.(*ast.Heading)
 	if entering {
 		// Add newline before heading if not at start
@@ -112,7 +112,7 @@ func (p *PlaintextRenderer) renderHeading(w util.BufWriter, source []byte, node 
 	return ast.WalkContinue, nil
 }
 
-func (p *PlaintextRenderer) renderList(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderList(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		_ = w.WriteByte('\n')
 	} else {
@@ -121,7 +121,7 @@ func (p *PlaintextRenderer) renderList(w util.BufWriter, source []byte, node ast
 	return ast.WalkContinue, nil
 }
 
-func (p *PlaintextRenderer) renderListItem(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderListItem(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		// Determine if this is part of an ordered or unordered list
 		parent := node.Parent()
@@ -147,14 +147,14 @@ func (p *PlaintextRenderer) renderListItem(w util.BufWriter, source []byte, node
 	return ast.WalkContinue, nil
 }
 
-func (p *PlaintextRenderer) renderParagraph(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderParagraph(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		_, _ = w.WriteString("\n\n")
 	}
 	return ast.WalkContinue, nil
 }
 
-func (p *PlaintextRenderer) renderText(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderText(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		t := node.(*ast.Text)
 		_, _ = w.Write(t.Value(source))
@@ -162,7 +162,7 @@ func (p *PlaintextRenderer) renderText(w util.BufWriter, source []byte, node ast
 	return ast.WalkContinue, nil
 }
 
-func (p *PlaintextRenderer) renderTextBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderTextBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		tb := node.(*ast.TextBlock)
 		lines := tb.Lines()
@@ -174,7 +174,7 @@ func (p *PlaintextRenderer) renderTextBlock(w util.BufWriter, source []byte, nod
 	return ast.WalkContinue, nil
 }
 
-func (p *PlaintextRenderer) renderCodeBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderCodeBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("\n")
 		lines := node.Lines()
@@ -187,7 +187,7 @@ func (p *PlaintextRenderer) renderCodeBlock(w util.BufWriter, source []byte, nod
 	return ast.WalkSkipChildren, nil
 }
 
-func (p *PlaintextRenderer) renderFencedCodeBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderFencedCodeBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("\n")
 		lines := node.Lines()
@@ -200,7 +200,7 @@ func (p *PlaintextRenderer) renderFencedCodeBlock(w util.BufWriter, source []byt
 	return ast.WalkSkipChildren, nil
 }
 
-func (p *PlaintextRenderer) renderCodeSpan(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderCodeSpan(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		cs := node.(*ast.CodeSpan)
 		_ = w.WriteByte('`')
@@ -214,7 +214,7 @@ func (p *PlaintextRenderer) renderCodeSpan(w util.BufWriter, source []byte, node
 	return ast.WalkSkipChildren, nil
 }
 
-func (p *PlaintextRenderer) renderEmphasis(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderEmphasis(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	em := node.(*ast.Emphasis)
 	if entering {
 		if em.Level == 1 {
@@ -232,7 +232,7 @@ func (p *PlaintextRenderer) renderEmphasis(w util.BufWriter, source []byte, node
 	return ast.WalkContinue, nil
 }
 
-func (p *PlaintextRenderer) renderLink(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderLink(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	l := node.(*ast.Link)
 	if entering {
 		_ = w.WriteByte('[')
@@ -244,7 +244,7 @@ func (p *PlaintextRenderer) renderLink(w util.BufWriter, source []byte, node ast
 	return ast.WalkContinue, nil
 }
 
-func (p *PlaintextRenderer) renderImage(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderImage(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	img := node.(*ast.Image)
 	if entering {
 		_, _ = w.WriteString("![")
@@ -256,7 +256,7 @@ func (p *PlaintextRenderer) renderImage(w util.BufWriter, source []byte, node as
 	return ast.WalkContinue, nil
 }
 
-func (p *PlaintextRenderer) renderAutoLink(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderAutoLink(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		al := node.(*ast.AutoLink)
 		_, _ = w.Write(al.URL(source))
@@ -264,19 +264,19 @@ func (p *PlaintextRenderer) renderAutoLink(w util.BufWriter, source []byte, node
 	return ast.WalkContinue, nil
 }
 
-func (p *PlaintextRenderer) renderThematicBreak(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderThematicBreak(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		_, _ = w.WriteString("\n---\n")
 	}
 	return ast.WalkSkipChildren, nil
 }
 
-func (p *PlaintextRenderer) renderHTMLBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderHTMLBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	// Skip HTML blocks entirely
 	return ast.WalkSkipChildren, nil
 }
 
-func (p *PlaintextRenderer) renderRawHTML(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (p *plaintextRenderer) renderRawHTML(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	// Skip raw HTML entirely
 	return ast.WalkSkipChildren, nil
 }
@@ -295,6 +295,6 @@ func itoa(n int) string {
 }
 
 // NewPlaintextRenderer creates and returns a new PlaintextRenderer instance.
-func NewPlaintextRenderer() renderer.NodeRenderer {
-	return &PlaintextRenderer{}
+func NewPlaintextRenderer() renderer.Renderer {
+	return renderer.NewRenderer(renderer.WithNodeRenderers(util.Prioritized(&plaintextRenderer{}, 1000)))
 }

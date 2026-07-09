@@ -8,8 +8,6 @@ import (
 
 	"github.com/sebdah/goldie/v2"
 	"github.com/yuin/goldmark"
-	"github.com/yuin/goldmark/renderer"
-	"github.com/yuin/goldmark/util"
 )
 
 func TestPlaintextRenderer(t *testing.T) {
@@ -18,11 +16,7 @@ func TestPlaintextRenderer(t *testing.T) {
 		t.Fatal(err)
 	}
 	md := goldmark.New(
-		goldmark.WithRendererOptions(
-			renderer.WithNodeRenderers(
-				util.Prioritized(NewPlaintextRenderer(), 1),
-			),
-		),
+		goldmark.WithRenderer(NewPlaintextRenderer()),
 	)
 
 	b := &bytes.Buffer{}
