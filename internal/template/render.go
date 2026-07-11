@@ -96,7 +96,7 @@ func (t *tmpl) RenderLetterForRecipient(recipient map[string]any) (m mdsend.Mess
 	}
 	m.HTML = b.String()
 	m.LetterID = t.LetterID
-	// panic(m.LetterID)
+	m.SeedKey = t.SeedKey
 	m.From = t.From
 	m.ScheduleAfter = t.context.Schedule.After
 	t.context.Schedule = t.context.Schedule.Next()

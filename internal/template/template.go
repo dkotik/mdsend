@@ -27,9 +27,10 @@ type Template interface {
 
 type tmpl struct {
 	LetterID        string
+	SeedKey         string
 	From            mail.Address
-	Subject         *ttemplate.Template
 	Headers         []headerTemplate
+	Subject         *ttemplate.Template
 	Text            *ttemplate.Template
 	HTML            *template.Template
 	ContentParser   parser.Parser
@@ -78,10 +79,19 @@ func New(
 		RendererForHTML: options.RendererForHTML,
 		context: Context{
 			Frontmatter: options.Frontmatter,
+			Content:     template.HTML(l.Content), // for initial templates only
 		},
 	}
 	if t.context.Frontmatter == nil {
 		t.context.Frontmatter = make(map[string]any)
+	}
+	t.context.Schedule, err = l.GetSchedule()
+	if err != nil {
+		return nil, err
+	}
+	t.SeedKey, err = newSeedKey(t.context, l)
+	if err != nil {
+		return nil, err
 	}
 	t.From, err = l.GetFrom()
 	if err != nil {

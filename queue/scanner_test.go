@@ -43,7 +43,8 @@ func TestContinuousScanner(t *testing.T) {
 	}
 	for i := range 1000 {
 		if err = q.CreateMessage(ctx, mdsend.Message{
-			ID: fmt.Sprintf("message_%d", i),
+			ID:      fmt.Sprintf("message_%d", i),
+			SeedKey: fmt.Sprintf("message_%d", i),
 			To: mail.Address{
 				Name:    "Recipient",
 				Address: fmt.Sprintf("recipient_%d@test.com", i),
@@ -60,7 +61,8 @@ func TestContinuousScanner(t *testing.T) {
 	}
 	for i := range 1000 {
 		if err = q.CreateMessage(ctx, mdsend.Message{
-			ID: fmt.Sprintf("message_%d", i+2000),
+			ID:      fmt.Sprintf("message_%d", i+2000),
+			SeedKey: fmt.Sprintf("message_%d", i+2000),
 			To: mail.Address{
 				Name:    "Recipient",
 				Address: fmt.Sprintf("recipient_%d@test.com", i),

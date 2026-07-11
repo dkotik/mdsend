@@ -54,7 +54,6 @@ type Letter struct {
 	Content     string
 	CreatedAt   time.Time
 	SentAt      time.Time
-	// MessageCount int
 }
 
 func NewLetterFromFile(
@@ -154,6 +153,15 @@ func (l Letter) GetDatabase() string {
 	}
 }
 
+func (l Letter) GetSeed() (string, error) {
+	switch seed := l.Frontmatter[FieldNameSeed].(type) {
+	case string:
+		return strings.TrimSpace(seed), nil
+	default:
+		return strings.TrimSpace(fmt.Sprintf("%+v", seed)), nil
+	}
+}
+
 func (l Letter) GetSubject() (string, error) {
 	switch subject := l.Frontmatter[FieldNameSubject].(type) {
 	case int, uint, int64, uint64, uint16, int16, float32, float64:
@@ -231,24 +239,21 @@ func (l Letter) GetHeaders() (headers []Header, err error) {
 		for name, value := range h {
 			switch value := value.(type) {
 			case int64, uint64, int32, uint32, int16, uint16, int8, uint8:
-				headers = append(headers, Header{
-					Name:  name,
-					Value: fmt.Sprintf("%d", value),
-				})
+				headers = append(headers, NewHeader(
+					name,
+					fmt.Sprintf("%d", value),
+				))
 			case float64, float32:
-				headers = append(headers, Header{
-					Name:  name,
-					Value: fmt.Sprintf("%v", value),
-				})
+				headers = append(headers, NewHeader(
+					name,
+					fmt.Sprintf("%v", value),
+				))
 			case string:
 				value = strings.TrimSpace(value)
 				if value == "" {
 					continue
 				}
-				headers = append(headers, Header{
-					Name:  name,
-					Value: value,
-				})
+				headers = append(headers, NewHeader(name, value))
 			default:
 				return headers, fmt.Errorf(
 					"header %q has invalid value type: %+v (%T)",

@@ -85,6 +85,22 @@ func NewAttachmentFromFile(fs fs.FS, p string, constraints media.Constraints) (a
 	return a, err
 }
 
+func (a Attachment) Validate() (err error) {
+	if a.LetterID == "" {
+		return errors.New("empty letter ID")
+	}
+	if a.Name == "" {
+		return errors.New("empty name")
+	}
+	if a.ContentType == "" {
+		return errors.New("empty content type")
+	}
+	if len(a.Content) == 0 {
+		return errors.New("empty content")
+	}
+	return nil
+}
+
 func (a Attachment) WithUpdatedHash() Attachment {
 	hash := xxhash.New()
 	var err error

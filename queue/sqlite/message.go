@@ -29,16 +29,17 @@ func (q sqliteQueue) CreateMessage(
 
 	q.stmtInsertMessage.BindText(1, d.ID)
 	q.stmtInsertMessage.BindText(2, d.LetterID)
-	q.stmtInsertMessage.BindText(3, b.String())
-	q.stmtInsertMessage.BindText(4, d.From.Name)
-	q.stmtInsertMessage.BindText(5, d.From.Address)
-	q.stmtInsertMessage.BindText(6, d.To.Name)
-	q.stmtInsertMessage.BindText(7, d.To.Address)
-	q.stmtInsertMessage.BindText(8, d.Subject)
-	q.stmtInsertMessage.BindText(9, d.Text)
-	q.stmtInsertMessage.BindText(10, d.HTML)
+	q.stmtInsertMessage.BindText(3, d.SeedKey)
+	q.stmtInsertMessage.BindText(4, b.String())
+	q.stmtInsertMessage.BindText(5, d.From.Name)
+	q.stmtInsertMessage.BindText(6, d.From.Address)
+	q.stmtInsertMessage.BindText(7, d.To.Name)
+	q.stmtInsertMessage.BindText(8, d.To.Address)
+	q.stmtInsertMessage.BindText(9, d.Subject)
+	q.stmtInsertMessage.BindText(10, d.Text)
+	q.stmtInsertMessage.BindText(11, d.HTML)
 	if !d.ScheduleAfter.IsZero() {
-		q.stmtInsertMessage.BindText(11, d.ScheduleAfter.Format(time.RFC3339))
+		q.stmtInsertMessage.BindText(12, d.ScheduleAfter.Format(time.RFC3339))
 	}
 	_, err = q.stmtInsertMessage.Step()
 	switch code := sqlite.ErrCode(err); code {
@@ -116,40 +117,41 @@ func (q sqliteQueue) ListMessages(ctx context.Context, cursor queue.ChildCursor)
 			}
 
 			m.ID = stmt.ColumnText(0)
+			m.SeedKey = stmt.ColumnText(1)
 			var headers []mdsend.Header
-			if err := json.NewDecoder(stmt.ColumnReader(1)).Decode(&headers); err != nil {
+			if err := json.NewDecoder(stmt.ColumnReader(2)).Decode(&headers); err != nil {
 				yield(m, fmt.Errorf("unable to decode headers: %w", err))
 				return
 			}
 			m.Headers = headers
 			m.From = mail.Address{
-				Name:    stmt.ColumnText(2),
-				Address: stmt.ColumnText(3),
+				Name:    stmt.ColumnText(3),
+				Address: stmt.ColumnText(4),
 			}
 			m.To = mail.Address{
-				Name:    stmt.ColumnText(4),
-				Address: stmt.ColumnText(5),
+				Name:    stmt.ColumnText(5),
+				Address: stmt.ColumnText(6),
 			}
-			m.Subject = stmt.ColumnText(6)
-			m.Text = stmt.ColumnText(7)
-			m.HTML = stmt.ColumnText(8)
+			m.Subject = stmt.ColumnText(7)
+			m.Text = stmt.ColumnText(8)
+			m.HTML = stmt.ColumnText(9)
 
-			if !stmt.ColumnIsNull(9) {
-				m.ScheduleAfter, err = decodeTime(stmt.ColumnText(9))
-				if err != nil {
-					yield(m, err)
-					return
-				}
-			}
 			if !stmt.ColumnIsNull(10) {
-				m.ScheduledAt, err = decodeTime(stmt.ColumnText(10))
+				m.ScheduleAfter, err = decodeTime(stmt.ColumnText(10))
 				if err != nil {
 					yield(m, err)
 					return
 				}
 			}
 			if !stmt.ColumnIsNull(11) {
-				m.SentAt, err = decodeTime(stmt.ColumnText(11))
+				m.ScheduledAt, err = decodeTime(stmt.ColumnText(11))
+				if err != nil {
+					yield(m, err)
+					return
+				}
+			}
+			if !stmt.ColumnIsNull(12) {
+				m.SentAt, err = decodeTime(stmt.ColumnText(12))
 				if err != nil {
 					yield(m, err)
 					return

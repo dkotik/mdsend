@@ -6,8 +6,6 @@ import (
 	"log/slog"
 	"net/mail"
 	"net/textproto"
-	"sort"
-	"strings"
 	"time"
 )
 
@@ -39,6 +37,13 @@ type Header struct {
 	Value string
 }
 
+func NewHeader(name, value string) Header {
+	return Header{
+		Name:  textproto.CanonicalMIMEHeaderKey(name),
+		Value: value,
+	}
+}
+
 func (h Header) Validate() (err error) {
 	if h.Name == "" {
 		return errors.New("empty header name")
@@ -49,41 +54,11 @@ func (h Header) Validate() (err error) {
 	return nil
 }
 
-func MergeHeaders(ms ...map[string]any) (result []Header) {
-	for _, m := range ms {
-		for k, v := range m {
-			k = textproto.CanonicalMIMEHeaderKey(k)
-			switch v := v.(type) {
-			case string:
-				v = strings.TrimSpace(v)
-				if v == "" {
-					continue
-				}
-				result = append(result, Header{Name: k, Value: v})
-			case []string:
-				for _, s := range v {
-					s = strings.TrimSpace(s)
-					if s == "" {
-						continue
-					}
-					result = append(result, Header{Name: k, Value: s})
-				}
-			case nil: // skip nil values
-			default:
-				result = append(result, Header{Name: k, Value: fmt.Sprintf("%v", v)})
-			}
-		}
-	}
-	sort.Slice(result, func(i, j int) bool {
-		return result[i].Name < result[j].Name
-	})
-	return
-}
-
 // Message is an intent to delivery a copy of a letter to a particular recipient.
 type Message struct {
 	ID            string
 	LetterID      string
+	SeedKey       string
 	Headers       []Header
 	From          mail.Address
 	To            mail.Address
@@ -138,6 +113,13 @@ func (m Message) AssertEqualityTo(b Message) error {
 			FieldName:     "LetterID",
 			ExpectedValue: m.LetterID,
 			ActualValue:   b.LetterID,
+		}
+	}
+	if m.SeedKey != b.SeedKey {
+		return FieldComparisonMismatchError{
+			FieldName:     "SeedKey",
+			ExpectedValue: m.SeedKey,
+			ActualValue:   b.SeedKey,
 		}
 	}
 	if m.From.String() != b.From.String() {

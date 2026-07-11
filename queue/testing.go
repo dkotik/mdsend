@@ -56,6 +56,7 @@ func TestQueue(q Queue) func(*testing.T) {
 		{
 			ID:       "firstMessage",
 			LetterID: l1.ID,
+			SeedKey:  "firstMessageSeedKey",
 			From: mail.Address{
 				Name:    "Test From",
 				Address: "testfrom1@test.com",
@@ -71,6 +72,7 @@ func TestQueue(q Queue) func(*testing.T) {
 		{
 			ID:       "secondMessage",
 			LetterID: l1.ID,
+			SeedKey:  "secondMessageSeedKey",
 			From: mail.Address{
 				Name:    "Test From",
 				Address: "testfrom2@test.com",
@@ -87,15 +89,19 @@ func TestQueue(q Queue) func(*testing.T) {
 
 	attachments := []mdsend.Attachment{
 		{
-			LetterID: l1.ID,
-			Content:  []byte("attachment content1"),
-			Hash:     "attachment content1",
+			LetterID:    l1.ID,
+			Name:        "firstAttachment",
+			Content:     []byte("attachment content1"),
+			ContentType: "text/plain",
+			Hash:        "attachment content1",
 		},
 		{
-			LetterID:  l1.ID,
-			ContentID: "<inline@domain.com>",
-			Content:   []byte("attachment content2"),
-			Hash:      "attachment content2",
+			LetterID:    l1.ID,
+			Name:        "secondAttachment",
+			ContentID:   "<inline@domain.com>",
+			Content:     []byte("attachment content2"),
+			ContentType: "text/plain",
+			Hash:        "attachment content2",
 		},
 	}
 	return func(t *testing.T) {
@@ -156,6 +162,9 @@ func TestQueue(q Queue) func(*testing.T) {
 		for l1attachment, err := range q.ListAttachments(ctx, l1.ID) {
 			if err != nil {
 				t.Fatal("unable to list attachments for first letter:", err)
+			}
+			if err = l1attachment.Validate(); err != nil {
+				t.Fatal("retrieved invalid attachment:", err)
 			}
 			l1attachments = append(l1attachments, l1attachment)
 		}

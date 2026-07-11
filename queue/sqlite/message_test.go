@@ -42,6 +42,7 @@ func TestMessageQueries(t *testing.T) {
 	if err = q.CreateMessage(ctx, mdsend.Message{
 		ID:       ulid.Make().String(),
 		LetterID: letterID,
+		SeedKey:  letterID + "1",
 		From:     mail.Address{},
 		To: mail.Address{
 			Name:    "First Last",
@@ -57,6 +58,7 @@ func TestMessageQueries(t *testing.T) {
 	if err = q.CreateMessage(ctx, mdsend.Message{
 		ID:       ulid.Make().String(),
 		LetterID: letterID,
+		SeedKey:  letterID + "1",
 		From:     mail.Address{},
 		To: mail.Address{
 			Name:    "Second",

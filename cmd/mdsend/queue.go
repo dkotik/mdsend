@@ -24,7 +24,7 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 		}
 		return errors.New(`no letters selected to add`)
 	}
-	// panic("woo")
+
 	fs := media.NewUnsafeUnconstrainedFileSystem()
 	letters := make([]mdsend.Letter, 0, c.Args().Len())
 	for _, arg := range c.Args().Slice() {

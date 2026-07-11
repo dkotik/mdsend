@@ -107,6 +107,7 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 		CREATE TABLE IF NOT EXISTS `+messagesTable+` (
 			id text PRIMARY KEY,
 			letter_id text NOT NULL REFERENCES `+lettersTable+`(id) ON DELETE CASCADE,
+			seed_key text NOT NULL,
 			headers text NOT NULL,
 			from_name text NOT NULL,
 			from_email text NOT NULL,
@@ -119,7 +120,7 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 			queued_at text,
 			sent_at text,
 
-			UNIQUE (letter_id, to_email)
+			UNIQUE (seed_key, to_email)
 		) STRICT;
 		`,
 		); err != nil {
@@ -133,7 +134,7 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 	if q.stmtInsertLetter, err = conn.Prepare(`INSERT INTO ` + lettersTable + `(id, frontmatter, content, created_at, sent_at) VALUES(?,?,?,?,?)`); err != nil {
 		return nil, fmt.Errorf("unable to prepare insert letter statement: %w", err)
 	}
-	if q.stmtInsertMessage, err = conn.Prepare(`INSERT INTO ` + messagesTable + ` (id, letter_id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`); err != nil {
+	if q.stmtInsertMessage, err = conn.Prepare(`INSERT INTO ` + messagesTable + ` (id, letter_id, seed_key, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`); err != nil {
 		return nil, fmt.Errorf("unable to prepare insert message statement: %w", err)
 	}
 	if q.stmtInsertAttachment, err = q.DB.Prepare(`INSERT INTO ` + attachmentsTable + ` (id, letter_id, name, content_hash, content_id, content_type, content) VALUES (?, ?, ?, ?, ?, ?, ?)`); err != nil {
@@ -171,13 +172,13 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 	if q.stmtListAttachments, err = conn.Prepare(`SELECT name, content_hash, content_id, content_type, content FROM ` + attachmentsTable + ` WHERE letter_id=?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list attachments statement: %w", err)
 	}
-	if q.stmtLisMessagesForward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id>? ORDER BY id ASC LIMIT ?`); err != nil {
+	if q.stmtLisMessagesForward, err = conn.Prepare(`SELECT id, seed_key, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id>? ORDER BY id ASC LIMIT ?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list messages statement: %w", err)
 	}
-	if q.stmtListMessagesBackwardHead, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? ORDER BY id DESC LIMIT ?`); err != nil {
+	if q.stmtListMessagesBackwardHead, err = conn.Prepare(`SELECT id, seed_key, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? ORDER BY id DESC LIMIT ?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list messages backwards head statement: %w", err)
 	}
-	if q.stmtListMessagesBackward, err = conn.Prepare(`SELECT id, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id<? ORDER BY id DESC LIMIT ?`); err != nil {
+	if q.stmtListMessagesBackward, err = conn.Prepare(`SELECT id, seed_key, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id<? ORDER BY id DESC LIMIT ?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list messages statement: %w", err)
 	}
 	if q.stmtMarkMessagesAsQueued, err = conn.Prepare(`UPDATE ` + messagesTable + ` SET queued_at=? WHERE id IN (SELECT value FROM json_each(?))`); err != nil {
