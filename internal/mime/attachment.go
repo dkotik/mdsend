@@ -7,6 +7,7 @@ import (
 	"iter"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/header"
 	"github.com/dkotik/mdsend/queue"
 )
 
@@ -41,13 +42,13 @@ type cachedAttachment struct {
 }
 
 func (a cachedAttachment) WriteHeader(w io.Writer) (err error) {
-	if _, err = WriteHeader(w, HeaderContentType, a.ContentType); err != nil {
+	if _, err = WriteHeader(w, header.ContentType, a.ContentType); err != nil {
 		return err
 	}
-	if _, err = WriteHeader(w, HeaderContentDisposition, fmt.Sprintf(`attachment; filename="%s"`, escapeQuotes(a.Name))); err != nil {
+	if _, err = WriteHeader(w, header.ContentDisposition, fmt.Sprintf(`attachment; filename="%s"`, escapeQuotes(a.Name))); err != nil {
 		return err
 	}
-	if _, err = WriteHeader(w, HeaderContentTransferEncoding, `base64`); err != nil {
+	if _, err = WriteHeader(w, header.ContentTransferEncoding, `base64`); err != nil {
 		return err
 	}
 	// _, err = io.WriteString(w, CRNL)
@@ -55,16 +56,16 @@ func (a cachedAttachment) WriteHeader(w io.Writer) (err error) {
 }
 
 func (a cachedAttachment) WriteInlineHeader(w io.Writer, contentID string) (err error) {
-	if _, err = WriteHeader(w, HeaderContentType, a.ContentType); err != nil {
+	if _, err = WriteHeader(w, header.ContentType, a.ContentType); err != nil {
 		return err
 	}
-	if _, err = WriteHeader(w, HeaderContentDisposition, fmt.Sprintf(`inline; filename="%s"`, escapeQuotes(a.Name))); err != nil {
+	if _, err = WriteHeader(w, header.ContentDisposition, fmt.Sprintf(`inline; filename="%s"`, escapeQuotes(a.Name))); err != nil {
 		return err
 	}
-	if _, err = WriteHeader(w, HeaderContentTransferEncoding, `base64`); err != nil {
+	if _, err = WriteHeader(w, header.ContentTransferEncoding, `base64`); err != nil {
 		return err
 	}
-	if _, err = WriteHeader(w, HeaderContentID, contentID); err != nil {
+	if _, err = WriteHeader(w, header.ContentID, contentID); err != nil {
 		return err
 	}
 	// _, err = io.WriteString(w, CRNL)

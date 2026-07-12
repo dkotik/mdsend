@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/header"
 )
 
 type Writer struct {
@@ -67,13 +68,13 @@ func (w Writer) Write(
 		w.cachedAttachments[m.LetterID] = attachments
 	}
 
-	if err = WriteAddressHeader(out, HeaderFrom, m.From); err != nil {
+	if err = WriteAddressHeader(out, header.From, m.From); err != nil {
 		return err
 	}
-	if err = WriteAddressHeader(out, HeaderTo, m.To); err != nil {
+	if err = WriteAddressHeader(out, header.To, m.To); err != nil {
 		return err
 	}
-	if _, err = WriteHeader(out, HeaderSubject, m.Subject); err != nil {
+	if _, err = WriteHeader(out, header.Subject, m.Subject); err != nil {
 		return err
 	}
 	for _, header := range m.Headers {
@@ -81,7 +82,7 @@ func (w Writer) Write(
 			return err
 		}
 	}
-	if _, err = io.WriteString(out, HeaderMIMEVersion+": 1.0"+CRNL); err != nil {
+	if _, err = io.WriteString(out, header.MIMEVersion+": 1.0"+CRNL); err != nil {
 		return err
 	}
 
@@ -138,7 +139,7 @@ func (w Writer) Write(
 			return err
 		}
 	} else {
-		if _, err = out.Write([]byte(HeaderContentType + `: multipart/alternative;` + CRNL + ` boundary="`)); err != nil {
+		if _, err = out.Write([]byte(header.ContentType + `: multipart/alternative;` + CRNL + ` boundary="`)); err != nil {
 			return err
 		}
 		if _, err = out.Write([]byte(w.textBoundary)); err != nil {

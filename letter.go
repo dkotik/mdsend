@@ -13,8 +13,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dkotik/mdsend/header"
 	"github.com/dkotik/mdsend/internal/media"
 	"github.com/dkotik/mdsend/markdown"
+	"golang.org/x/text/language"
 )
 
 var _ slog.LogValuer = (*Letter)(nil)
@@ -231,7 +233,7 @@ func getTemplates(frontmatter map[string]any) (templates []string, err error) {
 	return templates, nil
 }
 
-func (l Letter) GetHeaders() (headers []Header, err error) {
+func (l Letter) GetHeaders() (headers []header.Header, err error) {
 	switch h := l.Frontmatter[FieldNameHeaders].(type) {
 	case nil:
 		return headers, nil
@@ -239,21 +241,23 @@ func (l Letter) GetHeaders() (headers []Header, err error) {
 		for name, value := range h {
 			switch value := value.(type) {
 			case int64, uint64, int32, uint32, int16, uint16, int8, uint8:
-				headers = append(headers, NewHeader(
-					name,
-					fmt.Sprintf("%d", value),
-				))
-			case float64, float32:
-				headers = append(headers, NewHeader(
-					name,
-					fmt.Sprintf("%v", value),
-				))
-			case string:
-				value = strings.TrimSpace(value)
-				if value == "" {
-					continue
+				header, err := header.New(name, fmt.Sprintf("%d", value))
+				if err != nil {
+					return headers, err
 				}
-				headers = append(headers, NewHeader(name, value))
+				headers = append(headers, header)
+			case float64, float32:
+				header, err := header.New(name, fmt.Sprintf("%v", value))
+				if err != nil {
+					return headers, err
+				}
+				headers = append(headers, header)
+			case string:
+				header, err := header.New(name, fmt.Sprintf("%v", value))
+				if err != nil {
+					return headers, err
+				}
+				headers = append(headers, header)
 			default:
 				return headers, fmt.Errorf(
 					"header %q has invalid value type: %+v (%T)",
@@ -267,19 +271,20 @@ func (l Letter) GetHeaders() (headers []Header, err error) {
 	}
 }
 
-func (l Letter) GetLanguage() (lang string, err error) {
-	switch language := l.Frontmatter[FieldNameLanguage].(type) {
+func (l Letter) GetLanguage() (lang language.Tag, err error) {
+	switch languageTag := l.Frontmatter[FieldNameLanguage].(type) {
 	case nil:
-		return lang, nil
 	case string:
-		language = strings.TrimSpace(language)
-		if len(language) > 0 {
-			lang = language
+		// languageTag = strings.TrimSpace(languageTag)
+		lang, err = language.Parse(languageTag)
+		if err != nil {
+			return language.English, err
 		}
+		return lang, nil
 	default:
-		return lang, fmt.Errorf("invalid language type: %T", language)
+		return language.English, fmt.Errorf("invalid language type: %T", languageTag)
 	}
-	return lang, nil
+	return language.English, nil
 }
 
 func (l Letter) GetMediaConstraints() (m media.Constraints, err error) {

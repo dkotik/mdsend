@@ -1,10 +1,13 @@
-package mdsend
+package address
 
 import (
 	"errors"
-	"net/mail"
 	"regexp"
-	"strings"
+)
+
+const (
+	// RFC 3696 Errata 1690
+	MaximumLength = 254
 )
 
 /*
@@ -20,10 +23,8 @@ var (
 	// ErrEmailAddressDomainInvalid = errors.New("unable to validate email address domain")
 )
 
-const MaximumEmailAddressLength = 254 // RFC 3696 Errata 1690
-
-func ValidateEmailFormat(emailAddress string) error {
-	if len(emailAddress) > MaximumEmailAddressLength {
+func ValidateFormat(emailAddress string) error {
+	if len(emailAddress) > MaximumLength {
 		return ErrEmailAddressTooLong
 	}
 
@@ -36,28 +37,4 @@ func ValidateEmailFormat(emailAddress string) error {
 	// 	return errors.Join(ErrEmailAddressDomainInvalid, err)
 	// }
 	return nil
-}
-
-func newAddressFromMap(m map[string]any) (result mail.Address, err error) {
-	switch nameRaw := m[FieldNameName].(type) {
-	case nil:
-	case string:
-		result.Name = strings.TrimSpace(nameRaw)
-	default:
-		return result, errors.New("invalid name format")
-	}
-
-	switch emailRaw := m[FieldNameEmail].(type) {
-	case nil:
-		return result, errors.New("no electronic email address specified")
-	case string:
-		result.Address = strings.TrimSpace(emailRaw)
-		if err = ValidateEmailFormat(result.Address); err != nil {
-			return result, err
-		}
-	default:
-		return result, errors.New("invalid email format")
-	}
-
-	return result, nil
 }

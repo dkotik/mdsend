@@ -13,7 +13,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/header"
 )
 
 func TestValidBoundaryGeneration(t *testing.T) {
@@ -42,19 +42,19 @@ func TestValidBoundaryGeneration(t *testing.T) {
 }
 
 type partDefinition struct {
-	Headers []mdsend.Header
+	Headers []header.Header
 	// Content  []byte
 	Children []partDefinition
 }
 
 func (p partDefinition) Match(
-	header textproto.MIMEHeader,
+	mh textproto.MIMEHeader,
 	body io.Reader,
 ) func(*testing.T) {
 	return func(t *testing.T) {
 		wd := new(mime.WordDecoder)
 		for _, h := range p.Headers {
-			actual, err := wd.DecodeHeader(header.Get(h.Name))
+			actual, err := wd.DecodeHeader(mh.Get(h.Name))
 			if err != nil {
 				t.Fatal("unable to decode header:", err)
 			}
@@ -69,7 +69,7 @@ func (p partDefinition) Match(
 		if childrenCount == 0 {
 			return
 		}
-		mediaType, params, err := mime.ParseMediaType(header.Get(HeaderContentType))
+		mediaType, params, err := mime.ParseMediaType(mh.Get(header.ContentType))
 		if err != nil {
 			t.Fatal(err)
 		}

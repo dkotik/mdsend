@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"log/slog"
 	"net/mail"
-	"net/textproto"
 	"time"
+
+	"github.com/dkotik/mdsend/header"
 )
 
 var _ slog.LogValuer = (*Message)(nil)
@@ -32,34 +33,12 @@ func (err MessageError) Error() string {
 	}
 }
 
-type Header struct {
-	Name  string
-	Value string
-}
-
-func NewHeader(name, value string) Header {
-	return Header{
-		Name:  textproto.CanonicalMIMEHeaderKey(name),
-		Value: value,
-	}
-}
-
-func (h Header) Validate() (err error) {
-	if h.Name == "" {
-		return errors.New("empty header name")
-	}
-	if h.Value == "" {
-		return fmt.Errorf("empty header value: %s", h.Name)
-	}
-	return nil
-}
-
 // Message is an intent to delivery a copy of a letter to a particular recipient.
 type Message struct {
 	ID            string
 	LetterID      string
 	SeedKey       string
-	Headers       []Header
+	Headers       []header.Header
 	From          mail.Address
 	To            mail.Address
 	Subject       string
@@ -78,9 +57,10 @@ func (m Message) Validate() (err error) {
 		return errors.New("empty letter ID")
 	}
 	for _, h := range m.Headers {
-		if err = h.Validate(); err != nil {
+		if _, err = header.New(h.Name, h.Value); err != nil {
 			return err
 		}
+
 	}
 	if m.From.Address == "" {
 		return errors.New("empty from address")

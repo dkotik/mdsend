@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/header"
 	"github.com/dkotik/mdsend/queue"
 	lib "modernc.org/sqlite/lib"
 	"zombiezen.com/go/sqlite"
@@ -118,7 +119,7 @@ func (q sqliteQueue) ListMessages(ctx context.Context, cursor queue.ChildCursor)
 
 			m.ID = stmt.ColumnText(0)
 			m.SeedKey = stmt.ColumnText(1)
-			var headers []mdsend.Header
+			var headers []header.Header
 			if err := json.NewDecoder(stmt.ColumnReader(2)).Decode(&headers); err != nil {
 				yield(m, fmt.Errorf("unable to decode headers: %w", err))
 				return

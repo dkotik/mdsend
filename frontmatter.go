@@ -53,10 +53,6 @@ const (
 	FieldNameScheduleStep              = "step"
 	FieldNameScheduleExpire            = "expire"
 	FieldNameScheduleFluctuate         = "fluctuate"
-	FieldNameListID                    = "list_id"
-	FieldNameUnsubscribe               = "unsubscribe"
-	FieldNameUnsubscribeEmail          = "unsubscribe_email"
-	FieldNameUnsubscribeURL            = "unsubscribe_url"
 )
 
 func parseFrontmatter(source []byte, delimeter rune) (frontmatter map[string]any, err error) {

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/header"
 	"github.com/sebdah/goldie/v2"
 )
 
@@ -29,8 +30,8 @@ func TestPlainMessageEncoding(t *testing.T) {
 		ValidateMessageStructure(
 			bytes.NewReader(b.Bytes()),
 			partDefinition{
-				Headers: []mdsend.Header{
-					{Name: HeaderMIMEVersion, Value: "1.0"},
+				Headers: []header.Header{
+					{Name: header.MIMEVersion, Value: "1.0"},
 					{Name: "From", Value: "\"Sender\" <sender@example.com>"},
 					{Name: "To", Value: "\"Recipient\" <recipient@example.com>"},
 					{Name: "Subject", Value: "Test Subject Перший"},
@@ -64,21 +65,21 @@ func TestPlainMixedMessageEncoding(t *testing.T) {
 		ValidateMessageStructure(
 			bytes.NewReader(b.Bytes()),
 			partDefinition{
-				Headers: []mdsend.Header{
-					{Name: HeaderMIMEVersion, Value: "1.0"},
+				Headers: []header.Header{
+					{Name: header.MIMEVersion, Value: "1.0"},
 					{Name: "From", Value: "\"Sender\" <sender@example.com>"},
 					{Name: "To", Value: "\"Recipient\" <recipient@example.com>"},
 					{Name: "Subject", Value: "Test Subject 3"},
 				},
 				Children: []partDefinition{
 					{
-						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "text/plain; charset=utf-8"},
+						Headers: []header.Header{
+							{Name: header.ContentType, Value: "text/plain; charset=utf-8"},
 						},
 					},
 					{
-						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "text/plain; charset=utf-8"},
+						Headers: []header.Header{
+							{Name: header.ContentType, Value: "text/plain; charset=utf-8"},
 						},
 					},
 				},
@@ -105,21 +106,21 @@ func TestAlternativeMessageEncoding(t *testing.T) {
 		ValidateMessageStructure(
 			bytes.NewReader(b.Bytes()),
 			partDefinition{
-				Headers: []mdsend.Header{
-					{Name: HeaderMIMEVersion, Value: "1.0"},
+				Headers: []header.Header{
+					{Name: header.MIMEVersion, Value: "1.0"},
 					{Name: "From", Value: "\"Sender\" <sender@example.com>"},
 					{Name: "To", Value: "\"Recipient\" <recipient@example.com>"},
 					{Name: "Subject", Value: "😁 Test Subject"},
 				},
 				Children: []partDefinition{
 					{
-						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "text/plain; charset=utf-8"},
+						Headers: []header.Header{
+							{Name: header.ContentType, Value: "text/plain; charset=utf-8"},
 						},
 					},
 					{
-						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "text/html; charset=utf-8"},
+						Headers: []header.Header{
+							{Name: header.ContentType, Value: "text/html; charset=utf-8"},
 						},
 					},
 				},
@@ -165,43 +166,43 @@ func TestMixedMessageEncoding(t *testing.T) {
 		ValidateMessageStructure(
 			bytes.NewReader(b.Bytes()),
 			partDefinition{
-				Headers: []mdsend.Header{
-					{Name: HeaderMIMEVersion, Value: "1.0"},
+				Headers: []header.Header{
+					{Name: header.MIMEVersion, Value: "1.0"},
 					{Name: "From", Value: "\"Sender\" <sender@example.com>"},
 					{Name: "To", Value: "\"Recipient\" <recipient@example.com>"},
 					{Name: "Subject", Value: "😁 Test Subject"},
 				},
 				Children: []partDefinition{
 					{
-						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "multipart/alternative; boundary=\"6H48lprQ5jsIY3Q8:6x9i/'O6SWNdslloeYLjBi)Riw3.d6lAvlNNTU9Zg8_:ZaT\""},
+						Headers: []header.Header{
+							{Name: header.ContentType, Value: "multipart/alternative; boundary=\"6H48lprQ5jsIY3Q8:6x9i/'O6SWNdslloeYLjBi)Riw3.d6lAvlNNTU9Zg8_:ZaT\""},
 						},
 						Children: []partDefinition{
 							{
-								Headers: []mdsend.Header{
-									{Name: "Content-Type", Value: "text/plain; charset=utf-8"},
+								Headers: []header.Header{
+									{Name: header.ContentType, Value: "text/plain; charset=utf-8"},
 								},
 							},
 							{
-								Headers: []mdsend.Header{
-									{Name: "Content-Type", Value: "text/html; charset=utf-8"},
+								Headers: []header.Header{
+									{Name: header.ContentType, Value: "text/html; charset=utf-8"},
 								},
 							},
 						},
 					},
 					{
-						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "image/jpeg"},
+						Headers: []header.Header{
+							{Name: header.ContentType, Value: "image/jpeg"},
 						},
 					},
 					{
-						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "image/jpeg"},
+						Headers: []header.Header{
+							{Name: header.ContentType, Value: "image/jpeg"},
 						},
 					},
 					{
-						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "image/jpeg"},
+						Headers: []header.Header{
+							{Name: header.ContentType, Value: "image/jpeg"},
 						},
 					},
 				},
@@ -256,36 +257,36 @@ func TestRelatedMessageEncoding(t *testing.T) {
 		ValidateMessageStructure(
 			bytes.NewReader(b.Bytes()),
 			partDefinition{
-				Headers: []mdsend.Header{
-					{Name: HeaderMIMEVersion, Value: "1.0"},
+				Headers: []header.Header{
+					{Name: header.MIMEVersion, Value: "1.0"},
 					{Name: "From", Value: "\"Sender\" <sender@example.com>"},
 					{Name: "To", Value: "\"Recipient\" <recipient@example.com>"},
 					{Name: "Subject", Value: "😁 Test Subject"},
 				},
 				Children: []partDefinition{
 					{
-						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "multipart/alternative; boundary=\"/y-Da+X'9'De5C,n(2Sv(wD1heyVBka:XtW:+5,e+(:.e2Vj=gNyi'RDve9)hyla\""},
+						Headers: []header.Header{
+							{Name: header.ContentType, Value: "multipart/alternative; boundary=\"/y-Da+X'9'De5C,n(2Sv(wD1heyVBka:XtW:+5,e+(:.e2Vj=gNyi'RDve9)hyla\""},
 						},
 						Children: []partDefinition{
 							{
-								Headers: []mdsend.Header{
-									{Name: "Content-Type", Value: "text/plain; charset=utf-8"},
+								Headers: []header.Header{
+									{Name: header.ContentType, Value: "text/plain; charset=utf-8"},
 								},
 							},
 							{
-								Headers: []mdsend.Header{
-									{Name: "Content-Type", Value: "multipart/related; boundary=\"y=BbvMTZKArDv14o2eR7/y'?ok:fkQaf=qstd+=gwzmkK:zAMh70OtiBfDfIgFyF\""},
+								Headers: []header.Header{
+									{Name: header.ContentType, Value: "multipart/related; boundary=\"y=BbvMTZKArDv14o2eR7/y'?ok:fkQaf=qstd+=gwzmkK:zAMh70OtiBfDfIgFyF\""},
 								},
 								Children: []partDefinition{
 									{
-										Headers: []mdsend.Header{
-											{Name: "Content-Type", Value: "text/html; charset=utf-8"},
+										Headers: []header.Header{
+											{Name: header.ContentType, Value: "text/html; charset=utf-8"},
 										},
 									},
 									{
-										Headers: []mdsend.Header{
-											{Name: "Content-Type", Value: "image/jpeg"},
+										Headers: []header.Header{
+											{Name: header.ContentType, Value: "image/jpeg"},
 										},
 									},
 								},
@@ -293,13 +294,13 @@ func TestRelatedMessageEncoding(t *testing.T) {
 						},
 					},
 					{
-						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "image/jpeg"},
+						Headers: []header.Header{
+							{Name: header.ContentType, Value: "image/jpeg"},
 						},
 					},
 					{
-						Headers: []mdsend.Header{
-							{Name: "Content-Type", Value: "image/jpeg"},
+						Headers: []header.Header{
+							{Name: header.ContentType, Value: "image/jpeg"},
 						},
 					},
 				},

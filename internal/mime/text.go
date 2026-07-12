@@ -6,10 +6,12 @@ import (
 	"io"
 	"mime/quotedprintable"
 	"strings"
+
+	"github.com/dkotik/mdsend/header"
 )
 
 func writeText(w io.Writer, text string) (err error) {
-	_, err = fmt.Fprintf(w, HeaderContentType+": text/plain; charset=utf-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
+	_, err = fmt.Fprintf(w, header.ContentType+": text/plain; charset=utf-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
 	if err != nil {
 		return err
 	}
@@ -22,7 +24,7 @@ func writeText(w io.Writer, text string) (err error) {
 }
 
 func writeHTML(w io.Writer, text string) (err error) {
-	_, err = fmt.Fprintf(w, HeaderContentType+": text/html; charset=utf-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
+	_, err = fmt.Fprintf(w, header.ContentType+": text/html; charset=utf-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
 	if err != nil {
 		return err
 	}
@@ -35,7 +37,7 @@ func writeHTML(w io.Writer, text string) (err error) {
 }
 
 func writeAlternative(w io.Writer, text, html, boundary string) (err error) {
-	if _, err = w.Write([]byte(HeaderContentType + `: multipart/alternative;` + CRNL + ` boundary="`)); err != nil {
+	if _, err = w.Write([]byte(header.ContentType + `: multipart/alternative;` + CRNL + ` boundary="`)); err != nil {
 		return err
 	}
 	if _, err = w.Write([]byte(boundary)); err != nil {
@@ -69,7 +71,7 @@ func (w Writer) writeAlternativeWithAttachments(out io.Writer, text, html, bound
 	if len(inline) == 0 {
 		return writeAlternative(out, text, html, boundary)
 	}
-	if _, err = out.Write([]byte(HeaderContentType + `: multipart/alternative;` + CRNL + ` boundary="`)); err != nil {
+	if _, err = out.Write([]byte(header.ContentType + `: multipart/alternative;` + CRNL + ` boundary="`)); err != nil {
 		return err
 	}
 	if _, err = out.Write([]byte(w.textBoundary)); err != nil {

@@ -8,6 +8,8 @@ import (
 	"sync"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/address"
+	"github.com/dkotik/mdsend/header"
 	"github.com/yuin/goldmark/text"
 )
 
@@ -30,7 +32,7 @@ func (t *tmpl) RenderLetterForRecipient(recipient map[string]any) (m mdsend.Mess
 		if email == "" {
 			return m, fmt.Errorf("recipient address is empty")
 		}
-		if err = mdsend.ValidateEmailFormat(email); err != nil {
+		if err = address.ValidateFormat(email); err != nil {
 			return m, fmt.Errorf("recipient address is invalid: %w", err)
 		}
 		m.To.Address = email
@@ -62,7 +64,7 @@ func (t *tmpl) RenderLetterForRecipient(recipient map[string]any) (m mdsend.Mess
 		if b.Len() == 0 {
 			continue // skip empty headers
 		}
-		m.Headers = append(m.Headers, mdsend.Header{
+		m.Headers = append(m.Headers, header.Header{
 			Name:  h.Name,
 			Value: b.String(),
 		})

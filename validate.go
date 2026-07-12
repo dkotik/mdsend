@@ -20,10 +20,10 @@ func (l Letter) Validate() (err error) {
 	if _, err = l.GetFrom(); err != nil {
 		return err
 	}
-	if _, err = l.GetSchedule(); err != nil {
+	if _, err = l.GetLanguage(); err != nil {
 		return err
 	}
-	if _, err = l.GetUnsubscribe(); err != nil {
+	if _, err = l.GetSchedule(); err != nil {
 		return err
 	}
 	return nil
@@ -50,17 +50,17 @@ func (l Letter) IsValid(cxt context.Context, logger *slog.Logger) (ok bool) {
 		logger.ErrorContext(cxt, "invalid schedule:", slog.Any("error", err))
 		ok = false
 	}
-	if listID, err := l.GetListID(); err != nil {
-		logger.ErrorContext(cxt, "invalid list ID:", slog.Any("error", err))
-		ok = false
-	} else if listID == "" {
-		logger.WarnContext(cxt, "letter has no `list_id`")
-		ok = false
-	}
-	if _, err = l.GetUnsubscribe(); err != nil {
-		logger.ErrorContext(cxt, "invalid unsubscribe:", slog.Any("error", err))
-		ok = false
-	}
+	// if listID, err := l.GetListID(); err != nil {
+	// 	logger.ErrorContext(cxt, "invalid list ID:", slog.Any("error", err))
+	// 	ok = false
+	// } else if listID == "" {
+	// 	logger.WarnContext(cxt, "letter has no `list_id`")
+	// 	ok = false
+	// }
+	// if _, err = l.GetUnsubscribe(); err != nil {
+	// 	logger.ErrorContext(cxt, "invalid unsubscribe:", slog.Any("error", err))
+	// 	ok = false
+	// }
 	if ok {
 		if err = l.Validate(); err != nil {
 			logger.ErrorContext(cxt, "letter validation failed:", slog.Any("error", err))

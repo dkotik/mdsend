@@ -10,19 +10,8 @@ import (
 	"sort"
 	"time"
 	"unicode/utf8"
-)
 
-const (
-	HeaderMIMEVersion             = "MIME-Version"
-	HeaderContentType             = "Content-Type"
-	HeaderContentTransferEncoding = "Content-Transfer-Encoding"
-	HeaderContentID               = "Content-ID"
-	HeaderContentDescription      = "Content-Description"
-	HeaderContentDisposition      = "Content-Disposition"
-	HeaderFrom                    = "From"
-	HeaderTo                      = "To"
-	HeaderSubject                 = "Subject"
-	HeaderDate                    = "Date"
+	"github.com/dkotik/mdsend/header"
 )
 
 // taken from mime package of the standard library
@@ -220,7 +209,7 @@ func writeHeader(w io.Writer, header textproto.MIMEHeader) (err error) {
 // }
 
 func (w Writer) WriteMixedBoundaryHeader(out io.Writer) (err error) {
-	if _, err = out.Write([]byte(HeaderContentType + `: multipart/mixed;` + CRNL + ` boundary="`)); err != nil {
+	if _, err = out.Write([]byte(header.ContentType + `: multipart/mixed;` + CRNL + ` boundary="`)); err != nil {
 		return err
 	}
 	if _, err = out.Write([]byte(w.mixedBoundary)); err != nil {
@@ -233,7 +222,7 @@ func (w Writer) WriteMixedBoundaryHeader(out io.Writer) (err error) {
 }
 
 func (w Writer) WriteRelatedBoundaryHeader(out io.Writer) (err error) {
-	if _, err = out.Write([]byte(HeaderContentType + `: multipart/related;` + CRNL + ` boundary="`)); err != nil {
+	if _, err = out.Write([]byte(header.ContentType + `: multipart/related;` + CRNL + ` boundary="`)); err != nil {
 		return err
 	}
 	if _, err = out.Write([]byte(w.relatedBoundary)); err != nil {

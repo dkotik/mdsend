@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -14,6 +15,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/cuecontext"
+	"github.com/dkotik/mdsend/address"
 	"github.com/pelletier/go-toml/v2"
 	"gopkg.in/yaml.v3"
 )
@@ -296,4 +298,28 @@ func eachRecipient(
 			}
 		}
 	}
+}
+
+func newAddressFromMap(m map[string]any) (result mail.Address, err error) {
+	switch nameRaw := m[FieldNameName].(type) {
+	case nil:
+	case string:
+		result.Name = strings.TrimSpace(nameRaw)
+	default:
+		return result, errors.New("invalid name format")
+	}
+
+	switch emailRaw := m[FieldNameEmail].(type) {
+	case nil:
+		return result, errors.New("no electronic email address specified")
+	case string:
+		result.Address = strings.TrimSpace(emailRaw)
+		if err = address.ValidateFormat(result.Address); err != nil {
+			return result, err
+		}
+	default:
+		return result, errors.New("invalid email format")
+	}
+
+	return result, nil
 }
