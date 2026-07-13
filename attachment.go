@@ -36,11 +36,6 @@ func (err AttachmentError) Error() string {
 	}
 }
 
-type AttachmentSource struct {
-	Name     string
-	Location string
-}
-
 type Attachment struct {
 	LetterID string
 	Name     string
@@ -56,6 +51,18 @@ type Attachment struct {
 	ContentID   string
 	ContentType string
 	Content     []byte
+}
+
+type AttachmentSource struct {
+	Name     string
+	Location string
+}
+
+type AttachmentReference struct {
+	ID          string
+	Name        string
+	ContentID   string
+	ContentType string
 }
 
 func NewAttachment(b []byte, constraints media.Constraints) (a Attachment, err error) {

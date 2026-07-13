@@ -7,12 +7,12 @@ import (
 	"html/template"
 	"net/mail"
 	"strings"
-	"sync"
 	ttemplate "text/template"
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/internal"
 	"github.com/dkotik/mdsend/markdown"
+	"github.com/google/uuid"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer"
@@ -25,30 +25,47 @@ type Template interface {
 	RenderLetterForRecipient(map[string]any) (mdsend.Message, error)
 }
 
-type tmpl struct {
-	LetterID        string
-	SeedKey         string
-	From            mail.Address
-	Headers         []headerTemplate
-	Subject         *ttemplate.Template
-	Text            *ttemplate.Template
-	HTML            *template.Template
-	ContentParser   parser.Parser
-	RendererForText renderer.Renderer
-	RendererForHTML renderer.Renderer
+type IdentifierGenerator interface {
+	GenerateID() (string, error)
+}
 
-	mu      *sync.Mutex
+type IdentifierGeneratorFunc func() (string, error)
+
+func (f IdentifierGeneratorFunc) GenerateID() (string, error) {
+	return f()
+}
+
+type tmpl struct {
+	LetterID            string
+	SeedKey             string
+	From                mail.Address
+	Headers             []headerTemplate
+	Subject             *ttemplate.Template
+	Text                *ttemplate.Template
+	HTML                *template.Template
+	ContentParser       parser.Parser
+	RendererForText     renderer.Renderer
+	RendererForHTML     renderer.Renderer
+	IdentifierGenerator IdentifierGenerator
+
+	// mu      *sync.Mutex
 	context Context
 }
 
 type Options struct {
-	ContentParser   parser.Parser
-	RendererForText renderer.Renderer
-	RendererForHTML renderer.Renderer
-	Frontmatter     map[string]any
+	IdentifierGenerator IdentifierGenerator
+	ContentParser       parser.Parser
+	RendererForText     renderer.Renderer
+	RendererForHTML     renderer.Renderer
+	Frontmatter         map[string]any
 }
 
 func (o Options) withDefaults() Options {
+	if o.IdentifierGenerator == nil {
+		o.IdentifierGenerator = IdentifierGeneratorFunc(func() (string, error) {
+			return uuid.NewString(), nil
+		})
+	}
 	if o.ContentParser == nil {
 		o.ContentParser = goldmark.DefaultParser()
 	}
@@ -64,7 +81,7 @@ func (o Options) withDefaults() Options {
 	return o
 }
 
-// New creates a [Template]. The result is safe for asynchronous rendering.
+// New creates a [Template]. The result is not safe for asynchronous rendering.
 func New(
 	l mdsend.Letter,
 	options Options,
@@ -72,11 +89,12 @@ func New(
 	options = options.withDefaults()
 	internal.MergeLeft(options.Frontmatter, l.Frontmatter)
 	t := &tmpl{
-		LetterID:        l.ID,
-		mu:              &sync.Mutex{},
-		ContentParser:   options.ContentParser,
-		RendererForText: options.RendererForText,
-		RendererForHTML: options.RendererForHTML,
+		LetterID: l.ID,
+		// mu:              &sync.Mutex{},
+		ContentParser:       options.ContentParser,
+		RendererForText:     options.RendererForText,
+		RendererForHTML:     options.RendererForHTML,
+		IdentifierGenerator: options.IdentifierGenerator,
 		context: Context{
 			Frontmatter: options.Frontmatter,
 			Content:     template.HTML(l.Content), // for initial templates only

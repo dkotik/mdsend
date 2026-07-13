@@ -45,8 +45,8 @@ func (t *tmpl) RenderLetterForRecipient(recipient map[string]any) (m mdsend.Mess
 		b.Reset()
 		buffers.Put(b)
 	}(b)
-	t.mu.Lock()
-	defer t.mu.Unlock()
+	// t.mu.Lock()
+	// defer t.mu.Unlock()
 	t.context.Recipient = recipient
 	t.context.Content = template.HTML("") // reset
 
@@ -98,6 +98,10 @@ func (t *tmpl) RenderLetterForRecipient(recipient map[string]any) (m mdsend.Mess
 	}
 	m.HTML = b.String()
 	m.LetterID = t.LetterID
+	m.ID, err = t.IdentifierGenerator.GenerateID()
+	if err != nil {
+		return m, err
+	}
 	m.SeedKey = t.SeedKey
 	m.From = t.From
 	m.ScheduleAfter = t.context.Schedule.After

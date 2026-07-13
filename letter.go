@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dkotik/mdsend/address"
 	"github.com/dkotik/mdsend/header"
 	"github.com/dkotik/mdsend/internal/media"
 	"github.com/dkotik/mdsend/markdown"
@@ -189,7 +190,7 @@ func (l Letter) GetSubject() (string, error) {
 func (l Letter) GetFrom() (mail.Address, error) {
 	switch from := l.Frontmatter[FieldNameFrom].(type) {
 	case map[string]any:
-		return newAddressFromMap(from)
+		return address.New(from)
 	case string:
 		if strings.TrimSpace(from) == "" {
 			return mail.Address{}, ErrNoFromAddress

@@ -3,8 +3,12 @@ package mdsend
 import (
 	"context"
 	"io"
+	"io/fs"
+	"iter"
 	"log/slog"
 	"strings"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 func (l Letter) Validate() (err error) {
@@ -27,6 +31,36 @@ func (l Letter) Validate() (err error) {
 		return err
 	}
 	return nil
+}
+
+func (l Letter) EachWarning(fs fs.FS) iter.Seq2[*i18n.LocalizeConfig, error] {
+	return func(yield func(*i18n.LocalizeConfig, error) bool) {
+		known := make(map[string]int)
+		headers, err := l.GetHeaders()
+		if err != nil {
+			yield(nil, err)
+			return
+		}
+		for _, h := range headers {
+			known[h.Name] = known[h.Name] + 1
+		}
+
+		for _, count := range known {
+			if count < 2 {
+				continue
+			}
+			if !yield(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					Other: "there are {{.}} canonical header duplicates",
+				},
+				TemplateData: count - 1,
+				PluralCount:  count - 1,
+			},
+				nil) {
+				return
+			}
+		}
+	}
 }
 
 func (l Letter) IsValid(cxt context.Context, logger *slog.Logger) (ok bool) {

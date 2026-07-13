@@ -31,6 +31,7 @@ var flagDatabase = &cli.StringFlag{
 		return nil
 	},
 	Action: func(ctx context.Context, c *cli.Command, p string) (err error) {
+		p = strings.TrimSpace(p)
 		p, params, _ := strings.Cut(p, "?")
 		dir := filepath.Dir(p)
 		if _, err = os.Stat(dir); err != nil {

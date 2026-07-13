@@ -2,7 +2,9 @@ package address
 
 import (
 	"errors"
+	"net/mail"
 	"regexp"
+	"strings"
 )
 
 const (
@@ -23,6 +25,30 @@ var (
 	// ErrEmailAddressDomainInvalid = errors.New("unable to validate email address domain")
 )
 
+func New(m map[string]any) (result mail.Address, err error) {
+	switch nameRaw := m[`name`].(type) {
+	case nil:
+	case string:
+		result.Name = strings.TrimSpace(nameRaw)
+	default:
+		return result, errors.New("invalid name format")
+	}
+
+	switch emailRaw := m[`email`].(type) {
+	case nil:
+		return result, errors.New("no electronic email address specified")
+	case string:
+		result.Address = strings.TrimSpace(emailRaw)
+		if err = ValidateFormat(result.Address); err != nil {
+			return result, err
+		}
+	default:
+		return result, errors.New("invalid email format")
+	}
+
+	return result, nil
+}
+
 func ValidateFormat(emailAddress string) error {
 	if len(emailAddress) > MaximumLength {
 		return ErrEmailAddressTooLong
@@ -31,10 +57,5 @@ func ValidateFormat(emailAddress string) error {
 	if !reValidEmailAddressW3C.MatchString(emailAddress) {
 		return ErrEmailAddressInvalid
 	}
-
-	// domain := strings.Split(emailAddress, "@")[1]
-	// if mx, err := net.LookupMX(domain); err != nil || len(mx) == 0 {
-	// 	return errors.Join(ErrEmailAddressDomainInvalid, err)
-	// }
 	return nil
 }

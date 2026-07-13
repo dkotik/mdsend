@@ -4,53 +4,48 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/mail"
-	"time"
+	"io/fs"
+	"os"
+	"path/filepath"
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/internal/media"
+	"github.com/dkotik/mdsend/internal/template"
+	"github.com/dkotik/mdsend/queue"
 	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
+	"github.com/google/uuid"
 	"github.com/urfave/cli/v3"
 )
 
 func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
-	if c.Args().Len() == 0 {
-		if err = addLetters(ctx, c.String(flagDatabase.Name), []mdsend.Letter{
-			mdsend.Letter{
-				ID: "firstTestLetter" + fmt.Sprintf("%d", time.Now().UnixNano()),
-			},
-		}); err != nil {
-			return fmt.Errorf(`unable to add test letter: %w`, err)
-		}
-		return errors.New(`no letters selected to add`)
+	if !c.Args().Present() {
+		return errors.New(`no Markdown letters selected to add`)
 	}
-
 	fs := media.NewUnsafeUnconstrainedFileSystem()
-	letters := make([]mdsend.Letter, 0, c.Args().Len())
-	for _, arg := range c.Args().Slice() {
-		letter, err := mdsend.NewLetterFromFile(ctx, fs, arg)
-		if err != nil {
-			return fmt.Errorf(`unable to parse letter from file %q: %w`, arg, err)
-		}
-		letters = append(letters, letter)
+	p := c.Args().First()
+	letter, err := mdsend.NewLetterFromFile(ctx, fs, p)
+	if err != nil {
+		return fmt.Errorf(`unable to parse letter from file %q: %w`, p, err)
 	}
-	p := c.String(flagDatabase.Name)
-	// if !c.IsSet(flagDatabase.Name) {
-	// 	// TODO: this is not needed as long as transactions are applied properly
-	// 	alternativeQueueFile := letters[0].GetDatabase()
-	// 	if alternativeQueueFile != "" {
-	// 		p = alternativeQueueFile
-	// 	}
-	// 	for _, letter := range letters[1:] {
-	// 		if letter.GetDatabase() != "" && letter.GetDatabase() != p {
-	// 			return fmt.Errorf(`atomic operations require all letters to have the same queue: %q vs %q`, letter.GetDatabase(), p)
-	// 		}
-	// 	}
-	// }
-	return addLetters(ctx, p, letters)
-}
 
-func addLetters(ctx context.Context, connectionDSN string, letters []mdsend.Letter) (err error) {
+	var (
+		connectionDSN            string
+		connectionFileDescriptor os.FileInfo
+	)
+	if c.IsSet(flagDatabase.Name) {
+		connectionDSN = c.String(flagDatabase.Name)
+	} else {
+		connectionDSN = letter.GetDatabase()
+		if connectionDSN == "" {
+			connectionDSN = c.String(flagDatabase.Name)
+		} else {
+			connectionFileDescriptor, err = os.Stat(connectionDSN)
+			if err != nil {
+				return fmt.Errorf("database file %q inaccessible: %w", connectionDSN, err)
+			}
+		}
+	}
+
 	conn, err := newDatabaseConnection(connectionDSN)
 	if err != nil {
 		return fmt.Errorf("database %q inaccessible: %w", connectionDSN, err)
@@ -68,51 +63,80 @@ func addLetters(ctx context.Context, connectionDSN string, letters []mdsend.Lett
 	}
 	defer tx.Close(&err)
 
-	for _, letter := range letters {
-		if err = queue.CreateLetter(ctx, letter); err != nil {
-			if errors.Is(err, mdsend.ErrDuplicateLetter) {
-				err = nil
-				continue // already populated
+	if err = queueLetter(
+		ctx,
+		queue,
+		letter,
+		p,
+		fs,
+	); err != nil {
+		return err
+	}
+
+	for _, p = range c.Args().Slice()[1:] {
+		letter, err := mdsend.NewLetterFromFile(ctx, fs, p)
+		if err != nil {
+			return fmt.Errorf(`unable to parse letter from file %q: %w`, p, err)
+		}
+		if connectionFileDescriptor != nil {
+			if database := letter.GetDatabase(); database != "" {
+				alterantiveFileDescriptor, err := os.Stat(database)
+				if err != nil {
+					return fmt.Errorf("database file %q inaccessible: %w", database, err)
+				}
+				if !os.SameFile(
+					connectionFileDescriptor,
+					alterantiveFileDescriptor,
+				) {
+					return fmt.Errorf("cannot add letters that use different databases in one atomic operation: %q vs %q; override database location with --database flag", connectionDSN, database)
+				}
 			}
+		}
+		if err = queueLetter(
+			ctx,
+			queue,
+			letter,
+			p,
+			fs,
+		); err != nil {
 			return err
 		}
-		for range 1 {
-			err = queue.CreateAttachment(ctx, mdsend.Attachment{
-				LetterID:    letter.ID,
-				Name:        "random",
-				Source:      "",
-				Hash:        "",
-				ContentID:   "",
-				ContentType: "",
-				Content:     nil,
-			})
-			if err != nil {
-				return err
-			}
+	}
+	return nil
+}
+
+func queueLetter(
+	ctx context.Context,
+	queue queue.Queue,
+	letter mdsend.Letter,
+	letterPath string,
+	fs fs.FS,
+) (err error) {
+	if letter.ID == "" {
+		letter.ID = uuid.NewString()
+	}
+	tmpl, err := template.New(letter, template.Options{})
+	if err != nil {
+		return err
+	}
+	if err = queue.CreateLetter(ctx, letter); err != nil {
+		return err
+	}
+	directory := filepath.Dir(letterPath)
+	for recipient := range letter.EachRecipient(directory, fs) {
+		message, err := tmpl.RenderLetterForRecipient(recipient)
+		// if message.LetterID == "" {
+		// 	return errors.New("letter ID is not set")
+		// }
+		if err != nil {
+			return err
 		}
-		for i := range 100 {
-			err = queue.CreateMessage(ctx, mdsend.Message{
-				ID: fmt.Sprintf("testMessage%d%s", i, letter.ID),
-				From: mail.Address{
-					Name:    "random",
-					Address: fmt.Sprintf("testMessage%d@example.com", i),
-				},
-				To: mail.Address{
-					Name:    "random",
-					Address: fmt.Sprintf("testAddress%d@example.com", i),
-				},
-				LetterID:      letter.ID,
-				Subject:       fmt.Sprintf("testMessage%d", i),
-				Text:          "random",
-				HTML:          "",
-				ScheduleAfter: time.Time{},
-				ScheduledAt:   time.Time{},
-				SentAt:        time.Time{},
-			})
-			if err != nil {
-				return err
-			}
+		if err = queue.CreateMessage(ctx, message); err != nil {
+			return err
 		}
 	}
-	return err
+	// for attachments := range letter.EachAttachmentSource() {
+	// 	attachment := mdsend.NewAttachmentFromFile(fs fs.FS, p string, constraints media.Constraints)
+	// }
+	return nil
 }
