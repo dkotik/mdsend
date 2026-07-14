@@ -4,6 +4,8 @@ import (
 	"net/mail"
 )
 
+// TODO: Copy data from [@mocks.go](file:///Users/dima/Documents/mdsend/internal/mocks.go) into a list of names and email addresses in yaml format saved to a file named "mocks.yaml" in the same folder. Ensure that the resulting yaml file is valid.
+
 var MockAddresses = []mail.Address{
 	mail.Address{Name: "Joe Crazy", Address: "crazyjoe@test.com"},
 	mail.Address{Name: "Перший", Address: "first@test.com"},

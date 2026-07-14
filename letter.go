@@ -112,11 +112,11 @@ func NewLetterFromFile(
 }
 
 func NewLetter(b []byte) (letter Letter, err error) {
-	frontmatterRaw, body, delimeter, err := splitFrontmatterFromContent(b)
+	frontmatterRaw, body, delimeter, err := markdown.SplitFrontmatterFromContent(b)
 	if err != nil {
 		return letter, err
 	}
-	frontmatter, err := parseFrontmatter(frontmatterRaw, delimeter)
+	frontmatter, err := markdown.ParseFrontmatter(frontmatterRaw, delimeter)
 	if err != nil {
 		return letter, err
 	}
@@ -158,6 +158,8 @@ func (l Letter) GetDatabase() string {
 
 func (l Letter) GetSeed() (string, error) {
 	switch seed := l.Frontmatter[FieldNameSeed].(type) {
+	case nil:
+		return "", nil
 	case string:
 		return strings.TrimSpace(seed), nil
 	default:

@@ -20,13 +20,13 @@ var buffers = sync.Pool{
 }
 
 func (t *tmpl) RenderLetterForRecipient(recipient map[string]any) (m mdsend.Message, err error) {
-	switch name := recipient[mdsend.FieldNameName].(type) {
+	switch name := recipient[address.FieldName].(type) {
 	case string:
 		m.To.Name = strings.TrimSpace(name)
 	default:
 		return m, fmt.Errorf("unexpected type for recipient name: %+v (%T)", name, name)
 	}
-	switch email := recipient[mdsend.FieldNameEmail].(type) {
+	switch email := recipient[address.FieldEmail].(type) {
 	case string:
 		email = strings.TrimSpace(email)
 		if email == "" {

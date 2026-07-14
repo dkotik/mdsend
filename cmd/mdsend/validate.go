@@ -30,7 +30,7 @@ func cmdValidate(ctx context.Context, c *cli.Command) error {
 	}
 	defer tx.Close(&err)
 
-	if c.IsSet(flagDatabase.Name) {
+	if c.IsSet(flagQueue.Name) {
 		// validate letters and messages in the queue
 		return nil
 	}

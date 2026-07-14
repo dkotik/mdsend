@@ -28,15 +28,25 @@ func (q sqliteQueue) CreateAttachment(
 	q.stmtInsertAttachment.BindText(5, a.ContentID)
 	q.stmtInsertAttachment.BindText(6, a.ContentType)
 	q.stmtInsertAttachment.BindBytes(7, a.Content)
-	_, err = q.stmtInsertAttachment.Step()
-	switch code := sqlite.ErrCode(err); code {
-	case lib.SQLITE_OK:
-		return nil
-	case lib.SQLITE_CONSTRAINT_UNIQUE:
-		return mdsend.ErrDuplicateAttachment
-	default:
-		return err
+
+	ok := false
+	for {
+		ok, err = q.stmtInsertAttachment.Step()
+		if err != nil {
+			switch code := sqlite.ErrCode(err); code {
+			case lib.SQLITE_OK:
+				return nil
+			case lib.SQLITE_CONSTRAINT_UNIQUE:
+				return mdsend.ErrDuplicateAttachment
+			default:
+				return err
+			}
+		}
+		if !ok {
+			break
+		}
 	}
+	return nil
 }
 
 func (q sqliteQueue) ListAttachments(ctx context.Context, letterID string) iter.Seq2[mdsend.Attachment, error] {

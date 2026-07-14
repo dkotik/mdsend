@@ -27,5 +27,6 @@ func newSeedKey(ctx Context, l mdsend.Letter) (string, error) {
 	if err = seedTemplate.Execute(h, ctx); err != nil {
 		return "", fmt.Errorf("unable to execute seed template: %w", err)
 	}
+
 	return base58.Encode(h.Sum(nil)), nil
 }

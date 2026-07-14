@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/address"
 	"github.com/sebdah/goldie/v2"
 )
 
@@ -15,8 +16,8 @@ func TestValidMessageFromTemplate(t *testing.T) {
 			ID: "valid message test",
 			Frontmatter: map[string]any{
 				mdsend.FieldNameFrom: map[string]any{
-					mdsend.FieldNameName:  "Test Name From",
-					mdsend.FieldNameEmail: "from2from@test.com",
+					address.FieldName:  "Test Name From",
+					address.FieldEmail: "from2from@test.com",
 				},
 				mdsend.FieldNameSubject: "test letter subject for {{ .Recipient.Name }}",
 			},

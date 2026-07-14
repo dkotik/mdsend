@@ -92,7 +92,7 @@ func send(
 		wmLogger := watermill.NewSlogLogger(logger)
 		marshaler := queue.NewMarshalerJSON()
 
-		publisherConn, err := newDatabaseConnection(connectionDSN)
+		publisherConn, err := newQueueConnection(connectionDSN)
 		if err != nil {
 			return fmt.Errorf("publisher database %q inaccessible: %w", connectionDSN, err)
 		}
@@ -146,7 +146,7 @@ func send(
 			)
 
 			// a separate queue with its own connection is needed for each scheduler
-			conn, err := newDatabaseConnection(connectionDSN)
+			conn, err := newQueueConnection(connectionDSN)
 			if err != nil {
 				return fmt.Errorf("outbox database %q inaccessible: %w", connectionDSN, err)
 			}
@@ -162,7 +162,7 @@ func send(
 			})
 		}
 
-		queueConn, err := newDatabaseConnection(connectionDSN)
+		queueConn, err := newQueueConnection(connectionDSN)
 		if err != nil {
 			return fmt.Errorf("queue database %q inaccessible: %w", connectionDSN, err)
 		}
@@ -190,7 +190,7 @@ func send(
 			},
 		)
 
-		confirmationConn, err := newDatabaseConnection(connectionDSN)
+		confirmationConn, err := newQueueConnection(connectionDSN)
 		if err != nil {
 			return fmt.Errorf("confirmation connection %q inaccessible: %w", connectionDSN, err)
 		}

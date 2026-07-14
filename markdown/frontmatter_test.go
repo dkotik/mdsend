@@ -1,4 +1,4 @@
-package mdsend
+package markdown
 
 import (
 	"bytes"
@@ -53,7 +53,7 @@ content
 	}
 
 	for i, tc := range tcs {
-		frontmatter, content, delimeter, err := splitFrontmatterFromContent(tc.Source)
+		frontmatter, content, delimeter, err := SplitFrontmatterFromContent(tc.Source)
 		if err != nil {
 			t.Errorf("%d. case failed: %v", i+1, err)
 			continue

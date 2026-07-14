@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/cuecontext"
+	"github.com/dkotik/mdsend/address"
 	"github.com/dkotik/mdsend/internal"
 	"github.com/dkotik/mdsend/internal/media"
 	"github.com/dkotik/mdsend/markdown"
@@ -41,14 +42,14 @@ func injectPathPrefix(
 	if attachments, ok := frontmatter[FieldNameAttachments]; ok {
 		frontmatter[FieldNameAttachments] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, attachments)
 	}
-	if to, ok := frontmatter[FieldNameTo]; ok {
-		frontmatter[FieldNameTo] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, to)
+	if to, ok := frontmatter[address.FieldTo]; ok {
+		frontmatter[address.FieldTo] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, to)
 	}
-	if cc, ok := frontmatter[FieldNameCarbonCopy]; ok {
-		frontmatter[FieldNameCarbonCopy] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, cc)
+	if cc, ok := frontmatter[address.FieldBlindCarbonCopy]; ok {
+		frontmatter[address.FieldBlindCarbonCopy] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, cc)
 	}
-	if bcc, ok := frontmatter[FieldNameBlindCarbonCopy]; ok {
-		frontmatter[FieldNameBlindCarbonCopy] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, bcc)
+	if bcc, ok := frontmatter[address.FieldBlindCarbonCopy]; ok {
+		frontmatter[address.FieldBlindCarbonCopy] = media.AppendPathPrefixToExternalRecipientListEntries(rootDirectory, bcc)
 	}
 	return nil
 }
@@ -120,7 +121,7 @@ func extend(
 					return letter, err
 				}
 			}
-			internal.MergeLeft(frontmatter, letter.Frontmatter)
+			internal.MapMergeLeft(frontmatter, letter.Frontmatter)
 			letter.Frontmatter = frontmatter
 			continue
 		case ".yaml", ".yml":
@@ -136,7 +137,7 @@ func extend(
 					return letter, err
 				}
 			}
-			internal.MergeLeft(frontmatter, letter.Frontmatter)
+			internal.MapMergeLeft(frontmatter, letter.Frontmatter)
 			letter.Frontmatter = frontmatter
 			continue
 		case ".toml":
@@ -152,7 +153,7 @@ func extend(
 					return letter, err
 				}
 			}
-			internal.MergeLeft(frontmatter, letter.Frontmatter)
+			internal.MapMergeLeft(frontmatter, letter.Frontmatter)
 			letter.Frontmatter = frontmatter
 			continue
 		case ".cue":
@@ -168,7 +169,7 @@ func extend(
 					return letter, err
 				}
 			}
-			internal.MergeLeft(frontmatter, letter.Frontmatter)
+			internal.MapMergeLeft(frontmatter, letter.Frontmatter)
 			letter.Frontmatter = frontmatter
 			continue
 		case ".md", ".markdown":
@@ -217,7 +218,7 @@ func extend(
 		}
 		letter.Content = b.String()
 		if subLetter.Frontmatter != nil {
-			internal.MergeLeft(subLetter.Frontmatter, letter.Frontmatter)
+			internal.MapMergeLeft(subLetter.Frontmatter, letter.Frontmatter)
 			letter.Frontmatter = subLetter.Frontmatter
 		}
 	}

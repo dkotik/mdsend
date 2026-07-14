@@ -87,7 +87,7 @@ func New(
 	options Options,
 ) (_ Template, err error) {
 	options = options.withDefaults()
-	internal.MergeLeft(options.Frontmatter, l.Frontmatter)
+	internal.MapMergeLeft(options.Frontmatter, l.Frontmatter)
 	t := &tmpl{
 		LetterID: l.ID,
 		// mu:              &sync.Mutex{},

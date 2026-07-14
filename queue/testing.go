@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/address"
 )
 
 var mockTime = time.Date(2026, 5, 6, 7, 8, 9, 11, time.FixedZone("PST", -8*60*60))
@@ -43,8 +44,8 @@ func TestQueue(q Queue) func(*testing.T) {
 		Frontmatter: map[string]any{
 			"subject": "second letter",
 			"from": map[string]any{
-				mdsend.FieldNameName:  "Test From2",
-				mdsend.FieldNameEmail: "from5@test.com",
+				address.FieldName:  "Test From2",
+				address.FieldEmail: "from5@test.com",
 			},
 		},
 		Content:   "second letter",
@@ -380,15 +381,17 @@ func QueueRecognizesDuplicates(q Queue) func(*testing.T) {
 		}
 
 		d := mdsend.Message{
+			ID:       "testMessage",
 			LetterID: "testLetter",
+			SeedKey:  "string",
 			From:     mail.Address{},
 			To: mail.Address{
 				Name:    "First Last",
 				Address: "first.last@example.com",
 			},
-			Subject: "",
-			Text:    "",
-			HTML:    "",
+			Subject: "test message",
+			Text:    "test content",
+			HTML:    "test HTML content",
 		}
 		if err = q.CreateMessage(ctx, d); err != nil {
 			t.Fatal(err)
@@ -400,8 +403,13 @@ func QueueRecognizesDuplicates(q Queue) func(*testing.T) {
 			Name:    "First Last2",
 			Address: "first.last2@example.com",
 		}
-		if err := q.CreateMessage(ctx, d); !errors.Is(err, mdsend.ErrDuplicateMessage) {
+		if err = q.CreateMessage(ctx, d); !errors.Is(err, mdsend.ErrDuplicateMessage) {
 			t.Fatalf("expected duplicate message error, got: %v", err)
+		}
+		d.ID = d.ID + "2"
+		d.SeedKey = d.SeedKey + "2"
+		if err = q.CreateMessage(ctx, d); err != nil {
+			t.Fatal("failed to differentiate by seed key:", err)
 		}
 
 		a := mdsend.Attachment{

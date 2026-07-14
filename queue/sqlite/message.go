@@ -42,16 +42,30 @@ func (q sqliteQueue) CreateMessage(
 	if !d.ScheduleAfter.IsZero() {
 		q.stmtInsertMessage.BindText(12, d.ScheduleAfter.Format(time.RFC3339))
 	}
-	_, err = q.stmtInsertMessage.Step()
-	switch code := sqlite.ErrCode(err); code {
-	case lib.SQLITE_OK:
-		return nil
-	case lib.SQLITE_CONSTRAINT_PRIMARYKEY, lib.SQLITE_CONSTRAINT_UNIQUE:
-		// same id or same combination of letter_id and recipient address
-		return mdsend.ErrDuplicateMessage
-	default:
-		return err
+
+	ok := false
+	for {
+		ok, err = q.stmtInsertMessage.Step()
+		if err != nil {
+			switch code := sqlite.ErrCode(err); code {
+			case lib.SQLITE_OK:
+				return nil
+			case lib.SQLITE_CONSTRAINT_PRIMARYKEY:
+				if d.ID == "" {
+					return err
+				}
+				return mdsend.ErrDuplicateMessage
+			case lib.SQLITE_CONSTRAINT_UNIQUE:
+				return mdsend.ErrDuplicateMessage
+			default:
+				return err
+			}
+		}
+		if !ok {
+			break
+		}
 	}
+	return nil
 }
 
 func (q sqliteQueue) selectResetBindListMessagesStatement(letterID, ID string, batch int64) (stmt *sqlite.Stmt, err error) {

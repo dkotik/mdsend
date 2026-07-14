@@ -1,4 +1,4 @@
-package mdsend
+package address
 
 import (
 	"os"
@@ -36,7 +36,7 @@ func TestRecipientList(t *testing.T) {
 	cursor := 0
 	lastCursor := len(expected)
 
-	for recipient, err := range eachRecipient(map[string]any{
+	for recipient, err := range Each(map[string]any{
 		"to": []any{
 			// "first@testmail.com",
 			"./recipients.yaml",
@@ -50,7 +50,7 @@ func TestRecipientList(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Log(cursor, recipient)
-		email, ok := recipient[FieldNameEmail]
+		email, ok := recipient[FieldEmail]
 		if !ok {
 			t.Fatal("recipient does not contain an email address")
 		}

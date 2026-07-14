@@ -1,6 +1,6 @@
 package internal
 
-func MergeLeft(a, b map[string]any) {
+func MapMergeLeft(a, b map[string]any) {
 	var (
 		existing any
 		ok       bool
@@ -28,7 +28,7 @@ func MergeLeft(a, b map[string]any) {
 			case nil:
 				continue // skip nil values
 			case map[string]any:
-				MergeLeft(existing, v)
+				MapMergeLeft(existing, v)
 				// a[k] = mergeLeft(existing, v)
 			default:
 				a[k] = v

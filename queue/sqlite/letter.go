@@ -35,15 +35,28 @@ func (q sqliteQueue) CreateLetter(
 	} else {
 		q.stmtInsertLetter.BindText(5, encodeTime(l.SentAt))
 	}
-	_, err = q.stmtInsertLetter.Step()
-	switch code := sqlite.ErrCode(err); code {
-	case lib.SQLITE_OK:
-		return nil
-	case lib.SQLITE_CONSTRAINT_PRIMARYKEY:
-		return mdsend.ErrDuplicateLetter
-	default:
-		return err
+
+	ok := false
+	for {
+		ok, err = q.stmtInsertLetter.Step()
+		if err != nil {
+			switch code := sqlite.ErrCode(err); code {
+			case lib.SQLITE_OK:
+				return nil
+			case lib.SQLITE_CONSTRAINT_PRIMARYKEY:
+				if l.ID == "" {
+					return err
+				}
+				return mdsend.ErrDuplicateLetter
+			default:
+				return err
+			}
+		}
+		if !ok {
+			break
+		}
 	}
+	return nil
 }
 
 func (q sqliteQueue) RetrieveLetter(ctx context.Context, ID string) (result mdsend.Letter, err error) {

@@ -1,9 +1,10 @@
-package mdsend
+package address
 
 import (
 	"bytes"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -17,8 +18,6 @@ import (
 	"github.com/pelletier/go-toml/v2"
 	"gopkg.in/yaml.v3"
 )
-
-type Recipients iter.Seq2[map[string]any, error]
 
 func eachEntryFromFileCSV(data []byte) iter.Seq2[any, error] {
 	return func(yield func(any, error) bool) {
@@ -185,7 +184,7 @@ func eachRecipientFromEntry(
 	entry any,
 	rootDirectory string,
 	fs fs.FS,
-) Recipients {
+) iter.Seq2[map[string]any, error] {
 	return func(yield func(map[string]any, error) bool) {
 		ok := false
 		switch v := entry.(type) {
@@ -234,14 +233,14 @@ func eachRecipientFromEntry(
 			}
 			for _, address := range addresses {
 				if !yield(map[string]any{
-					FieldNameName:  address.Name,
-					FieldNameEmail: address.Address,
+					FieldName:  address.Name,
+					FieldEmail: address.Address,
 				}, nil) {
 					return
 				}
 			}
 		case map[string]any:
-			if _, ok = v[FieldNameEmail]; !ok {
+			if _, ok = v[FieldEmail]; !ok {
 				yield(nil, fmt.Errorf("contact contains no electronic mail address: %s", v))
 				return
 			}
@@ -263,13 +262,13 @@ func eachRecipientFromEntry(
 	}
 }
 
-func eachRecipient(
+func Each(
 	frontmatter map[string]any,
 	rootDirectory string,
 	fs fs.FS,
-) Recipients {
+) iter.Seq2[map[string]any, error] {
 	return func(yield func(map[string]any, error) bool) {
-		to, ok := frontmatter[FieldNameTo]
+		to, ok := frontmatter[FieldTo]
 		if ok {
 			for recipient, err := range eachRecipientFromEntry(to, rootDirectory, fs) {
 				if !yield(recipient, err) {
@@ -278,7 +277,7 @@ func eachRecipient(
 			}
 		}
 
-		cc, ok := frontmatter[FieldNameCarbonCopy]
+		cc, ok := frontmatter[FieldCarbonCopy]
 		if ok {
 			for recipient, err := range eachRecipientFromEntry(cc, rootDirectory, fs) {
 				if !yield(recipient, err) {
@@ -287,7 +286,7 @@ func eachRecipient(
 			}
 		}
 
-		bcc, ok := frontmatter[FieldNameBlindCarbonCopy]
+		bcc, ok := frontmatter[FieldBlindCarbonCopy]
 		if ok {
 			for recipient, err := range eachRecipientFromEntry(bcc, rootDirectory, fs) {
 				if !yield(recipient, err) {
@@ -298,9 +297,28 @@ func eachRecipient(
 	}
 }
 
-func (l Letter) EachRecipient(
-	rootDirectory string,
-	fs fs.FS,
-) Recipients {
-	return eachRecipient(l.Frontmatter, rootDirectory, fs)
+func EachUnique(
+	in iter.Seq2[map[string]any, error],
+) iter.Seq2[map[string]any, error] {
+	return func(yield func(map[string]any, error) bool) {
+		known := make(map[string]struct{}, 64)
+		for recipient, err := range in {
+			if err != nil {
+				yield(recipient, err)
+				return
+			}
+			email, _ := recipient[FieldEmail].(string)
+			if email == "" {
+				yield(recipient, errors.New("empty email address"))
+				return
+			}
+			if _, ok := known[email]; ok {
+				continue // sift out duplicate
+			}
+			known[email] = struct{}{}
+			if !yield(recipient, err) {
+				return
+			}
+		}
+	}
 }

@@ -23,13 +23,14 @@ func TestQueue(t *testing.T) {
 	if err := application.Run(ctx, []string{
 		"mdsend",
 		"queue", "add",
-		"--database", database,
-		"../../internal/testdata/letter/1-minimal.md",
+		"--queue", database,
+		"../../examples/1-minimal.md",
+		"../../examples/2-list.md",
 	}); err != nil {
 		t.Fatal("unable to queue letters to database:", err)
 	}
 
-	conn, err := newDatabaseConnection(database)
+	conn, err := newQueueConnection(database)
 	if err != nil {
 		t.Fatal("cannot check database:", err)
 	}
@@ -38,7 +39,7 @@ func TestQueue(t *testing.T) {
 		t.Fatal("cannot mount queue:", err)
 	}
 
-	expectLetters := 1
+	expectLetters := 2
 	foundLetters := make([]string, 0, expectLetters)
 	for letter, err := range q.ListLetters(ctx, queue.Cursor{Batch: int64(expectLetters) + 1}) {
 		if err != nil {
@@ -50,10 +51,9 @@ func TestQueue(t *testing.T) {
 		t.Fatal("unexpected number of letters queued:", foundLetters, "vs", expectLetters)
 	}
 
-	expectMessages := 1
+	expectMessages := 23
 	foundMessages := 0
 	for _, letterID := range foundLetters {
-		t.Log("collecting messages for letter:", letterID)
 		for _, err = range q.ListMessages(ctx, queue.ChildCursor{
 			ParentID: letterID,
 			Cursor: queue.Cursor{

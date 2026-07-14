@@ -10,6 +10,12 @@ import (
 const (
 	// RFC 3696 Errata 1690
 	MaximumLength = 254
+
+	FieldName            = "name"
+	FieldEmail           = "email"
+	FieldTo              = "to"
+	FieldCarbonCopy      = "cc"
+	FieldBlindCarbonCopy = "bcc"
 )
 
 /*
@@ -26,7 +32,7 @@ var (
 )
 
 func New(m map[string]any) (result mail.Address, err error) {
-	switch nameRaw := m[`name`].(type) {
+	switch nameRaw := m[FieldName].(type) {
 	case nil:
 	case string:
 		result.Name = strings.TrimSpace(nameRaw)
@@ -34,7 +40,7 @@ func New(m map[string]any) (result mail.Address, err error) {
 		return result, errors.New("invalid name format")
 	}
 
-	switch emailRaw := m[`email`].(type) {
+	switch emailRaw := m[FieldEmail].(type) {
 	case nil:
 		return result, errors.New("no electronic email address specified")
 	case string:

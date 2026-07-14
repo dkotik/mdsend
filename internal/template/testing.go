@@ -3,7 +3,7 @@ package template
 import (
 	"testing"
 
-	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/address"
 )
 
 func NewTemplateTest(tmpl Template) func(*testing.T) {
@@ -14,7 +14,7 @@ func NewTemplateTest(tmpl Template) func(*testing.T) {
 		}
 		message, err = tmpl.RenderLetterForRecipient(
 			map[string]any{
-				mdsend.FieldNameEmail: "testTo@test.com",
+				address.FieldEmail: "testTo@test.com",
 			},
 		)
 		if err == nil {
@@ -22,7 +22,7 @@ func NewTemplateTest(tmpl Template) func(*testing.T) {
 		}
 		message, err = tmpl.RenderLetterForRecipient(
 			map[string]any{
-				mdsend.FieldNameName: "testName",
+				address.FieldName: "testName",
 			},
 		)
 		if err == nil {
@@ -30,8 +30,8 @@ func NewTemplateTest(tmpl Template) func(*testing.T) {
 		}
 		message, err = tmpl.RenderLetterForRecipient(
 			map[string]any{
-				mdsend.FieldNameName:  "testName",
-				mdsend.FieldNameEmail: "testTo@test.com",
+				address.FieldName:  "testName",
+				address.FieldEmail: "testTo@test.com",
 			},
 		)
 		if err != nil {

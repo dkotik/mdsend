@@ -9,11 +9,12 @@ import (
 	"path/filepath"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/address"
 	"github.com/dkotik/mdsend/internal/media"
 	"github.com/dkotik/mdsend/internal/template"
 	"github.com/dkotik/mdsend/queue"
 	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
-	"github.com/google/uuid"
+	"github.com/oklog/ulid/v2"
 	"github.com/urfave/cli/v3"
 )
 
@@ -32,12 +33,12 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 		connectionDSN            string
 		connectionFileDescriptor os.FileInfo
 	)
-	if c.IsSet(flagDatabase.Name) {
-		connectionDSN = c.String(flagDatabase.Name)
+	if c.IsSet(flagQueue.Name) {
+		connectionDSN = c.String(flagQueue.Name)
 	} else {
 		connectionDSN = letter.GetDatabase()
 		if connectionDSN == "" {
-			connectionDSN = c.String(flagDatabase.Name)
+			connectionDSN = c.String(flagQueue.Name)
 		} else {
 			connectionFileDescriptor, err = os.Stat(connectionDSN)
 			if err != nil {
@@ -46,7 +47,7 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 		}
 	}
 
-	conn, err := newDatabaseConnection(connectionDSN)
+	conn, err := newQueueConnection(connectionDSN)
 	if err != nil {
 		return fmt.Errorf("database %q inaccessible: %w", connectionDSN, err)
 	}
@@ -63,7 +64,7 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 	}
 	defer tx.Close(&err)
 
-	if err = queueLetter(
+	if _, err = queueLetter(
 		ctx,
 		queue,
 		letter,
@@ -92,7 +93,7 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 				}
 			}
 		}
-		if err = queueLetter(
+		if _, err = queueLetter(
 			ctx,
 			queue,
 			letter,
@@ -111,32 +112,50 @@ func queueLetter(
 	letter mdsend.Letter,
 	letterPath string,
 	fs fs.FS,
-) (err error) {
+) (queued int, err error) {
 	if letter.ID == "" {
-		letter.ID = uuid.NewString()
+		letter.ID = ulid.Make().String()
 	}
 	tmpl, err := template.New(letter, template.Options{})
 	if err != nil {
-		return err
+		return queued, err
 	}
 	if err = queue.CreateLetter(ctx, letter); err != nil {
-		return err
+		return queued, err
 	}
-	directory := filepath.Dir(letterPath)
-	for recipient := range letter.EachRecipient(directory, fs) {
+	rootDirectory := filepath.Dir(letterPath)
+	// for attachments := range letter.EachAttachmentSource() {
+	// 	attachment := mdsend.NewAttachmentFromFile(fs fs.FS, p string, constraints media.Constraints)
+	// }
+
+	for recipient := range address.Each(
+		letter.Frontmatter,
+		rootDirectory,
+		fs,
+	) {
+		email, _ := recipient[address.FieldEmail].(string)
+		if email == "" {
+			return queued, errors.New("empty email address")
+		}
+
 		message, err := tmpl.RenderLetterForRecipient(recipient)
 		// if message.LetterID == "" {
 		// 	return errors.New("letter ID is not set")
 		// }
 		if err != nil {
-			return err
+			return queued, err
 		}
 		if err = queue.CreateMessage(ctx, message); err != nil {
-			return err
+			if errors.Is(err, mdsend.ErrDuplicateMessage) {
+				continue // ignore duplicate messages
+			}
+			return queued, err
 		}
+		queued++
 	}
-	// for attachments := range letter.EachAttachmentSource() {
-	// 	attachment := mdsend.NewAttachmentFromFile(fs fs.FS, p string, constraints media.Constraints)
-	// }
-	return nil
+
+	if queued == 0 {
+		return queued, errors.New("letter has no recipients")
+	}
+	return queued, nil
 }
