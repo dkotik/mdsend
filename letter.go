@@ -51,7 +51,8 @@ func (l LetterError) Error() string {
 }
 
 type Letter struct {
-	ID          string
+	ID string
+	// Frontmatter orderedmap.OrderedMap[string, any]
 	Frontmatter map[string]any
 	Templates   []Attachment
 	Content     string

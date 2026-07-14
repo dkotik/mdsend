@@ -55,15 +55,20 @@ func (t *tmpl) RenderLetterForRecipient(recipient map[string]any) (m mdsend.Mess
 		return m, fmt.Errorf("unable to render subject: %w", err)
 	}
 	m.Subject = b.String()
+	t.context.Frontmatter[mdsend.FieldNameSubject] = m.Subject
 	b.Reset()
 
 	for _, h := range t.Headers {
 		if err = h.Template.Execute(b, t.context); err != nil {
 			return m, fmt.Errorf("unable to render header %q: %w", h.Name, err)
 		}
+		// t.context.Frontmatter[mdsend.FieldNameHeaders][h.Name]
 		if b.Len() == 0 {
 			continue // skip empty headers
 		}
+		// if h.Name[0] == '_' {
+		// 	continue // skip underscore prefixed header
+		// }
 		m.Headers = append(m.Headers, header.Header{
 			Name:  h.Name,
 			Value: b.String(),

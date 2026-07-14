@@ -52,3 +52,24 @@ func TestTemplateRendering(t *testing.T) {
 
 	goldie.New(t).Assert(t, "default", b.Bytes())
 }
+
+func TestExposeLocalVariableViaTemplate(t *testing.T) {
+	t.Skip("frozen")
+	tmpl, err := template.New("").Parse(`
+		$someVariable := {{.}}
+
+		{{ define "subTemplate" }}
+			someVariable is {{ $.someVariable }}
+		{{ end }}
+
+		{{ template "subTemplate" "nil" }}
+	`)
+	if err != nil {
+		t.Fatal("cannot parse:", err)
+	}
+
+	b := &bytes.Buffer{}
+	if err = tmpl.Execute(b, nil); err != nil {
+		t.Fatal("cannot execute:", err)
+	}
+}

@@ -65,6 +65,10 @@ func New(name, value string) (h Header, err error) {
 	return h, nil
 }
 
+func (h Header) String() string {
+	return fmt.Sprintf("%s: %s", h.Name, h.Value)
+}
+
 var reValidListID = regexp.MustCompile(`(\w+\s+)*\<[^\<\>]+\>$`)
 
 func ValidateListID(value string) (err error) {
