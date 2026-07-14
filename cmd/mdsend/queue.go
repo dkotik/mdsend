@@ -124,9 +124,25 @@ func queueLetter(
 		return queued, err
 	}
 	rootDirectory := filepath.Dir(letterPath)
-	// for attachments := range letter.EachAttachmentSource() {
-	// 	attachment := mdsend.NewAttachmentFromFile(fs fs.FS, p string, constraints media.Constraints)
-	// }
+	constraints, err := letter.GetMediaConstraints()
+	if err != nil {
+		return queued, err
+	}
+	for src := range letter.EachAttachmentSource() {
+		attachment, err := mdsend.NewAttachmentFromFile(
+			fs,
+			src.Location,
+			constraints,
+		)
+		if err != nil {
+			return queued, err
+		}
+		attachment.LetterID = letter.ID
+		attachment.Name = src.Name
+		if err = queue.CreateAttachment(ctx, attachment); err != nil {
+			return queued, err
+		}
+	}
 
 	for recipient := range address.Each(
 		letter.Frontmatter,
@@ -135,7 +151,8 @@ func queueLetter(
 	) {
 		email, _ := recipient[address.FieldEmail].(string)
 		if email == "" {
-			return queued, errors.New("empty email address")
+			// spew.Dump(recipient)
+			return queued, address.ErrAbsentEmailAddress
 		}
 
 		message, err := tmpl.RenderLetterForRecipient(recipient)

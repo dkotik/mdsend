@@ -9,11 +9,11 @@ import (
 	"mime/multipart"
 	"net/mail"
 	"net/textproto"
-	"os"
 	"strings"
 	"testing"
 
 	"github.com/dkotik/mdsend/header"
+	"github.com/dkotik/mdsend/internal/media"
 )
 
 func TestValidBoundaryGeneration(t *testing.T) {
@@ -117,13 +117,10 @@ func ValidateMessageStructure(r io.Reader, m partDefinition) func(*testing.T) {
 }
 
 func TestFileEncoding(t *testing.T) {
-	cat, err := os.ReadFile("testdata/image/cat.jpg")
-	if err != nil {
-		t.Fatal(err)
-	}
 	b := &bytes.Buffer{}
 	e := NewEncoderBase64(b)
-	if _, err = io.Copy(e, bytes.NewReader(cat)); err != nil {
+	var err error
+	if _, err = io.Copy(e, bytes.NewReader(media.Cat)); err != nil {
 		t.Fatal(err)
 	}
 	if err = e.Close(); err != nil {

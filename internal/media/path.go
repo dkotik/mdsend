@@ -14,7 +14,7 @@ func IsRecipientEntryExternal(p string) bool {
 func AppendPathPrefixToExternalRecipientListEntries(prefix string, recipientEntry any) any {
 	switch v := recipientEntry.(type) {
 	case string:
-		if IsRecipientEntryExternal(v) {
+		if !IsRecipientEntryExternal(v) {
 			return path.Join(prefix, v)
 		}
 		return v

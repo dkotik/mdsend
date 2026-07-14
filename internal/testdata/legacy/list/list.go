@@ -66,7 +66,6 @@ func (l *List) ReplaceSource(original, replacement Source) (err error) {
 			for _, contact := range l.contacts {
 				if contact.source == original {
 					contact.source = replacement
-					// panic(contact.source.Location())
 				}
 			}
 			return nil

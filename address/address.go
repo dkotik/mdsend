@@ -26,6 +26,7 @@ W3C has provided [recommendation](https://html.spec.whatwg.org/multipage/input.h
 var (
 	reValidEmailAddressW3C = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
+	ErrAbsentEmailAddress  = errors.New("absent email address")
 	ErrEmailAddressTooLong = errors.New("email address too long")
 	ErrEmailAddressInvalid = errors.New("email address is in the wrong format")
 	// ErrEmailAddressDomainInvalid = errors.New("unable to validate email address domain")

@@ -34,8 +34,6 @@ func (m *Model) Render() []string {
 		}
 
 	}
-	// spew.Dump(result)
-	// panic("done")
 	return result
 	// return m.lines[m.cursor:window]
 }

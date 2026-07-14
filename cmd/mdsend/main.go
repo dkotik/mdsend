@@ -16,6 +16,8 @@ import (
 	"github.com/adrg/xdg"
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/mailer"
+	"github.com/dkotik/mdsend/mailer/environment"
+	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
 	"github.com/urfave/cli/v3"
 	"golang.org/x/sync/errgroup"
 	"zombiezen.com/go/sqlite"
@@ -124,6 +126,38 @@ var application = &cli.Command{
 						return errors.New(`not implemented, yet`)
 					},
 				},
+				{
+					Name:  `path`,
+					Usage: `Prints the path to the current queue.`,
+					Flags: []cli.Flag{
+						flagQueue,
+					},
+					Action: func(ctx context.Context, c *cli.Command) error {
+						fmt.Println(c.String(flagQueue.Name))
+						return nil
+					},
+				},
+				{
+					Name:  `clear`,
+					Usage: `Removes all queued messages from the current queue.`,
+					Flags: []cli.Flag{
+						flagQueue,
+					},
+					Action: func(ctx context.Context, c *cli.Command) error {
+						p := c.String(flagQueue.Name)
+						info, err := os.Stat(p)
+						if err != nil {
+							return err
+						}
+						if info.IsDir() {
+							return errors.New("queue is a directory, not a file")
+						}
+						_ = os.Remove(p + ".db-wal")
+						_ = os.Remove(p + ".db-shm")
+						_ = os.Remove(p + ".db-journal")
+						return os.Remove(p)
+					},
+				},
 			},
 		},
 		{
@@ -155,16 +189,43 @@ var application = &cli.Command{
 				if c.Bool(flagVerbose.Name) {
 					middleware = append(middleware, mailer.NewLogger(logger))
 				}
+				// mailer, err := newSemaphoreMailer(
+				// 	c.Int(flagWorkerCount.Name),
+				// 	middleware...,
+				// )
+				connectionDSN := c.String(flagQueue.Name)
+				mailers := make([]mdsend.Mailer, c.Int(flagWorkerCount.Name))
+				for i := range mailers {
+					// m := mailer.NewVoid()
+					conn, err := newQueueConnection(connectionDSN)
+					if err != nil {
+						return fmt.Errorf("unable to connect to queue: %w", err)
+					}
+					defer conn.Close()
+					queue, err := sqliteQ.New(conn, "")
+					if err != nil {
+						return fmt.Errorf("unable to connect to queue: %w", err)
+					}
+
+					m, err := environment.New(queue)
+					if err != nil {
+						return fmt.Errorf("unable to send mail: %w", err)
+					}
+					for _, mw := range middleware {
+						m = mw(m)
+					}
+					mailers[i] = m
+				}
+				// mailers = mailers[:1]
+				mailer := mailer.NewSemaphore(mailers...)
+
 				wg, ctx := errgroup.WithContext(ctx)
 				if err = send(
 					ctx,
 					wg,
-					c.String(flagQueue.Name),
+					connectionDSN,
 					c.Duration(flagGraceTimeout.Name),
-					newSemaphoreMailer(
-						c.Int(flagWorkerCount.Name),
-						middleware...,
-					),
+					mailer,
 					logger,
 				); err != nil {
 					return err
@@ -183,12 +244,21 @@ var application = &cli.Command{
 			Action: cmdValidate,
 		},
 	},
+	ExitErrHandler: func(
+		ctx context.Context,
+		cmd *cli.Command,
+		err error,
+	) {
+		getLogger(cmd).Error(
+			err.Error(),
+		)
+	},
 }
 
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
-	application.Run(ctx, os.Args)
+	_ = application.Run(ctx, os.Args)
 }
 
 type xdgDataFile string
@@ -212,7 +282,7 @@ func (f xdgDataFile) String() string {
 func version() string {
 	v := "dev"
 	if info, ok := debug.ReadBuildInfo(); ok {
-		v = `v` + info.Main.Version
+		v = info.Main.Version
 		for _, setting := range info.Settings {
 			if setting.Key == "vcs.revision" {
 				v = v + "-" + setting.Value

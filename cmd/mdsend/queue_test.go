@@ -26,6 +26,7 @@ func TestQueue(t *testing.T) {
 		"--queue", database,
 		"../../examples/1-minimal.md",
 		"../../examples/2-list.md",
+		"../../examples/3-extends.md",
 	}); err != nil {
 		t.Fatal("unable to queue letters to database:", err)
 	}
@@ -39,7 +40,7 @@ func TestQueue(t *testing.T) {
 		t.Fatal("cannot mount queue:", err)
 	}
 
-	expectLetters := 2
+	expectLetters := 3
 	foundLetters := make([]string, 0, expectLetters)
 	for letter, err := range q.ListLetters(ctx, queue.Cursor{Batch: int64(expectLetters) + 1}) {
 		if err != nil {
@@ -51,7 +52,7 @@ func TestQueue(t *testing.T) {
 		t.Fatal("unexpected number of letters queued:", foundLetters, "vs", expectLetters)
 	}
 
-	expectMessages := 23
+	expectMessages := 45
 	foundMessages := 0
 	for _, letterID := range foundLetters {
 		for _, err = range q.ListMessages(ctx, queue.ChildCursor{

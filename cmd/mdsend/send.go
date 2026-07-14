@@ -12,7 +12,6 @@ import (
 	"github.com/ThreeDotsLabs/watermill-sqlite/wmsqlitezombiezen"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/dkotik/mdsend"
-	"github.com/dkotik/mdsend/mailer"
 	"github.com/dkotik/mdsend/queue"
 	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
 	"github.com/urfave/cli/v3"
@@ -55,22 +54,6 @@ var (
 		},
 	}
 )
-
-func newSemaphoreMailer(
-	size int,
-	middleware ...func(mdsend.Mailer) mdsend.Mailer,
-) mdsend.Mailer {
-	mailers := make([]mdsend.Mailer, size)
-	for i := range mailers {
-		m := mailer.NewVoid()
-		for _, mw := range middleware {
-			m = mw(m)
-		}
-		mailers[i] = m
-	}
-	// mailers = mailers[:1]
-	return mailer.NewSemaphore(mailers...)
-}
 
 func send(
 	ctx context.Context,
@@ -184,9 +167,10 @@ func send(
 			progressTracker,
 			queue.NewRoundRobinScheduler(schedulers...),
 			queue.ContinuousScannerOptions{
-				Frequency:        time.Millisecond * 30,
-				MessageBatchSize: 10,
 				// BeginWithOlderLetters: true,
+				// Frequency:        time.Millisecond * 30,
+				Frequency:        time.Second * 2,
+				MessageBatchSize: 10,
 			},
 		)
 

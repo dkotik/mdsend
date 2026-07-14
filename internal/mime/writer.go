@@ -121,7 +121,6 @@ func (w Writer) Write(
 
 	attachments, inline := SplitAttachments(m.HTML, attachments)
 	if len(attachments) == 0 {
-		// panic("no attachments")
 		return w.writeAlternativeWithAttachments(out, m.Text, m.HTML, w.textBoundary, inline)
 	}
 

@@ -81,7 +81,6 @@ func (t *tmpl) RenderLetterForRecipient(recipient map[string]any) (m mdsend.Mess
 		b.Reset()
 		buffers.Put(b)
 	}(b)
-	// panic("woo")
 
 	if err = t.RendererForText.Render(b, source, tree); err != nil {
 		return m, fmt.Errorf("unable to render text: %w", err)

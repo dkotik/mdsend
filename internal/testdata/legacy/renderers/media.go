@@ -46,7 +46,6 @@ func resizedReadCloser(file string, maxWidth, maxHeight uint, quality int) (io.R
 	}
 	m, _, err := image.Decode(handle)
 	if err != nil {
-		// panic(file)
 		return handle, err
 	}
 	t := resize.Thumbnail(maxWidth, maxHeight, m, resize.Lanczos3)

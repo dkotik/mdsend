@@ -1,4 +1,4 @@
-# Creative Commons Credits
+# Creative Commons Image Credits
 
 - `cat.jpg`: Cindy vanHeerden.
 - `panda.jpg`: Snow Chang.

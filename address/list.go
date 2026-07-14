@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/csv"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -241,7 +240,7 @@ func eachRecipientFromEntry(
 			}
 		case map[string]any:
 			if _, ok = v[FieldEmail]; !ok {
-				yield(nil, fmt.Errorf("contact contains no electronic mail address: %s", v))
+				yield(nil, ErrAbsentEmailAddress)
 				return
 			}
 			if !yield(v, nil) {
@@ -300,6 +299,9 @@ func Each(
 func EachUnique(
 	in iter.Seq2[map[string]any, error],
 ) iter.Seq2[map[string]any, error] {
+	if in == nil {
+		panic("empty address source")
+	}
 	return func(yield func(map[string]any, error) bool) {
 		known := make(map[string]struct{}, 64)
 		for recipient, err := range in {
@@ -309,7 +311,7 @@ func EachUnique(
 			}
 			email, _ := recipient[FieldEmail].(string)
 			if email == "" {
-				yield(recipient, errors.New("empty email address"))
+				yield(recipient, ErrAbsentEmailAddress)
 				return
 			}
 			if _, ok := known[email]; ok {

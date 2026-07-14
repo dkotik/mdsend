@@ -13,6 +13,7 @@ import (
 )
 
 const (
+	MailerName         = "mailgun"
 	EnvironmentKey     = "MG_API_KEY"
 	EnvironmentDomain  = "MG_DOMAIN"
 	EnvironmentEmailTo = "MG_EMAIL_TO"

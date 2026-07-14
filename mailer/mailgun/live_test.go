@@ -9,7 +9,6 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/internal/media"
-	"github.com/dkotik/mdsend/internal/mime"
 )
 
 func TestLiveSend(t *testing.T) {
@@ -37,13 +36,13 @@ func TestLiveSend(t *testing.T) {
 		Quality: 20,
 	}
 
-	cat, err := mdsend.NewAttachment(mime.Cat, constraints)
+	cat, err := mdsend.NewAttachment(media.Cat, constraints)
 	cat.Name = "cat.jpg"
 	cat.LetterID = testLetterID
 	if err = config.Queue.CreateAttachment(ctx, cat); err != nil {
 		t.Fatal(err)
 	}
-	chamillion, err := mdsend.NewAttachment(mime.Chamillion, constraints)
+	chamillion, err := mdsend.NewAttachment(media.Chamillion, constraints)
 	chamillion.Name = "chamillion.jpg"
 	chamillion.LetterID = testLetterID
 	if err = config.Queue.CreateAttachment(ctx, chamillion); err != nil {

@@ -118,7 +118,6 @@ func (s continuousScanner) Scan(
 		for range letterBatchSize {
 			letter, err, ok = letterPull()
 			if err != nil {
-				// panic(fmt.Sprintf("%s: %+v", letter.ID, lc))
 				letterStop()
 				return err
 			}

@@ -20,6 +20,7 @@ import (
 )
 
 const (
+	MailerName          = "smtp"
 	EnvironmentServer   = "SMTP_SERVER"
 	EnvironmentPort     = "SMTP_PORT"
 	EnvironmentUsername = "SMTP_USERNAME"
