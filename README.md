@@ -80,7 +80,7 @@ Any Markdown content below the last horizontal rule is added as a footer to the 
 ## Development Roadmap
 
 - [ ] Write a better Goldmark 2.0 renderer that recognizes single-line youtube and image paragraphs, centers them.
-- [ ] Markdown inline `code` panics.
+- [ ] Reify function injected into template Funcs.
 - [ ] Beautify the default template. Add `dark.html` one.
 - [x] Anticipate circular imports for recipient lists and extensions.
 - [x] Add queue.Marshaler interface and a JSON implementation?

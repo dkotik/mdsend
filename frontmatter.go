@@ -12,7 +12,6 @@ const (
 	FieldNameExtends                   = "extends"
 	FieldNameDatabase                  = "queue"
 	FieldNameSubject                   = "subject"
-	FieldNameFrom                      = "from"
 	FieldNameReplyTo                   = "reply_to"
 	FieldNameAttachments               = "attachments"
 	FieldNameAttachmentName            = "name"

@@ -187,11 +187,11 @@ func (l Letter) GetSubject() (string, error) {
 	}
 }
 
-// GetFrom returns the [FieldNameFrom] address from the frontmatter.
+// GetFrom returns the [address.FieldFrom] address from the frontmatter.
 // There must be only one valid address. Mutliple from addresses
 // can disrupt delivery.
 func (l Letter) GetFrom() (mail.Address, error) {
-	switch from := l.Frontmatter[FieldNameFrom].(type) {
+	switch from := l.Frontmatter[address.FieldFrom].(type) {
 	case map[string]any:
 		return address.New(from)
 	case string:

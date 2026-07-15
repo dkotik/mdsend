@@ -13,6 +13,7 @@ const (
 
 	FieldName            = "name"
 	FieldEmail           = "email"
+	FieldFrom            = "from"
 	FieldTo              = "to"
 	FieldCarbonCopy      = "cc"
 	FieldBlindCarbonCopy = "bcc"

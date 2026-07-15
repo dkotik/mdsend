@@ -204,11 +204,8 @@ func (p *plaintextRenderer) renderCodeSpan(w util.BufWriter, source []byte, node
 	if entering {
 		cs := node.(*ast.CodeSpan)
 		_ = w.WriteByte('`')
-		lines := cs.Lines()
-		for i := 0; i < lines.Len(); i++ {
-			line := lines.At(i)
-			_, _ = w.Write(line.Value(source))
-		}
+		text := cs.FirstChild().(*ast.Text)
+		_, _ = w.Write(text.Value(source))
 		_ = w.WriteByte('`')
 	}
 	return ast.WalkSkipChildren, nil

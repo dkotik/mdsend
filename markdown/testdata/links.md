@@ -15,3 +15,127 @@ In List:
 [flowing tail](finalMash2.txt "fm2")
 
 [refLink]: greatRefLink "last title"
+
+# Heading Level 1 (Document Title)
+## Heading Level 2 (Major Sections)
+### Heading Level 3 (Subsections)
+#### Heading Level 4
+##### Heading Level 5
+###### Heading Level 6
+
+---
+
+## 1. Text Emphasis
+
+This is standard paragraph text. 
+
+You can make text **bold using double asterisks** or __bold using double underscores__.
+
+You can make text *italic using single asterisks* or _italic using single underscores_.
+
+You can combine them for ***bold and italic text*** or ___alternative bold and italic___.
+
+---
+
+## 2. Lists
+
+### Unordered List
+* First item
+* Second item
+  * Indented sub-item (use 2 or 4 spaces)
+  * Another sub-item
+- Alternative bullet style
++ Another alternative bullet style
+
+### Ordered List
+1. First item
+2. Second item
+3. Third item
+   1. Nested ordered item
+   2. Another nested item
+
+### Task List (Extended Syntax)
+- [x] This task is completed
+- [ ] This task is not completed yet
+- [ ] This task is also pending
+
+---
+
+## 3. Links and Images
+
+### Links
+* Inline link: [Visit the Markdown Guide Official Site](https://www.markdownguide.org)
+* Link with hover title: [Google Search](https://www.google.com "Go to Google")
+* Automatic URL link: <https://www.example.com>
+
+### Images
+![Markdown Logo](https://wikimedia.org)
+
+---
+
+## 4. Blockquotes
+
+> This is a standard blockquote. It is used to highlight quotes, notes, or referenced text.
+> 
+> > This is a nested blockquote inside the main blockquote.
+
+---
+
+## 5. Code Formatting
+
+### Inline Code
+Use `system.out.println()` or `npm run dev` to reference code inline within sentences.
+
+### Fenced Code Blocks (with Syntax Highlighting)
+```javascript
+// JavaScript Example
+const greet = (name) => {
+    console.log(`Hello, ${name}!`);
+};
+greet('World');
+```
+
+```python
+# Python Example
+def calculate_sum(a, b):
+    return a + b
+
+print(calculate_sum(5, 10))
+```
+
+---
+
+## 6. Tables (Extended Syntax)
+
+| Feature | Markdown | Rich Text | Alignment |
+| :--- | :---: | ---: | :--- |
+| **Parsing** | Plain Text | Binary/JSON | Left-aligned |
+| **Portability** | Universal | Application-based | Centered |
+| **Speed** | Fast | Slow | Right-aligned |
+
+---
+
+## 7. Extended & Miscellaneous Formatting
+
+### Strikethrough
+~~This sentence has been crossed out using double tildes.~~
+
+### Horizontal Rules
+Three or more asterisks, dashes, or underscores create a separator line:
+
+***
+---
+___
+
+### Escaping Formatting Characters
+If you want to type literal characters like \*asterisks\* or \# hash symbols without triggering formatting, escape them using a backslash `\`.
+
+### Footnotes
+Here is a sentence that requires a formal citation.[^1] 
+And here is a second note reference.[^2]
+
+[^1]: This is the first footnote text appearing at the bottom.
+[^2]: This is the second footnote text.
+
+### HTML Workarounds (Renderer Dependent)
+Most engines allow basic HTML for features like <span style="color:red">colored text</span>, <ins>underlined text</ins>, or formatting formatting text with <sup>superscript</sup> and <sub>subscript</sub> elements.

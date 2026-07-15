@@ -15,7 +15,7 @@ func TestValidMessageFromTemplate(t *testing.T) {
 		mdsend.Letter{
 			ID: "valid message test",
 			Frontmatter: map[string]any{
-				mdsend.FieldNameFrom: map[string]any{
+				address.FieldFrom: map[string]any{
 					address.FieldName:  "Test Name From",
 					address.FieldEmail: "from2from@test.com",
 				},

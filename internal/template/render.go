@@ -40,6 +40,7 @@ func (t *tmpl) RenderLetterForRecipient(recipient map[string]any) (m mdsend.Mess
 		return m, fmt.Errorf("unexpected type for recipient email: %+v (%T)", email, email)
 	}
 
+	t.Reset()
 	b := buffers.Get().(*bytes.Buffer)
 	defer func(b *bytes.Buffer) {
 		b.Reset()
@@ -62,13 +63,9 @@ func (t *tmpl) RenderLetterForRecipient(recipient map[string]any) (m mdsend.Mess
 		if err = h.Template.Execute(b, t.context); err != nil {
 			return m, fmt.Errorf("unable to render header %q: %w", h.Name, err)
 		}
-		// t.context.Frontmatter[mdsend.FieldNameHeaders][h.Name]
 		if b.Len() == 0 {
 			continue // skip empty headers
 		}
-		// if h.Name[0] == '_' {
-		// 	continue // skip underscore prefixed header
-		// }
 		m.Headers = append(m.Headers, header.Header{
 			Name:  h.Name,
 			Value: b.String(),

@@ -4,12 +4,16 @@ import (
 	"encoding/base64"
 	"html/template"
 	"net/url"
+	"time"
 
 	"github.com/btcsuite/btcd/btcutil/base58"
 )
 
-func Functions() template.FuncMap {
+func functions() template.FuncMap {
 	return template.FuncMap{
+		"RFC3339": func() string {
+			return time.Now().Format(time.RFC3339)
+		},
 		"base64":    base64.RawStdEncoding.EncodeToString,
 		"base64URL": base64.RawURLEncoding.EncodeToString,
 		"urlQuery":  url.QueryEscape,
