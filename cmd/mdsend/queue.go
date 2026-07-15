@@ -71,7 +71,11 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 		p,
 		fs,
 	); err != nil {
-		return err
+		return fmt.Errorf(
+			"unable to queue letter: %s: %w",
+			filepath.Base(p),
+			err,
+		)
 	}
 
 	for _, p = range c.Args().Slice()[1:] {
@@ -100,7 +104,11 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 			p,
 			fs,
 		); err != nil {
-			return err
+			return fmt.Errorf(
+				"unable to queue letter: %s: %w",
+				filepath.Base(p),
+				err,
+			)
 		}
 	}
 	return nil

@@ -1,7 +1,7 @@
 ---
+subject: minimal example message
 from: Test Author <joedoe@test.com>
 to: to@test.com
-subject: minimal example message
 ---
 
 # Content

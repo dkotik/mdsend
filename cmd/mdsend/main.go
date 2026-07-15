@@ -87,9 +87,10 @@ func newQueueConnection(p string) (conn *sqlite.Conn, err error) {
 }
 
 var application = &cli.Command{
-	Name:    `mdsend`,
-	Usage:   `Sends markdown documents as templated emails.`,
-	Version: version(),
+	Name:      `mdsend`,
+	Usage:     `Sends markdown documents as templated emails.`,
+	Copyright: "Copyright 2022 Dmitry Kotik",
+	Version:   version(),
 	Commands: []*cli.Command{
 		{
 			Name:    `queue`,

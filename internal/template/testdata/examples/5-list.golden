@@ -1,20 +1,41 @@
 subject: typical mailing list message
-seed_key: XoSqN7NhxhR
+seed_key: TsXHGkwqf2P
 List-Id: Some List <greatlist@test.com>
 List-Unsubscribe: <mailto:unsub@yourdomain.com>, <https://yourdomain.com/unsub?id=orMDSH9upTqMfMZfPwwAuCReRxaZiQqvDy>
 List-Unsubscribe-Post: token=orMDSH9upTqMfMZfPwwAuCReRxaZiQqvDy
 
 
-Content
-=======
+Load Recipient Lists
+====================
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.
+Target address fields, `to`, `cc`, and `bcc` support a list of entries. Any entry can also point to a configuration file in a variety of common formats that will be merged into the parent list.
+
+
+to: mailinglist.yaml
+cc:
+  - another_list.toml
+  - jsonIsFine.json
+  - cuelist.cue
+bcc:
+  - name: Named Entry
+    email: test@test.com
+    title: Mr.
+    first_name: First
+
+Each entry is a map, regardless of how it was loaded. Any value of the map is accessible to the template engine through the context.
+
+
+Greeting <no value> <no value>,
+
+I am writing, because ...
 
 
 Footer
 ------
 
 You may unsubscribe here.
+
+The CAN-SPAM act became law on Jan. 1, 2004. It says there many things you must do as a commercial email-er. Highlights are basically don't be deceptive, and that you **MUST** include a physical mailing address as well as a working unsubscribe link in the body.
 
 
 
@@ -31,10 +52,27 @@ You may unsubscribe here.
 
 <body style="color: #1d1d1d;">
   <div style="background-color: #e8ecfb; padding: 0.5em 1em 0.5em 1.5em;">
-    <h1>Content</h1>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.</p>
+    <h1>Load Recipient Lists</h1>
+<p>Target address fields, <code>to</code>, <code>cc</code>, and <code>bcc</code> support a list of entries. Any entry can also point to a configuration file in a variety of common formats that will be merged into the parent list.</p>
+<pre><code class="language-yaml">to: mailinglist.yaml
+cc:
+  - another_list.toml
+  - jsonIsFine.json
+  - cuelist.cue
+bcc:
+  - name: Named Entry
+    email: test@test.com
+    title: Mr.
+    first_name: First
+</code></pre>
+<p>Each entry is a map, regardless of how it was loaded. Any value of the map is accessible to the template engine through the context.</p>
+<pre><code class="language-markdown">Greeting &lt;no value&gt; &lt;no value&gt;,
+
+I am writing, because ...
+</code></pre>
 <h2>Footer</h2>
 <p>You may unsubscribe <!-- raw HTML omitted -->here<!-- raw HTML omitted -->.</p>
+<p>The CAN-SPAM act became law on Jan. 1, 2004. It says there many things you must do as a commercial email-er. Highlights are basically don't be deceptive, and that you <strong>MUST</strong> include a physical mailing address as well as a working unsubscribe link in the body.</p>
 
   </div>
 </body>

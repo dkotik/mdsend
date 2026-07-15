@@ -1,15 +1,41 @@
-# Mdsend
+# Mdsend (beta)
 
-Send markdown files as mail.
-
-**Project status: active development towads beta.**
+Send markdown files as electronic mail.
 
 ## Features
 
-- **Durable:** mail queues are fault tolerant and atomic, brokered by <Watermill.io> over SQLite3.
+- **Durable:** mail queues are fault tolerant and atomic, brokered by <Watermill.io> over SQLite3. Can handle any volume of mail without degredation.
 - **Flexible:** select the mailer backend based on highest deliverability. Swap it out later without changing anything in your letters or templates.
   - Supports recipient lists formats: CSV, JSON, YAML, TOML, and Cue.
 - **Portable:** runs on many kinds of systems. Will include an embeddable HTTP service and Posgres support in the future.
+
+## Examples
+
+```markdown
+---
+subject: "Test Email"
+from: "Sender <test@gmail.com>"
+to: "Recipient <test@gmail.com>"
+---
+
+# Title of the Example Letter
+
+Write text in **Markdown** notation.
+```
+
+```sh
+cd examples
+mdsend send 1-minimal.md
+```
+
+Annotated examples are the documentation:
+
+- [1-minimal.md](examples/minimal.md)
+- [2-attachments.md](examples/attachments.md)
+- [3-scheduling.md](examples/scheduling.md)
+- [4-templating.md](examples/templating.md)
+- [5-list.md](examples/list.md)
+- [6-extending.md](examples/extending.md)
 
 ## Installation
 
@@ -23,68 +49,20 @@ Send markdown files as mail.
   go install github.com/dkotik/mdsend@latest
   ```
 
-## Letter
-
-```markdown
----
-subject: "Test Email"
-from: "Test Account <test@gmail.com>"
-to: "Test Account <test@gmail.com>"
----
-
-# Title of the Example Letter
-
-Write text in **Markdown** notation.
-```
-
-## Load Recipient Lists
-
-Target address fields, `to`, `cc`, and `bcc` support a list of entries. Any entry can also point to a configuration file in a variety of common formats that will be merged into the parent list.
-
-```yaml
-to: mailinglist.yaml
-cc:
-  - another_list.toml
-  - jsonIsFine.json
-  - cuelist.cue
-bcc:
-  - name: Named Entry
-    email: test@test.com
-    title: Mr.
-    first_name: First
-```
-
-Each entry is a map, regardless of how it was loaded. Any value of the map is accessible to the template engine through the context.
-
-```markdown
-Greeting {{ .Recipient.title }} {{ .Recipient.first_name }},
-
-I am writing, because ...
-```
-
-## Extend One Letter with Another
-
-Merge the content and frontmatter fields into a letter from another file by using the `extends` field.
-
-```yaml
-extends:
-  # this letter will inherit the content
-  # and configuration values of `template.md`
-  - template.md
-  # load a configuration file
-  - config.yaml
-```
-
-Any Markdown content below the last horizontal rule is added as a footer to the current letter. You may nest the extensions deep as long as there are no circular references.
-
 ## Development Roadmap
 
+Mdsend is under active development.
+
+<details>
+  <summary>Click here to see a list of planned features.</summary>
+
+- [ ] Bug: example six extending example five produces a <nil> recipient.
+- [ ] Ensure carbon copy list is in header.
 - [ ] Write a better Goldmark 2.0 renderer that recognizes single-line youtube and image paragraphs, centers them.
 - [ ] Beautify the default template. Add `dark.html` one.
 - [x] Anticipate circular imports for recipient lists and extensions.
 - [x] Add queue.Marshaler interface and a JSON implementation?
 - [ ] Validate function should detect language and complain that `language` field is not set, if the content is not English.
-- [ ] https://github.com/charmbracelet/glamour
 - [ ] Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
 - [x] Mailgun
 - [ ] Resend
@@ -101,16 +79,16 @@ Any Markdown content below the last horizontal rule is added as a footer to the 
 - [ ] Twilio
 - [ ] <https://emaillabs.io/en/product/>
 - [ ] <https://mailtrap.io/>
+- [ ] https://github.com/charmbracelet/glamour
 - [ ] add to https://github.com/rothgar/awesome-tuis and bubbletea list of apps
 
-## Tools
+</details>
 
-* OBEY THE LAW. The CAN-SPAM act became law on Jan. 1, 2004. It says there many things you must do as a commercial email-er. Highlights are basically don't be deceptive, and that you MUST include a physical mailing address as well as a working unsubscribe link.
-* unsubscribe button: https://blog.leavemealone.app/how-does-the-gmail-unsubscribe-button-work/
+## E-mail Tools
 
 - <https://www.caniemail.com/> - check what is template-appropriate
-- <https://www.htmlemailcheck.com/check/>
 - Use <https://www.mail-tester.com/> to check the deliverability of your mail.
+- <https://www.htmlemailcheck.com/check/>
 - Address verification:
   - <https://github.com/AfterShip/email-verifier>
   - <https://github.com/reacherhq/check-if-email-exists>

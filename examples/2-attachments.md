@@ -1,7 +1,7 @@
 ---
+subject: example message with attachments
 from: Test Author <joedoe@test.com>
 to: to@test.com
-subject: minimal example message
 attachments:
   - ../internal/media/testdata/cat.jpg
   - ../internal/media/testdata/chamillion.jpg

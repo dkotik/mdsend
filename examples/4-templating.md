@@ -1,10 +1,10 @@
 ---
+subject: example message for {{ .Recipient.name }}
 from: Test Author <joedoe@test.com>
 to:
   - name: Full Name
     email: to@test.com
     first_name: FirstName
-subject: example message for {{ .Recipient.name }}
 someVariable: test
 templates:
   - ../internal/template/html/default.html

@@ -1,5 +1,5 @@
-subject: minimal example message
-seed_key: LedxrxLbKb2
+subject: example message with attachments
+seed_key: CknxbZ8CTf6
 
 
 Content
@@ -28,7 +28,7 @@ Creative Commons Credits
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>minimal example message</title>
+  <title>example message with attachments</title>
 </head>
 
 <body style="color: #1d1d1d;">

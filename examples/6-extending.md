@@ -1,11 +1,26 @@
 ---
+subject: extend one letter from letter
 from: Test Author <joedoe@test.com>
 to: extends@test.com
-subject: extends from another letter
-extends: 5-list.md
+extends: 3-scheduling.md
 ---
 
-# Content
+# Extend One Letter with Another
+
+Merge the content and frontmatter fields into a letter from another file by using the `extends` field.
+
+```yaml
+extends:
+  # this letter will inherit the content
+  # and configuration values of `template.md`
+  - template.md
+  # load a configuration file
+  - config.yaml
+```
+
+Any Markdown content below the last horizontal rule is added as a footer to the current letter. You may nest the extensions deep as long as there are no circular references.
+
+## Content
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.
 
