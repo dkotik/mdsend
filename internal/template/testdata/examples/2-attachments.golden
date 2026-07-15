@@ -1,17 +1,21 @@
 subject: example message with attachments
-seed_key: CknxbZ8CTf6
+seed_key: dCnwcWricLB
 
 
-Content
-=======
+Attach Files to the Message
+===========================
 
-> A Markdown file requires valid 'from', 'to', and 'subject' fieldsin the frontmatter.
+List added files under `attachments` frontmatter section.Images are automatically compressed. Control the sizewith `media_constraints` frontmatter section.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.
+
+Inline Attachments
+------------------
+
+Inline attachments are placed into message body,when linked like so: [cat](../internal/media/testdata/cat.jpg).
 
 
 Creative Commons Credits
-========================
+------------------------
 
 
 - **cat.jpg:** Cindy vanHeerden.**cat.jpg:** Cindy vanHeerden.
@@ -33,13 +37,14 @@ Creative Commons Credits
 
 <body style="color: #1d1d1d;">
   <div style="background-color: #e8ecfb; padding: 0.5em 1em 0.5em 1.5em;">
-    <h1>Content</h1>
-<blockquote>
-<p>A Markdown file requires valid 'from', 'to', and 'subject' fields
-in the frontmatter.</p>
-</blockquote>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.</p>
-<h1>Creative Commons Credits</h1>
+    <h1>Attach Files to the Message</h1>
+<p>List added files under <code>attachments</code> frontmatter section.
+Images are automatically compressed. Control the size
+with <code>media_constraints</code> frontmatter section.</p>
+<h2>Inline Attachments</h2>
+<p>Inline attachments are placed into message body,
+when linked like so: <a href="../internal/media/testdata/cat.jpg" title="Cat Photo by Cindy vanHeerden">cat</a>.</p>
+<h2>Creative Commons Credits</h2>
 <ul>
 <li><strong>cat.jpg:</strong> Cindy vanHeerden.</li>
 <li><strong>panda.jpg:</strong> Snow Chang.</li>

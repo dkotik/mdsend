@@ -12,14 +12,18 @@ media_constraints:
   height: 120
 ---
 
-# Content
+# Attach Files to the Message
 
-> A Markdown file requires valid 'from', 'to', and 'subject' fields
-> in the frontmatter.
+List added files under `attachments` frontmatter section.
+Images are automatically compressed. Control the size
+with `media_constraints` frontmatter section.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.
+## Inline Attachments
 
-# Creative Commons Credits
+Inline attachments are placed into message body,
+when linked like so: [cat](../internal/media/testdata/cat.jpg "Cat Photo by Cindy vanHeerden").
+
+## Creative Commons Credits
 
 - **cat.jpg:** Cindy vanHeerden.
 - **panda.jpg:** Snow Chang.

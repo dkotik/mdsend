@@ -1,4 +1,5 @@
-# Mdsend (beta)
+# Mdsend
+[![Go Reference](https://camo.githubusercontent.com/f3bee28c74a644e266e819bedf0150b80af8a7d46292a8fa2837e42aff739ccc/68747470733a2f2f706b672e676f2e6465762f62616467652f6769746875622e636f6d2f5468726565446f74734c6162732f77617465726d696c6c2e737667)](https://pkg.go.dev/github.com/dkotik/mdsend)
 
 Send markdown files as electronic mail.
 
@@ -7,6 +8,7 @@ Send markdown files as electronic mail.
 - **Durable:** mail queues are fault tolerant and atomic, brokered by <Watermill.io> over SQLite3. Can handle any volume of mail without degredation.
 - **Flexible:** select the mailer backend based on highest deliverability. Swap it out later without changing anything in your letters or templates.
   - Supports recipient lists formats: CSV, JSON, YAML, TOML, and Cue.
+  - Supports drivers: **SMTP**, **Mailgun**, ...more soon.
 - **Portable:** runs on many kinds of systems. Will include an embeddable HTTP service and Posgres support in the future.
 
 ## Examples
@@ -30,12 +32,12 @@ mdsend send 1-minimal.md
 
 Annotated examples are the documentation:
 
-- [1-minimal.md](examples/minimal.md)
-- [2-attachments.md](examples/attachments.md)
-- [3-scheduling.md](examples/scheduling.md)
-- [4-templating.md](examples/templating.md)
-- [5-list.md](examples/list.md)
-- [6-extending.md](examples/extending.md)
+- [1-minimal.md](examples/1-minimal.md?plain=1)
+- [2-attachments.md](examples/2-attachments.md?plain=1)
+- [3-scheduling.md](examples/3-scheduling.md?plain=1)
+- [4-templating.md](examples/4-templating.md?plain=1)
+- [5-list.md](examples/5-list.md?plain=1)
+- [6-extending.md](examples/6-extending.md?plain=1)
 
 ## Installation
 
@@ -49,14 +51,18 @@ Annotated examples are the documentation:
   go install github.com/dkotik/mdsend@latest
   ```
 
-## Development Roadmap
+## Development
 
-Mdsend is under active development.
+Mdsend is under active development. Version 1.0.0 is expected by the end of 2026.
 
 <details>
   <summary>Click here to see a list of planned features.</summary>
 
 - [ ] Bug: example six extending example five produces a <nil> recipient.
+- [ ] Letter expiration via schedule.expires.
+- [ ] `d` day unit for schedule duration parsing.
+- [ ] Queue clean up scanner - should be first added to sqlite Watermill driver.
+- [ ] Sending message with scheduling delay should prompt a confirmation.
 - [ ] Ensure carbon copy list is in header.
 - [ ] Write a better Goldmark 2.0 renderer that recognizes single-line youtube and image paragraphs, centers them.
 - [ ] Beautify the default template. Add `dark.html` one.

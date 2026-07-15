@@ -1,9 +1,19 @@
 subject: extend one letter from letter
-seed_key: HdM4LBwNjJ2
+seed_key: 3GJ1HmdZPh1
+schedule_after: 2026-12-30T00:30:00Z
 
 
-Schedule Messages for Delivery
-==============================
+Schedule Messages for Later Delivery
+====================================
+
+Queued messages can be delayed by providing `schedule` frontmatter instructions:
+
+
+- **after:** time until the message can be sent.**after:** time until the message can be sent.
+- **delay:** time duration added to `after` or current time.**delay:** time duration added to `after` or current time.
+- **step:** time duration added for each recipient.**step:** time duration added for each recipient.
+- **fluctuate:** normalized random time duration added for each mailing step, including the first message.**fluctuate:** normalized random time duration added for each mailing step, including the first message.
+- **expire:** time duration, after all the messages have been sent, to keep the letter and message records in the database before they are deleted.**expire:** time duration, after all the messages have been sent, to keep the letter and message records in the database before they are deleted.
 
 
 Context
@@ -69,7 +79,15 @@ Suspendisse iaculis tortor at massa congue condimentum. Ut interdum leo vel dign
 <body style="color: #1d1d1d;">
   <div style="background-color: #e8ecfb; padding: 0.5em 1em 0.5em 1.5em;">
     <!-- raw HTML omitted -->
-<h1>Schedule Messages for Delivery</h1>
+<h1>Schedule Messages for Later Delivery</h1>
+<p>Queued messages can be delayed by providing <code>schedule</code> frontmatter instructions:</p>
+<ul>
+<li><strong>after:</strong> time until the message can be sent.</li>
+<li><strong>delay:</strong> time duration added to <code>after</code> or current time.</li>
+<li><strong>step:</strong> time duration added for each recipient.</li>
+<li><strong>fluctuate:</strong> normalized random time duration added for each mailing step, including the first message.</li>
+<li><strong>expire:</strong> time duration, after all the messages have been sent, to keep the letter and message records in the database before they are deleted.</li>
+</ul>
 <h2>Context</h2>
 <p>Template execution context contains the following fields:</p>
 <ul>

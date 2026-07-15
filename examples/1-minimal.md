@@ -4,7 +4,49 @@ from: Test Author <joedoe@test.com>
 to: to@test.com
 ---
 
-# Content
+# Introduction
+
+This is the simplest letter that can be sent. It has one recipient.
+
+- _Letter_: this file.
+- _Message_: a rendered copy of this file for each recipient.
+
+## 1. Install `mdsend`
+
+- MacOS:
+  ```sh
+  brew tap dkotik/tap
+  brew install mdsend
+  ```
+- Build from source:
+  ```sh
+  go install github.com/dkotik/mdsend@latest
+  ```
+
+
+## 2. Send the Letter
+
+Sending requires a set of mailing service credentials provided as environment variables.
+
+```sh
+export SMTP_SERVER=...
+export SMTP_PORT=...
+export SMTP_USERNAME=...
+export SMTP_PASSWORD=...
+mdsend send 1-minimal.md
+```
+
+## 3. Separate Queuing
+
+Send command will continued to deliver any queued messages, which can be added to the queue with a separate command.
+
+```sh
+mdsend queue add 1-minimal.md
+mdsend queue add 2-attachments.md
+mdsend send
+```
+
+# Sample Content
 
 > A Markdown file requires valid 'from', 'to', and 'subject' fields
 > in the frontmatter.
