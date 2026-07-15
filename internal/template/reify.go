@@ -2,10 +2,16 @@ package template
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	"strings"
 )
 
 func (t *tmpl) Reify(templateName string) (v string, err error) {
+	templateName = strings.TrimSpace(templateName)
+	if templateName == "" {
+		return "", errors.New("reify function requires a template name")
+	}
 	v, ok := t.ReifiedCache[templateName]
 	if ok {
 		return v, nil

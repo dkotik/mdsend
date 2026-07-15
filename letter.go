@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"net/mail"
 	"path"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"time"
@@ -80,11 +81,12 @@ func NewLetterFromFile(
 	if err != nil {
 		return letter, err
 	}
-	letter, err = extend(ctx, letter, path.Dir(p), media.NewCyclicalImportPreventingFileSystem(fs))
+	rootDirectory := path.Dir(p)
+	letter, err = extend(ctx, letter, rootDirectory, media.NewCyclicalImportPreventingFileSystem(fs))
 	if err != nil {
 		return letter, err
 	}
-	templates, err := getTemplates(letter.Frontmatter)
+	templates, err := getTemplates(letter.Frontmatter, rootDirectory)
 	if err != nil {
 		return letter, err
 	}
@@ -208,12 +210,13 @@ func (l Letter) GetFrom() (mail.Address, error) {
 	}
 }
 
-func getTemplates(frontmatter map[string]any) (templates []string, err error) {
+func getTemplates(frontmatter map[string]any, prefix string) (templates []string, err error) {
 	switch t := frontmatter[FieldNameTemplates].(type) {
 	case nil:
 	case string:
 		t = strings.TrimSpace(t)
 		if len(t) > 0 {
+			t = filepath.Join(prefix, t)
 			templates = append(templates, t)
 		}
 	case []any:
@@ -222,6 +225,7 @@ func getTemplates(frontmatter map[string]any) (templates []string, err error) {
 			case string:
 				s = strings.TrimSpace(s)
 				if len(s) > 0 {
+					s = filepath.Join(prefix, s)
 					templates = append(templates, s)
 				}
 			default:

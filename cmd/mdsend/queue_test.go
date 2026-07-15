@@ -25,8 +25,8 @@ func TestQueue(t *testing.T) {
 		"queue", "add",
 		"--queue", database,
 		"../../examples/1-minimal.md",
-		"../../examples/2-list.md",
-		"../../examples/3-extends.md",
+		"../../examples/5-list.md",
+		"../../examples/6-extending.md",
 	}); err != nil {
 		t.Fatal("unable to queue letters to database:", err)
 	}

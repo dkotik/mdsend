@@ -1,0 +1,52 @@
+subject: minimal example message
+seed_key: LedxrxLbKb2
+
+
+Content
+=======
+
+> A Markdown file requires valid 'from', 'to', and 'subject' fieldsin the frontmatter.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.
+
+
+Creative Commons Credits
+========================
+
+
+- **cat.jpg:** Cindy vanHeerden.**cat.jpg:** Cindy vanHeerden.
+- **panda.jpg:** Snow Chang.**panda.jpg:** Snow Chang.
+- **camillion.jpg:** Regan Dsouza.**camillion.jpg:** Regan Dsouza.
+
+
+
+===========[HTML]=============
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>minimal example message</title>
+</head>
+
+<body style="color: #1d1d1d;">
+  <div style="background-color: #e8ecfb; padding: 0.5em 1em 0.5em 1.5em;">
+    <h1>Content</h1>
+<blockquote>
+<p>A Markdown file requires valid 'from', 'to', and 'subject' fields
+in the frontmatter.</p>
+</blockquote>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.</p>
+<h1>Creative Commons Credits</h1>
+<ul>
+<li><strong>cat.jpg:</strong> Cindy vanHeerden.</li>
+<li><strong>panda.jpg:</strong> Snow Chang.</li>
+<li><strong>camillion.jpg:</strong> Regan Dsouza.</li>
+</ul>
+
+  </div>
+</body>
+
+</html>

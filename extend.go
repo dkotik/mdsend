@@ -24,7 +24,7 @@ func injectPathPrefix(
 	frontmatter map[string]any,
 	rootDirectory string,
 ) (err error) {
-	templates, err := getTemplates(frontmatter)
+	templates, err := getTemplates(frontmatter, rootDirectory)
 	if err != nil {
 		return err
 	}

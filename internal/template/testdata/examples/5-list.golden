@@ -1,0 +1,42 @@
+subject: typical mailing list message
+seed_key: XoSqN7NhxhR
+List-Id: Some List <greatlist@test.com>
+List-Unsubscribe: <mailto:unsub@yourdomain.com>, <https://yourdomain.com/unsub?id=orMDSH9upTqMfMZfPwwAuCReRxaZiQqvDy>
+List-Unsubscribe-Post: token=orMDSH9upTqMfMZfPwwAuCReRxaZiQqvDy
+
+
+Content
+=======
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.
+
+
+Footer
+------
+
+You may unsubscribe here.
+
+
+
+===========[HTML]=============
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>typical mailing list message</title>
+</head>
+
+<body style="color: #1d1d1d;">
+  <div style="background-color: #e8ecfb; padding: 0.5em 1em 0.5em 1.5em;">
+    <h1>Content</h1>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.</p>
+<h2>Footer</h2>
+<p>You may unsubscribe <!-- raw HTML omitted -->here<!-- raw HTML omitted -->.</p>
+
+  </div>
+</body>
+
+</html>

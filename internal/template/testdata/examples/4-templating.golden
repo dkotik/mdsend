@@ -1,0 +1,93 @@
+subject: example message for Full Name
+seed_key: JLqK2r2Vqni
+X-Template-Test: test
+
+Hello FirstName,
+
+
+example message for Full Name
+=============================
+
+The Markdown content itself is a `Golang` text template.To wrap the output of a letter into an `HTML` template, specifythe list of files to load using the `template` field in thefrontmatter.
+
+The frontmatter subject and the header values are also treatedas text templates. If the header template is rendered empty,it will be ommitted from the sent message.
+
+
+Context
+-------
+
+Template execution context contains the following fields:
+
+
+- **Frontmatter:** the raw Markdown frontmatter as `map[string]any`.**Frontmatter:** the raw Markdown frontmatter as `map[string]any`.
+- **Recipient:** the raw message target as `map[string]any`. It
+will contain `name` and `email` fields and any other fields
+fromt the contact source.**Recipient:** the raw message target as `map[string]any`. Itwill contain `name` and `email` fields and any other fieldsfromt the contact source.
+- **Content:** rendered Markdown body.**Content:** rendered Markdown body.
+- **Schedule:** parsed scheduling directives.**Schedule:** parsed scheduling directives.
+
+
+Reify Templates
+---------------
+
+Special `reify` function stores the output of a named `Golang` block or template. Calling `reify` again on the same template, returnsthe initial output. Each recipient starts with an empty output cache.
+
+Here is an example of declaring a template that encodes recipientaddress as a URL-safe field once to be used several times:
+
+
+
+
+URL: https://test.com/?unsubscribe=
+  to%40test.com
+
+
+
+
+===========[HTML]=============
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>example message for Full Name</title>
+</head>
+
+<body style="color: #1d1d1d;">
+  <div style="background-color: #e8ecfb; padding: 0.5em 1em 0.5em 1.5em;">
+    <p>Hello FirstName,</p>
+<h1>example message for Full Name</h1>
+<p>The Markdown content itself is a <code>Golang</code> text template.
+To wrap the output of a letter into an <code>HTML</code> template, specify
+the list of files to load using the <code>template</code> field in the
+frontmatter.</p>
+<p>The frontmatter subject and the header values are also treated
+as text templates. If the header template is rendered empty,
+it will be ommitted from the sent message.</p>
+<h2>Context</h2>
+<p>Template execution context contains the following fields:</p>
+<ul>
+<li><strong>Frontmatter:</strong> the raw Markdown frontmatter as <code>map[string]any</code>.</li>
+<li><strong>Recipient:</strong> the raw message target as <code>map[string]any</code>. It
+will contain <code>name</code> and <code>email</code> fields and any other fields
+fromt the contact source.</li>
+<li><strong>Content:</strong> rendered Markdown body.</li>
+<li><strong>Schedule:</strong> parsed scheduling directives.</li>
+</ul>
+<h2>Reify Templates</h2>
+<p>Special <code>reify</code> function stores the output of a named <code>Golang</code> block or template. Calling <code>reify</code> again on the same template, returns
+the initial output. Each recipient starts with an empty output cache.</p>
+<p>Here is an example of declaring a template that encodes recipient
+address as a URL-safe field once to be used several times:</p>
+<pre><code>
+
+URL: https://test.com/?unsubscribe=
+  to%40test.com
+
+</code></pre>
+
+  </div>
+</body>
+
+</html>

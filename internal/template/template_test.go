@@ -3,10 +3,14 @@ package template
 import (
 	"bytes"
 	"html/template"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/address"
+	"github.com/dkotik/mdsend/internal/media"
 	"github.com/sebdah/goldie/v2"
 )
 
@@ -53,23 +57,22 @@ func TestTemplateRendering(t *testing.T) {
 	goldie.New(t).Assert(t, "default", b.Bytes())
 }
 
-func TestExposeLocalVariableViaTemplate(t *testing.T) {
-	t.Skip("frozen")
-	tmpl, err := template.New("").Parse(`
-		$someVariable := {{.}}
-
-		{{ define "subTemplate" }}
-			someVariable is {{ $.someVariable }}
-		{{ end }}
-
-		{{ template "subTemplate" "nil" }}
-	`)
+func TestExamples(t *testing.T) {
+	examplePath := filepath.Join("..", "..", "examples")
+	entries, err := os.ReadDir(examplePath)
 	if err != nil {
-		t.Fatal("cannot parse:", err)
+		t.Fatal("unable to reach examples folder:", err)
 	}
-
-	b := &bytes.Buffer{}
-	if err = tmpl.Execute(b, nil); err != nil {
-		t.Fatal("cannot execute:", err)
+	if len(entries) != 6 {
+		t.Fatal("there should be 6 examples, instead:", len(entries))
+	}
+	fs := media.NewUnsafeUnconstrainedFileSystem()
+	for _, entry := range entries {
+		name := entry.Name()
+		ext := filepath.Ext(name)
+		if strings.ToLower(ext) != ".md" {
+			continue // skip files that are not Markdown
+		}
+		t.Run(name, NewLetterTest(fs, filepath.Join(examplePath, name)))
 	}
 }

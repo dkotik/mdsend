@@ -2,7 +2,7 @@
 from: Test Author <joedoe@test.com>
 to: extends@test.com
 subject: extends from another letter
-extends: 2-list.md
+extends: 5-list.md
 ---
 
 # Content
