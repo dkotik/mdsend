@@ -1,5 +1,5 @@
 subject: example message with attachments
-seed_key: dCnwcWricLB
+seed_key: HbSRoAxM7o6
 
 
 Attach Files to the Message
@@ -11,7 +11,7 @@ List added files under `attachments` frontmatter section.Images are automaticall
 Inline Attachments
 ------------------
 
-Inline attachments are placed into message body,when linked like so: [cat](../internal/media/testdata/cat.jpg).
+Inline attachments are placed into message body,when linked like so:[cat](../internal/media/testdata/cat.jpg).
 
 
 Creative Commons Credits
@@ -43,7 +43,8 @@ Images are automatically compressed. Control the size
 with <code>media_constraints</code> frontmatter section.</p>
 <h2>Inline Attachments</h2>
 <p>Inline attachments are placed into message body,
-when linked like so: <a href="../internal/media/testdata/cat.jpg" title="Cat Photo by Cindy vanHeerden">cat</a>.</p>
+when linked like so:
+<a href="../internal/media/testdata/cat.jpg" title="Cat Photo by Cindy vanHeerden">cat</a>.</p>
 <h2>Creative Commons Credits</h2>
 <ul>
 <li><strong>cat.jpg:</strong> Cindy vanHeerden.</li>

@@ -38,7 +38,8 @@ Template execution context contains the following fields:
 
 ## Reify Templates
 
-Special `reify` function stores the output of a named `Golang` block or template. Calling `reify` again on the same template, returns
+Special `reify` function stores the output of a named `Golang` block
+or template. Calling `reify` again on the same template, returns
 the initial output. Each recipient starts with an empty output cache.
 
 Here is an example of declaring a template that encodes recipient

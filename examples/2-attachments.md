@@ -21,7 +21,8 @@ with `media_constraints` frontmatter section.
 ## Inline Attachments
 
 Inline attachments are placed into message body,
-when linked like so: [cat](../internal/media/testdata/cat.jpg "Cat Photo by Cindy vanHeerden").
+when linked like so:
+[cat](../internal/media/testdata/cat.jpg "Cat Photo by Cindy vanHeerden").
 
 ## Creative Commons Credits
 

@@ -22,6 +22,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.4.0
 	github.com/sebdah/goldie/v2 v2.8.0
 	github.com/urfave/cli/v3 v3.10.0
+	github.com/xhit/go-str2duration/v2 v2.1.0
 	github.com/yuin/goldmark v1.8.2
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0
 	golang.org/x/image v0.41.0

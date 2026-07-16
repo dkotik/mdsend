@@ -1,5 +1,5 @@
 subject: scheduling deliveries
-seed_key: TGubmnumbB3
+seed_key: G1j7TmbWjTh
 schedule_after: 2026-12-30T00:30:00Z
 
 
@@ -9,31 +9,31 @@ Schedule Messages for Later Delivery
 Queued messages can be delayed by providing `schedule` frontmatter instructions:
 
 
-- **after:** time until the message can be sent.**after:** time until the message can be sent.
+- **after:** time until the message can be sent.
+Must be in ISO format `YYYY-MM-DD hh:mm`.**after:** time until the message can be sent.Must be in ISO format `YYYY-MM-DD hh:mm`.
 - **delay:** time duration added to `after` or current time.**delay:** time duration added to `after` or current time.
 - **step:** time duration added for each recipient.**step:** time duration added for each recipient.
-- **fluctuate:** normalized random time duration added for each mailing step, including the first message.**fluctuate:** normalized random time duration added for each mailing step, including the first message.
-- **expire:** time duration, after all the messages have been sent, to keep the letter and message records in the database before they are deleted.**expire:** time duration, after all the messages have been sent, to keep the letter and message records in the database before they are deleted.
+- **fluctuate:** normalized random time duration added for each
+mailing step, including the first message.**fluctuate:** normalized random time duration added for eachmailing step, including the first message.
+- **expire:** time duration, after all the messages have been sent,
+to keep the letter and message records in the database before they
+are deleted.**expire:** time duration, after all the messages have been sent,to keep the letter and message records in the database before theyare deleted.
 
 
-Context
--------
-
-Template execution context contains the following fields:
+Time Duration Units
+-------------------
 
 
-- **Frontmatter:** the raw Markdown frontmatter as `map[string]any`.**Frontmatter:** the raw Markdown frontmatter as `map[string]any`.
-- **Recipient:** the raw message target as `map[string]any`. It
-will contain `name` and `email` fields and any other fields
-fromt the contact source.**Recipient:** the raw message target as `map[string]any`. Itwill contain `name` and `email` fields and any other fieldsfromt the contact source.
-- **Content:** rendered Markdown body.**Content:** rendered Markdown body.
-- **Schedule:****Schedule:**
+- `m`: Minute`m`: Minute
+- `h`: Hour`h`: Hour
+- `d`: Day`d`: Day
+- `w`: Week`w`: Week
+
+Units can be combined together. For example, to delay the messageby eight weeks, four days, and seven hours, add to the front matter:
 
 
-Reify Templates
----------------
-
-Special `reify` function stores the output of a
+schedule:
+  delay: 8w4d7h
 
 
 
@@ -53,24 +53,28 @@ Special `reify` function stores the output of a
     <h1>Schedule Messages for Later Delivery</h1>
 <p>Queued messages can be delayed by providing <code>schedule</code> frontmatter instructions:</p>
 <ul>
-<li><strong>after:</strong> time until the message can be sent.</li>
+<li><strong>after:</strong> time until the message can be sent.
+Must be in ISO format <code>YYYY-MM-DD hh:mm</code>.</li>
 <li><strong>delay:</strong> time duration added to <code>after</code> or current time.</li>
 <li><strong>step:</strong> time duration added for each recipient.</li>
-<li><strong>fluctuate:</strong> normalized random time duration added for each mailing step, including the first message.</li>
-<li><strong>expire:</strong> time duration, after all the messages have been sent, to keep the letter and message records in the database before they are deleted.</li>
+<li><strong>fluctuate:</strong> normalized random time duration added for each
+mailing step, including the first message.</li>
+<li><strong>expire:</strong> time duration, after all the messages have been sent,
+to keep the letter and message records in the database before they
+are deleted.</li>
 </ul>
-<h2>Context</h2>
-<p>Template execution context contains the following fields:</p>
+<h2>Time Duration Units</h2>
 <ul>
-<li><strong>Frontmatter:</strong> the raw Markdown frontmatter as <code>map[string]any</code>.</li>
-<li><strong>Recipient:</strong> the raw message target as <code>map[string]any</code>. It
-will contain <code>name</code> and <code>email</code> fields and any other fields
-fromt the contact source.</li>
-<li><strong>Content:</strong> rendered Markdown body.</li>
-<li><strong>Schedule:</strong></li>
+<li><code>m</code>: Minute</li>
+<li><code>h</code>: Hour</li>
+<li><code>d</code>: Day</li>
+<li><code>w</code>: Week</li>
 </ul>
-<h2>Reify Templates</h2>
-<p>Special <code>reify</code> function stores the output of a</p>
+<p>Units can be combined together. For example, to delay the message
+by eight weeks, four days, and seven hours, add to the front matter:</p>
+<pre><code class="language-yaml">schedule:
+  delay: 8w4d7h
+</code></pre>
 
   </div>
 </body>

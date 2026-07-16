@@ -15,22 +15,26 @@ schedule:
 Queued messages can be delayed by providing `schedule` frontmatter instructions:
 
 - **after:** time until the message can be sent.
+  Must be in ISO format `YYYY-MM-DD hh:mm`.
 - **delay:** time duration added to `after` or current time.
 - **step:** time duration added for each recipient.
-- **fluctuate:** normalized random time duration added for each mailing step, including the first message.
-- **expire:** time duration, after all the messages have been sent, to keep the letter and message records in the database before they are deleted.
+- **fluctuate:** normalized random time duration added for each
+  mailing step, including the first message.
+- **expire:** time duration, after all the messages have been sent,
+  to keep the letter and message records in the database before they
+  are deleted.
 
-## Context
+## Time Duration Units
 
-Template execution context contains the following fields:
+- `m`: Minute
+- `h`: Hour
+- `d`: Day
+- `w`: Week
 
-- **Frontmatter:** the raw Markdown frontmatter as `map[string]any`.
-- **Recipient:** the raw message target as `map[string]any`. It
-  will contain `name` and `email` fields and any other fields
-  fromt the contact source.
-- **Content:** rendered Markdown body.
-- **Schedule:**
+Units can be combined together. For example, to delay the message
+by eight weeks, four days, and seven hours, add to the front matter:
 
-## Reify Templates
-
-Special `reify` function stores the output of a
+```yaml
+schedule:
+  delay: 8w4d7h
+```

@@ -1,5 +1,5 @@
 subject: extend one letter from letter
-seed_key: 6itpny5AkYz
+seed_key: hGaFuZsXD5u
 List-Id: Some List <greatlist@test.com>
 List-Unsubscribe: <mailto:unsub@yourdomain.com>, <https://yourdomain.com/unsub?id=MLFhcxXQr1kWB3z3sCTTnUCVT3TzmoMg3BUfGTBM5>
 List-Unsubscribe-Post: token=MLFhcxXQr1kWB3z3sCTTnUCVT3TzmoMg3BUfGTBM5
@@ -8,7 +8,7 @@ List-Unsubscribe-Post: token=MLFhcxXQr1kWB3z3sCTTnUCVT3TzmoMg3BUfGTBM5
 Load Recipient Lists
 ====================
 
-Target address fields, `to`, `cc`, and `bcc` support a list of entries. Any entry can also point to a configuration file in a variety of common formats that will be merged into the parent list.
+Target address fields, `to`, `cc`, and `bcc` support a list ofentries. Any entry can also point to a configuration file in avariety of common formats that will be merged into the parent list.
 
 
 to: mailinglist.yaml
@@ -22,7 +22,7 @@ bcc:
     title: Mr.
     first_name: First
 
-Each entry is a map, regardless of how it was loaded. Any value of the map is accessible to the template engine through the context.
+Each entry is a map, regardless of how it was loaded. Any value ofthe map is accessible to the template engine through the context.
 
 
 Greeting <no value> <no value>,
@@ -35,13 +35,13 @@ Footer
 
 You may unsubscribe here.
 
-The CAN-SPAM act became law on Jan. 1, 2004. It says there many things you must do as a commercial email-er. Highlights are basically don't be deceptive, and that you **MUST** include a physical mailing address as well as a working unsubscribe link in the body.
+The CAN-SPAM act became law on Jan. 1, 2004. It says there manythings you must do as a commercial email-er. Highlights arebasically don't be deceptive, and that you **MUST** include aphysical mailing address as well as a working unsubscribe link inthe body.
 
 
 Extend One Letter with Another
 ==============================
 
-Merge the content and frontmatter fields into a letter from another file by using the `extends` field.
+Merge the content and frontmatter fields into a letter from anotherfile by using the `extends` field.
 
 
 extends:
@@ -51,19 +51,7 @@ extends:
   # load a configuration file
   - config.yaml
 
-Any Markdown content below the last horizontal rule is added as a footer to the current letter. You may nest the extensions deep as long as there are no circular references.
-
-
-Content
--------
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.
-
-Integer fringilla ipsum in elit tempus varius. Phasellus viverra velit in pulvinar bibendum. Pellentesque non varius est, in faucibus felis. Praesent sem tellus, consequat id sem nec, tempor efficitur mi. Proin et sem condimentum, dictum dolor vitae, blandit mi. Vestibulum eget diam ante. Etiam facilisis mi non augue malesuada placerat. Maecenas porttitor nulla a sem mattis eleifend. Fusce at neque augue.
-
-Integer at odio laoreet orci iaculis hendrerit. Curabitur sollicitudin volutpat dui at sodales. Vestibulum elit magna, semper nec dolor eget, pharetra tempus augue.
-
-Suspendisse iaculis tortor at massa congue condimentum. Ut interdum leo vel dignissim feugiat. Pellentesque volutpat molestie interdum. Vivamus vel purus sem. In eu hendrerit purus, vel gravida libero.
+Any Markdown content below the last horizontal rule is added as afooter to the current letter. You may nest the extensions deep aslong as there are no circular references.
 
 
 
@@ -82,7 +70,9 @@ Suspendisse iaculis tortor at massa congue condimentum. Ut interdum leo vel dign
   <div style="background-color: #e8ecfb; padding: 0.5em 1em 0.5em 1.5em;">
     <!-- raw HTML omitted -->
 <h1>Load Recipient Lists</h1>
-<p>Target address fields, <code>to</code>, <code>cc</code>, and <code>bcc</code> support a list of entries. Any entry can also point to a configuration file in a variety of common formats that will be merged into the parent list.</p>
+<p>Target address fields, <code>to</code>, <code>cc</code>, and <code>bcc</code> support a list of
+entries. Any entry can also point to a configuration file in a
+variety of common formats that will be merged into the parent list.</p>
 <pre><code class="language-yaml">to: mailinglist.yaml
 cc:
   - another_list.toml
@@ -94,16 +84,22 @@ bcc:
     title: Mr.
     first_name: First
 </code></pre>
-<p>Each entry is a map, regardless of how it was loaded. Any value of the map is accessible to the template engine through the context.</p>
+<p>Each entry is a map, regardless of how it was loaded. Any value of
+the map is accessible to the template engine through the context.</p>
 <pre><code class="language-markdown">Greeting &lt;no value&gt; &lt;no value&gt;,
 
 I am writing, because ...
 </code></pre>
 <h2>Footer</h2>
 <p>You may unsubscribe <!-- raw HTML omitted -->here<!-- raw HTML omitted -->.</p>
-<p>The CAN-SPAM act became law on Jan. 1, 2004. It says there many things you must do as a commercial email-er. Highlights are basically don't be deceptive, and that you <strong>MUST</strong> include a physical mailing address as well as a working unsubscribe link in the body.<!-- raw HTML omitted --></p>
+<p>The CAN-SPAM act became law on Jan. 1, 2004. It says there many
+things you must do as a commercial email-er. Highlights are
+basically don't be deceptive, and that you <strong>MUST</strong> include a
+physical mailing address as well as a working unsubscribe link in
+the body.<!-- raw HTML omitted --></p>
 <h1>Extend One Letter with Another</h1>
-<p>Merge the content and frontmatter fields into a letter from another file by using the <code>extends</code> field.</p>
+<p>Merge the content and frontmatter fields into a letter from another
+file by using the <code>extends</code> field.</p>
 <pre><code class="language-yaml">extends:
   # this letter will inherit the content
   # and configuration values of `template.md`
@@ -111,12 +107,9 @@ I am writing, because ...
   # load a configuration file
   - config.yaml
 </code></pre>
-<p>Any Markdown content below the last horizontal rule is added as a footer to the current letter. You may nest the extensions deep as long as there are no circular references.</p>
-<h2>Content</h2>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.</p>
-<p>Integer fringilla ipsum in elit tempus varius. Phasellus viverra velit in pulvinar bibendum. Pellentesque non varius est, in faucibus felis. Praesent sem tellus, consequat id sem nec, tempor efficitur mi. Proin et sem condimentum, dictum dolor vitae, blandit mi. Vestibulum eget diam ante. Etiam facilisis mi non augue malesuada placerat. Maecenas porttitor nulla a sem mattis eleifend. Fusce at neque augue.</p>
-<p>Integer at odio laoreet orci iaculis hendrerit. Curabitur sollicitudin volutpat dui at sodales. Vestibulum elit magna, semper nec dolor eget, pharetra tempus augue.</p>
-<p>Suspendisse iaculis tortor at massa congue condimentum. Ut interdum leo vel dignissim feugiat. Pellentesque volutpat molestie interdum. Vivamus vel purus sem. In eu hendrerit purus, vel gravida libero.</p>
+<p>Any Markdown content below the last horizontal rule is added as a
+footer to the current letter. You may nest the extensions deep as
+long as there are no circular references.</p>
 
   </div>
 </body>

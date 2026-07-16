@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/xhit/go-str2duration/v2"
 )
 
 type Schedule struct {
@@ -181,7 +183,8 @@ func parseTime(v any) (time.Time, error) {
 func parseDuration(v any) (time.Duration, error) {
 	switch v := v.(type) {
 	case string:
-		return time.ParseDuration(v)
+		// return time.ParseDuration(v)
+		return str2duration.ParseDuration(v)
 	default:
 		return 0, fmt.Errorf("invalid duration value: %v (%T)", v, v)
 	}

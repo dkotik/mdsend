@@ -17,7 +17,9 @@ headers:
 
 # Load Recipient Lists
 
-Target address fields, `to`, `cc`, and `bcc` support a list of entries. Any entry can also point to a configuration file in a variety of common formats that will be merged into the parent list.
+Target address fields, `to`, `cc`, and `bcc` support a list of
+entries. Any entry can also point to a configuration file in a
+variety of common formats that will be merged into the parent list.
 
 ```yaml
 to: mailinglist.yaml
@@ -32,7 +34,8 @@ bcc:
     first_name: First
 ```
 
-Each entry is a map, regardless of how it was loaded. Any value of the map is accessible to the template engine through the context.
+Each entry is a map, regardless of how it was loaded. Any value of
+the map is accessible to the template engine through the context.
 
 ```markdown
 Greeting {{ .Recipient.title }} {{ .Recipient.first_name }},
@@ -42,9 +45,14 @@ I am writing, because ...
 
 ## Footer
 
-You may unsubscribe <a title="unsubscribe from the mailing list" href="{{ reify "unsubscribe_url" }}">here</a>.
+You may unsubscribe <a title="unsubscribe from the mailing list"
+href="{{ reify "unsubscribe_url" }}">here</a>.
 
-The CAN-SPAM act became law on Jan. 1, 2004. It says there many things you must do as a commercial email-er. Highlights are basically don't be deceptive, and that you **MUST** include a physical mailing address as well as a working unsubscribe link in the body.
+The CAN-SPAM act became law on Jan. 1, 2004. It says there many
+things you must do as a commercial email-er. Highlights are
+basically don't be deceptive, and that you **MUST** include a
+physical mailing address as well as a working unsubscribe link in
+the body.
 
 {{- define "unsubscribe_token" -}}
   {{ base58 (print .Recipient.email "?list=testList") }}

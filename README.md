@@ -7,8 +7,24 @@ Send markdown files as electronic mail.
 
 - **Durable:** mail queues are fault tolerant and atomic, brokered by <Watermill.io> over SQLite3. Can handle any volume of mail without degredation.
 - **Flexible:** select the mailer backend based on highest deliverability. Swap it out later without changing anything in your letters or templates.
-  - Supports recipient lists formats: CSV, JSON, YAML, TOML, and Cue.
-  - Supports drivers: **SMTP**, **Mailgun**, ...more soon.
+  - Supports recipient list formats: `CSV`, `JSON`, `YAML`, `TOML`, and `Cue`.
+  - Supports mailing services:
+    - [x] **SMTP**
+    - [x] **Mailgun**
+    - [ ] Resend (soon)
+    - [ ] Loops (soon)
+    - [ ] SendGrid (soon)
+    - [ ] Amazon SES (soon)
+    - [ ] Postmark (soon)
+    - [ ] Sparkpost (soon)
+    - [ ] Brevo (soon)
+    - [ ] SendGrid (soon)
+    - [ ] Mailchimp (soon)
+    - [ ] HubSpot (soon)
+    - [ ] Twilio (soon)
+    - [ ] <https://purelymail.com/> (soon)
+    - [ ] <https://emaillabs.io/en/product/> (soon)
+    - [ ] <https://mailtrap.io/> (soon)
 - **Portable:** runs on many kinds of systems. Will include an embeddable HTTP service and Posgres support in the future.
 
 ## Examples
@@ -58,12 +74,9 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 <details>
   <summary>Click here to see a list of planned features.</summary>
 
-- [ ] Bug: example six extending example five produces a <nil> recipient.
-- [ ] word-wrap all the examples.
 - [ ] Letter expiration via schedule.expires.
-- [ ] `d` day unit for schedule duration parsing.
 - [ ] Queue clean up scanner - should be first added to sqlite Watermill driver.
-- [ ] Sending message with scheduling delay should prompt a confirmation.
+- [ ] Sending message with scheduling delay (instead of only queuing) should prompt a confirmation.
 - [ ] Ensure carbon copy list is in header.
 - [ ] Write a better Goldmark 2.0 renderer that recognizes single-line youtube and image paragraphs, centers them.
 - [ ] Beautify the default template. Add `dark.html` one.
@@ -71,21 +84,6 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 - [x] Add queue.Marshaler interface and a JSON implementation?
 - [ ] Validate function should detect language and complain that `language` field is not set, if the content is not English.
 - [ ] Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
-- [x] Mailgun
-- [ ] Resend
-- [ ] Loops
-- [ ] https://purelymail.com/
-- [ ] SendGrid
-- [ ] Amazon SES
-- [ ] Postmark
-- [ ] Sparkpost
-- [ ] Brevo
-- [ ] SendGrid
-- [ ] Mailchimp
-- [ ] HubSpot
-- [ ] Twilio
-- [ ] <https://emaillabs.io/en/product/>
-- [ ] <https://mailtrap.io/>
 - [ ] https://github.com/charmbracelet/glamour
 - [ ] add to https://github.com/rothgar/awesome-tuis and bubbletea list of apps
 

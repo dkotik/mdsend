@@ -1,5 +1,5 @@
 subject: example message for Full Name
-seed_key: JLqK2r2Vqni
+seed_key: 5arNgkhq7dF
 X-Template-Test: test
 
 Hello FirstName,
@@ -30,7 +30,7 @@ fromt the contact source.**Recipient:** the raw message target as `map[string]an
 Reify Templates
 ---------------
 
-Special `reify` function stores the output of a named `Golang` block or template. Calling `reify` again on the same template, returnsthe initial output. Each recipient starts with an empty output cache.
+Special `reify` function stores the output of a named `Golang` blockor template. Calling `reify` again on the same template, returnsthe initial output. Each recipient starts with an empty output cache.
 
 Here is an example of declaring a template that encodes recipientaddress as a URL-safe field once to be used several times:
 
@@ -76,7 +76,8 @@ fromt the contact source.</li>
 <li><strong>Schedule:</strong> parsed scheduling directives.</li>
 </ul>
 <h2>Reify Templates</h2>
-<p>Special <code>reify</code> function stores the output of a named <code>Golang</code> block or template. Calling <code>reify</code> again on the same template, returns
+<p>Special <code>reify</code> function stores the output of a named <code>Golang</code> block
+or template. Calling <code>reify</code> again on the same template, returns
 the initial output. Each recipient starts with an empty output cache.</p>
 <p>Here is an example of declaring a template that encodes recipient
 address as a URL-safe field once to be used several times:</p>

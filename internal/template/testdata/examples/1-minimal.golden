@@ -1,5 +1,5 @@
 subject: minimal example message
-seed_key: EqQqnczD5aX
+seed_key: fYj8XNaQ5S3
 
 
 Introduction
@@ -30,7 +30,7 @@ go install github.com/dkotik/mdsend@latest
 2. Send the Letter
 ------------------
 
-Sending requires a set of mailing service credentials provided as environment variables.
+Sending requires a set of mailing service credentialsprovided as environment variables.
 
 
 export SMTP_SERVER=...
@@ -56,13 +56,13 @@ Sample Content
 
 > A Markdown file requires valid 'from', 'to', and 'subject' fieldsin the frontmatter.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fuscecommodo sapien sed magna eleifend, a aliquam nunc condimentum.Sed feugiat nibh at lorem malesuada, lobortis tincidunt urnabibendum. Maecenas pulvinar, quam id tincidunt auctor, sem esttincidunt nulla, ac fringilla velit sapien eget nisl.
 
-Integer fringilla ipsum in elit `tempus varius`. Phasellus viverra velit in pulvinar bibendum. Pellentesque non varius est, in faucibus felis. Praesent sem tellus, consequat id sem nec, tempor efficitur mi. Proin et sem condimentum, dictum dolor vitae, blandit mi. Vestibulum eget diam ante. Etiam facilisis mi non augue malesuada placerat. Maecenas porttitor nulla a sem mattis eleifend. Fusce at neque augue.
+Integer fringilla ipsum in elit `tempus varius`. Phasellus viverravelit in pulvinar bibendum. Pellentesque non varius est, in faucibusfelis. Praesent sem tellus, consequat id sem nec, tempor efficiturmi. Proin et sem condimentum, dictum dolor vitae, blandit mi.Vestibulum eget diam ante. Etiam facilisis mi non augue malesuadaplacerat. Maecenas porttitor nulla a sem mattis eleifend. Fusce atneque augue.
 
-Integer at odio laoreet orci iaculis hendrerit. Curabitur sollicitudin volutpat dui at sodales. Vestibulum elit magna, semper nec dolor eget, pharetra tempus augue.
+Integer at odio laoreet orci iaculis hendrerit. Curabitursollicitudin volutpat dui at sodales. Vestibulum elit magna, sempernec dolor eget, pharetra tempus augue.
 
-Suspendisse iaculis tortor at massa congue condimentum. Ut interdum leo vel dignissim feugiat. Pellentesque volutpat molestie interdum. Vivamus vel purus sem. In eu hendrerit purus, vel gravida libero.
+Suspendisse iaculis tortor at massa congue condimentum. Ut interdumleo vel dignissim feugiat. Pellentesque volutpat molestie interdum.Vivamus vel purus sem. In eu hendrerit purus, vel gravida libero.
 
 
 
@@ -98,7 +98,8 @@ brew install mdsend
 </li>
 </ul>
 <h2>2. Send the Letter</h2>
-<p>Sending requires a set of mailing service credentials provided as environment variables.</p>
+<p>Sending requires a set of mailing service credentials
+provided as environment variables.</p>
 <pre><code class="language-sh">export SMTP_SERVER=...
 export SMTP_PORT=...
 export SMTP_USERNAME=...
@@ -118,10 +119,24 @@ mdsend send
 <p>A Markdown file requires valid 'from', 'to', and 'subject' fields
 in the frontmatter.</p>
 </blockquote>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce commodo sapien sed magna eleifend, a aliquam nunc condimentum. Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est tincidunt nulla, ac fringilla velit sapien eget nisl.</p>
-<p>Integer fringilla ipsum in elit <code>tempus varius</code>. Phasellus viverra velit in pulvinar bibendum. Pellentesque non varius est, in faucibus felis. Praesent sem tellus, consequat id sem nec, tempor efficitur mi. Proin et sem condimentum, dictum dolor vitae, blandit mi. Vestibulum eget diam ante. Etiam facilisis mi non augue malesuada placerat. Maecenas porttitor nulla a sem mattis eleifend. Fusce at neque augue.</p>
-<p>Integer at odio laoreet orci iaculis hendrerit. Curabitur sollicitudin volutpat dui at sodales. Vestibulum elit magna, semper nec dolor eget, pharetra tempus augue.</p>
-<p>Suspendisse iaculis tortor at massa congue condimentum. Ut interdum leo vel dignissim feugiat. Pellentesque volutpat molestie interdum. Vivamus vel purus sem. In eu hendrerit purus, vel gravida libero.</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
+commodo sapien sed magna eleifend, a aliquam nunc condimentum.
+Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna
+bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est
+tincidunt nulla, ac fringilla velit sapien eget nisl.</p>
+<p>Integer fringilla ipsum in elit <code>tempus varius</code>. Phasellus viverra
+velit in pulvinar bibendum. Pellentesque non varius est, in faucibus
+felis. Praesent sem tellus, consequat id sem nec, tempor efficitur
+mi. Proin et sem condimentum, dictum dolor vitae, blandit mi.
+Vestibulum eget diam ante. Etiam facilisis mi non augue malesuada
+placerat. Maecenas porttitor nulla a sem mattis eleifend. Fusce at
+neque augue.</p>
+<p>Integer at odio laoreet orci iaculis hendrerit. Curabitur
+sollicitudin volutpat dui at sodales. Vestibulum elit magna, semper
+nec dolor eget, pharetra tempus augue.</p>
+<p>Suspendisse iaculis tortor at massa congue condimentum. Ut interdum
+leo vel dignissim feugiat. Pellentesque volutpat molestie interdum.
+Vivamus vel purus sem. In eu hendrerit purus, vel gravida libero.</p>
 
   </div>
 </body>
