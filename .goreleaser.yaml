@@ -35,3 +35,15 @@ homebrew_casks:
     homepage: "https://github.com/dkotik/mdsend"
     description: "Send markdown files as MIME-encoded electronic mail."
     license: "MIT"
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/mdsend"]
+          end
+signs:
+  - id: cosign
+    cmd: cosign
+    args: ["sign-blob", "--bundle", "${signature}", "${artifact}", "--yes"]
+    artifacts: checksum
+    signature: "${artifact}.sigstore.json"

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -64,12 +65,14 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 	}
 	defer tx.Close(&err)
 
+	logger := getLogger(c)
 	if _, err = queueLetter(
 		ctx,
 		queue,
 		letter,
 		p,
 		fs,
+		logger,
 	); err != nil {
 		return fmt.Errorf(
 			"unable to queue letter: %s: %w",
@@ -103,6 +106,7 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 			letter,
 			p,
 			fs,
+			logger,
 		); err != nil {
 			return fmt.Errorf(
 				"unable to queue letter: %s: %w",
@@ -120,6 +124,7 @@ func queueLetter(
 	letter mdsend.Letter,
 	letterPath string,
 	fs fs.FS,
+	logger *slog.Logger,
 ) (queued int, err error) {
 	if letter.ID == "" {
 		letter.ID = ulid.Make().String()
@@ -132,10 +137,6 @@ func queueLetter(
 		return queued, err
 	}
 	rootDirectory := filepath.Dir(letterPath)
-	// rootDirectory, err = filepath.Abs(rootDirectory)
-	// if err != nil {
-	// 	return queued, fmt.Errorf("unable to convert path to absolute: %w", err)
-	// }
 	constraints, err := letter.GetMediaConstraints()
 	if err != nil {
 		return queued, err
@@ -168,7 +169,6 @@ func queueLetter(
 
 		email, _ := recipient[address.FieldEmail].(string)
 		if email == "" {
-			// spew.Dump(recipient)
 			return queued, address.ErrAbsentEmailAddress
 		}
 
@@ -181,6 +181,12 @@ func queueLetter(
 		}
 		if err = queue.CreateMessage(ctx, message); err != nil {
 			if errors.Is(err, mdsend.ErrDuplicateMessage) {
+				logger.Warn(
+					"message has already been sent",
+					slog.String("letter_id", letter.ID),
+					slog.String("message_id", message.ID),
+					slog.String("seed_key", message.SeedKey),
+				)
 				continue // ignore duplicate messages
 			}
 			return queued, err

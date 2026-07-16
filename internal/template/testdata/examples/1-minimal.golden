@@ -1,5 +1,5 @@
 subject: minimal example message
-seed_key: fYj8XNaQ5S3
+seed_key: TKjXWym7V3S
 
 
 Introduction
@@ -11,25 +11,6 @@ This is the simplest letter that can be sent. It has one recipient.
 - _Letter_: this file.*Letter*: this file.
 - _Message_: a rendered copy of this file for each recipient.*Message*: a rendered copy of this file for each recipient.
 
-
-1. Install `mdsend`
------------
-
-
-- MacOS:MacOS:
-brew tap dkotik/tap
-brew install mdsend
-
-
-- Build from source:Build from source:
-go install github.com/dkotik/mdsend@latest
-
-
-
-
-2. Send the Letter
-------------------
-
 Sending requires a set of mailing service credentialsprovided as environment variables.
 
 
@@ -40,8 +21,8 @@ export SMTP_PASSWORD=...
 mdsend send 1-minimal.md
 
 
-3. Separate Queuing
--------------------
+Separate Queuing
+----------------
 
 Send command will continued to deliver anyqueued messages, which can be added to thequeue with a separate command.
 
@@ -85,19 +66,6 @@ Suspendisse iaculis tortor at massa congue condimentum. Ut interdumleo vel digni
 <li><em>Letter</em>: this file.</li>
 <li><em>Message</em>: a rendered copy of this file for each recipient.</li>
 </ul>
-<h2>1. Install <code>mdsend</code></h2>
-<ul>
-<li>MacOS:
-<pre><code class="language-sh">brew tap dkotik/tap
-brew install mdsend
-</code></pre>
-</li>
-<li>Build from source:
-<pre><code class="language-sh">go install github.com/dkotik/mdsend@latest
-</code></pre>
-</li>
-</ul>
-<h2>2. Send the Letter</h2>
 <p>Sending requires a set of mailing service credentials
 provided as environment variables.</p>
 <pre><code class="language-sh">export SMTP_SERVER=...
@@ -106,7 +74,7 @@ export SMTP_USERNAME=...
 export SMTP_PASSWORD=...
 mdsend send 1-minimal.md
 </code></pre>
-<h2>3. Separate Queuing</h2>
+<h2>Separate Queuing</h2>
 <p>Send command will continued to deliver any
 queued messages, which can be added to the
 queue with a separate command.</p>

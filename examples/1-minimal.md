@@ -11,21 +11,6 @@ This is the simplest letter that can be sent. It has one recipient.
 - _Letter_: this file.
 - _Message_: a rendered copy of this file for each recipient.
 
-## 1. Install `mdsend`
-
-- MacOS:
-  ```sh
-  brew tap dkotik/tap
-  brew install mdsend
-  ```
-- Build from source:
-  ```sh
-  go install github.com/dkotik/mdsend@latest
-  ```
-
-
-## 2. Send the Letter
-
 Sending requires a set of mailing service credentials
 provided as environment variables.
 
@@ -37,7 +22,7 @@ export SMTP_PASSWORD=...
 mdsend send 1-minimal.md
 ```
 
-## 3. Separate Queuing
+## Separate Queuing
 
 Send command will continued to deliver any 
 queued messages, which can be added to the

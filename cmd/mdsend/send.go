@@ -12,6 +12,8 @@ import (
 	"github.com/ThreeDotsLabs/watermill-sqlite/wmsqlitezombiezen"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/mailer"
+	"github.com/dkotik/mdsend/mailer/environment"
 	"github.com/dkotik/mdsend/queue"
 	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
 	"github.com/urfave/cli/v3"
@@ -55,12 +57,77 @@ var (
 	}
 )
 
+func cmdSend(ctx context.Context, c *cli.Command) (err error) {
+	if c.Args().Len() > 0 {
+		if err = cmdQueueAdd(ctx, c); err != nil {
+			return err
+		}
+	}
+	logger := getLogger(c)
+
+	middleware := []func(mdsend.Mailer) mdsend.Mailer{
+		mailer.NewDelay(
+			c.Duration(flagDelay.Name)+time.Millisecond*50,
+			c.Duration(flagFluctuate.Name)+time.Millisecond*20,
+		),
+	}
+	if c.Bool(flagVerbose.Name) {
+		middleware = append(middleware, mailer.NewLogger(logger))
+	}
+	// mailer, err := newSemaphoreMailer(
+	// 	c.Int(flagWorkerCount.Name),
+	// 	middleware...,
+	// )
+	connectionDSN := c.String(flagQueue.Name)
+	mailers := make([]mdsend.Mailer, c.Int(flagWorkerCount.Name))
+	for i := range mailers {
+		// m := mailer.NewVoid()
+		conn, err := newQueueConnection(connectionDSN)
+		if err != nil {
+			return fmt.Errorf("unable to connect to queue: %w", err)
+		}
+		defer conn.Close()
+		queue, err := sqliteQ.New(conn, "")
+		if err != nil {
+			return fmt.Errorf("unable to connect to queue: %w", err)
+		}
+
+		m, err := environment.New(queue)
+		if err != nil {
+			return fmt.Errorf("unable to send mail: %w", err)
+		}
+		for _, mw := range middleware {
+			m = mw(m)
+		}
+		mailers[i] = m
+	}
+	// mailers = mailers[:1]
+	mailer := mailer.NewSemaphore(mailers...)
+
+	wg, ctx := errgroup.WithContext(ctx)
+	// tracker := newProgressTracker(logger)
+	tracker := newInterruptingProgressTracker(ctx, wg, logger)
+	if err = send(
+		ctx,
+		wg,
+		connectionDSN,
+		c.Duration(flagGraceTimeout.Name),
+		mailer,
+		tracker,
+		logger,
+	); err != nil {
+		return err
+	}
+	return wg.Wait()
+}
+
 func send(
 	ctx context.Context,
 	wg *errgroup.Group,
 	connectionDSN string,
 	graceTimeOut time.Duration,
 	mailer mdsend.Mailer,
+	tracker queue.ProgressTracker,
 	logger *slog.Logger,
 ) (err error) {
 	wg.Go(func() (err error) {
@@ -72,7 +139,12 @@ func send(
 		// 	return err
 		// }
 		logger.Info("using database file", slog.String("path", connectionDSN))
-		wmLogger := watermill.NewSlogLogger(logger)
+		wmLogger := watermill.NewSlogLoggerWithLevelMapping(
+			logger,
+			map[slog.Level]slog.Level{
+				slog.LevelInfo: slog.LevelDebug,
+			},
+		)
 		marshaler := queue.NewMarshalerJSON()
 
 		publisherConn, err := newQueueConnection(connectionDSN)
@@ -156,11 +228,7 @@ func send(
 		if err != nil {
 			return fmt.Errorf("unable to setup queue: %w", err)
 		}
-		progressTracker := queue.NewProgressTracker(q, queue.ProgressTrackerFunc(
-			func(ctx context.Context, p queue.Progress) {
-				logger.Info("progress", slog.Any("report", p))
-			},
-		))
+		progressTracker := queue.NewProgressTracker(q, tracker)
 		queue.NewContinuousScanner(
 			ctx,
 			wg,

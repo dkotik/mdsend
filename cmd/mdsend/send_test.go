@@ -66,6 +66,7 @@ func TestSend(t *testing.T) {
 		time.Second/8,
 		// newSemaphoreMailer(6),
 		mailer,
+		newProgressTracker(logger),
 		logger,
 	)
 	if err != nil {

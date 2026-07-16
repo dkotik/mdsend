@@ -11,15 +11,9 @@ import (
 	"slices"
 	"strings"
 	"syscall"
-	"time"
 
 	"github.com/adrg/xdg"
-	"github.com/dkotik/mdsend"
-	"github.com/dkotik/mdsend/mailer"
-	"github.com/dkotik/mdsend/mailer/environment"
-	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
 	"github.com/urfave/cli/v3"
-	"golang.org/x/sync/errgroup"
 	"zombiezen.com/go/sqlite"
 )
 
@@ -173,66 +167,7 @@ var application = &cli.Command{
 				flagWorkerCount,
 				flagVerbose,
 			},
-			Action: func(ctx context.Context, c *cli.Command) (err error) {
-				if c.Args().Len() > 0 {
-					if err = cmdQueueAdd(ctx, c); err != nil {
-						return err
-					}
-				}
-				logger := getLogger(c)
-
-				middleware := []func(mdsend.Mailer) mdsend.Mailer{
-					mailer.NewDelay(
-						c.Duration(flagDelay.Name)+time.Millisecond*50,
-						c.Duration(flagFluctuate.Name)+time.Millisecond*20,
-					),
-				}
-				if c.Bool(flagVerbose.Name) {
-					middleware = append(middleware, mailer.NewLogger(logger))
-				}
-				// mailer, err := newSemaphoreMailer(
-				// 	c.Int(flagWorkerCount.Name),
-				// 	middleware...,
-				// )
-				connectionDSN := c.String(flagQueue.Name)
-				mailers := make([]mdsend.Mailer, c.Int(flagWorkerCount.Name))
-				for i := range mailers {
-					// m := mailer.NewVoid()
-					conn, err := newQueueConnection(connectionDSN)
-					if err != nil {
-						return fmt.Errorf("unable to connect to queue: %w", err)
-					}
-					defer conn.Close()
-					queue, err := sqliteQ.New(conn, "")
-					if err != nil {
-						return fmt.Errorf("unable to connect to queue: %w", err)
-					}
-
-					m, err := environment.New(queue)
-					if err != nil {
-						return fmt.Errorf("unable to send mail: %w", err)
-					}
-					for _, mw := range middleware {
-						m = mw(m)
-					}
-					mailers[i] = m
-				}
-				// mailers = mailers[:1]
-				mailer := mailer.NewSemaphore(mailers...)
-
-				wg, ctx := errgroup.WithContext(ctx)
-				if err = send(
-					ctx,
-					wg,
-					connectionDSN,
-					c.Duration(flagGraceTimeout.Name),
-					mailer,
-					logger,
-				); err != nil {
-					return err
-				}
-				return wg.Wait()
-			},
+			Action: cmdSend,
 		},
 		{
 			Name:    `validate`,
