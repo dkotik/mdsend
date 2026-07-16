@@ -26,8 +26,8 @@ homebrew_casks:
   - name: mdsend
     url:
       template: "https://github.com/dkotik/mdsend/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-      using: ":homebrew_curl"
       verified: github.com/dkotik/mdsend/
+      using: ":post"
     repository:
       owner: dkotik
       name: homebrew-tap

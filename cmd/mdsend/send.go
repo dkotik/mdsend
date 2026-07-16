@@ -11,6 +11,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-sqlite/wmsqlitezombiezen"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/mailer"
 	"github.com/dkotik/mdsend/mailer/environment"
@@ -185,6 +186,39 @@ func send(
 
 		mailer := queue.NewSender(mailer)
 		schedulers := make([]queue.Scheduler, 12)
+		retry := middleware.Retry{
+			// MaxRetries is maximum number of times a retry will be attempted.
+			// MaxRetries int
+
+			// InitialInterval is the first interval between retries. Subsequent intervals will be scaled by Multiplier.
+			InitialInterval: time.Second * 3,
+			// MaxInterval sets the limit for the exponential backoff of retries. The interval will not be increased beyond MaxInterval.
+			MaxInterval: time.Minute * 10,
+			// Multiplier is the factor by which the waiting interval will be multiplied between retries.
+			Multiplier: 2.0,
+			// MaxElapsedTime sets the time limit of how long retries will be attempted. Disabled if 0.
+			// MaxElapsedTime time.Duration
+			// RandomizationFactor randomizes the spread of the backoff times within the interval of:
+			// [currentInterval * (1 - RandomizationFactor), currentInterval * (1 + RandomizationFactor)].
+			RandomizationFactor: 0.1,
+
+			// OnRetryHook is an optional function that will be executed on each retry attempt.
+			// The number of the current retry is passed as retryNum,
+			// OnRetryHook func(retryNum int, delay time.Duration)
+
+			// OnRetriesExhausted is an optional function that will be executed when all retries are exhausted.
+			// This is called when MaxRetries is reached and the handler still returns an error.
+			// It is NOT called when ShouldRetry returns false (that path returns a permanent error and exits earlier).
+			// OnRetriesExhausted func(params RetriesExhaustedParams)
+
+			// ResetContextOnRetry indicates whether the message context should be reset on each retry attempt.
+			// See more: https://github.com/ThreeDotsLabs/watermill/issues/467
+			//
+			// This is not enabled by default to keep backward compatibility
+			// (in theory, someone may want to preserve context values between retries).
+			ResetContextOnRetry: true,
+			Logger:              wmLogger,
+		}.Middleware
 		for i := 1; i <= 12; i++ {
 			outbox := fmt.Sprintf("mdsendOutbox%d", i)
 			router.AddHandler(
@@ -194,7 +228,7 @@ func send(
 				"mdsendSent",
 				publisher,
 				// TODO: add retry
-				mailer,
+				retry(mailer),
 				// message.HandlerFunc(func(msg *message.Message) ([]*message.Message, error) {
 				// 	panic("djkflsjd")
 				// }),
