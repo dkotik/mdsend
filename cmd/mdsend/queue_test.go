@@ -52,8 +52,7 @@ func TestQueue(t *testing.T) {
 		t.Fatal("unexpected number of letters queued:", foundLetters, "vs", expectLetters)
 	}
 
-	expectMessages := 23
-	// expectMessages := 45
+	expectMessages := 43
 	foundMessages := 0
 	for _, letterID := range foundLetters {
 		for _, err = range q.ListMessages(ctx, queue.ChildCursor{

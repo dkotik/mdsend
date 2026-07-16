@@ -2,7 +2,7 @@
 subject: extend one letter from letter
 from: Test Author <joedoe@test.com>
 to: extends@test.com
-extends: 3-scheduling.md
+extends: 5-list.md
 ---
 
 # Extend One Letter with Another

@@ -194,7 +194,9 @@ func eachRecipientFromEntry(
 			}
 			switch v[0] {
 			case '.':
+				// fmt.Println(rootDirectory, v)
 				v = path.Join(rootDirectory, v)
+				// fmt.Println(v)
 				subRoot := path.Dir(v)
 				for entry, err := range eachEntryFromFile(v, fs) {
 					if err != nil {

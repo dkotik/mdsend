@@ -1,5 +1,5 @@
 subject: minimal example message
-seed_key: R4aZroZuw4d
+seed_key: EqQqnczD5aX
 
 
 Introduction
@@ -43,7 +43,7 @@ mdsend send 1-minimal.md
 3. Separate Queuing
 -------------------
 
-Send command will continued to deliver any queued messages, which can be added to the queue with a separate command.
+Send command will continued to deliver anyqueued messages, which can be added to thequeue with a separate command.
 
 
 mdsend queue add 1-minimal.md
@@ -106,7 +106,9 @@ export SMTP_PASSWORD=...
 mdsend send 1-minimal.md
 </code></pre>
 <h2>3. Separate Queuing</h2>
-<p>Send command will continued to deliver any queued messages, which can be added to the queue with a separate command.</p>
+<p>Send command will continued to deliver any
+queued messages, which can be added to the
+queue with a separate command.</p>
 <pre><code class="language-sh">mdsend queue add 1-minimal.md
 mdsend queue add 2-attachments.md
 mdsend send

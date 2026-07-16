@@ -1,39 +1,41 @@
 subject: extend one letter from letter
-seed_key: 3GJ1HmdZPh1
-schedule_after: 2026-12-30T00:30:00Z
+seed_key: 6itpny5AkYz
+List-Id: Some List <greatlist@test.com>
+List-Unsubscribe: <mailto:unsub@yourdomain.com>, <https://yourdomain.com/unsub?id=MLFhcxXQr1kWB3z3sCTTnUCVT3TzmoMg3BUfGTBM5>
+List-Unsubscribe-Post: token=MLFhcxXQr1kWB3z3sCTTnUCVT3TzmoMg3BUfGTBM5
 
 
-Schedule Messages for Later Delivery
-====================================
+Load Recipient Lists
+====================
 
-Queued messages can be delayed by providing `schedule` frontmatter instructions:
-
-
-- **after:** time until the message can be sent.**after:** time until the message can be sent.
-- **delay:** time duration added to `after` or current time.**delay:** time duration added to `after` or current time.
-- **step:** time duration added for each recipient.**step:** time duration added for each recipient.
-- **fluctuate:** normalized random time duration added for each mailing step, including the first message.**fluctuate:** normalized random time duration added for each mailing step, including the first message.
-- **expire:** time duration, after all the messages have been sent, to keep the letter and message records in the database before they are deleted.**expire:** time duration, after all the messages have been sent, to keep the letter and message records in the database before they are deleted.
+Target address fields, `to`, `cc`, and `bcc` support a list of entries. Any entry can also point to a configuration file in a variety of common formats that will be merged into the parent list.
 
 
-Context
--------
+to: mailinglist.yaml
+cc:
+  - another_list.toml
+  - jsonIsFine.json
+  - cuelist.cue
+bcc:
+  - name: Named Entry
+    email: test@test.com
+    title: Mr.
+    first_name: First
 
-Template execution context contains the following fields:
+Each entry is a map, regardless of how it was loaded. Any value of the map is accessible to the template engine through the context.
 
 
-- **Frontmatter:** the raw Markdown frontmatter as `map[string]any`.**Frontmatter:** the raw Markdown frontmatter as `map[string]any`.
-- **Recipient:** the raw message target as `map[string]any`. It
-will contain `name` and `email` fields and any other fields
-fromt the contact source.**Recipient:** the raw message target as `map[string]any`. Itwill contain `name` and `email` fields and any other fieldsfromt the contact source.
-- **Content:** rendered Markdown body.**Content:** rendered Markdown body.
-- **Schedule:****Schedule:**
+Greeting <no value> <no value>,
+
+I am writing, because ...
 
 
-Reify Templates
----------------
+Footer
+------
 
-Special `reify` function stores the output of a
+You may unsubscribe here.
+
+The CAN-SPAM act became law on Jan. 1, 2004. It says there many things you must do as a commercial email-er. Highlights are basically don't be deceptive, and that you **MUST** include a physical mailing address as well as a working unsubscribe link in the body.
 
 
 Extend One Letter with Another
@@ -79,28 +81,27 @@ Suspendisse iaculis tortor at massa congue condimentum. Ut interdum leo vel dign
 <body style="color: #1d1d1d;">
   <div style="background-color: #e8ecfb; padding: 0.5em 1em 0.5em 1.5em;">
     <!-- raw HTML omitted -->
-<h1>Schedule Messages for Later Delivery</h1>
-<p>Queued messages can be delayed by providing <code>schedule</code> frontmatter instructions:</p>
-<ul>
-<li><strong>after:</strong> time until the message can be sent.</li>
-<li><strong>delay:</strong> time duration added to <code>after</code> or current time.</li>
-<li><strong>step:</strong> time duration added for each recipient.</li>
-<li><strong>fluctuate:</strong> normalized random time duration added for each mailing step, including the first message.</li>
-<li><strong>expire:</strong> time duration, after all the messages have been sent, to keep the letter and message records in the database before they are deleted.</li>
-</ul>
-<h2>Context</h2>
-<p>Template execution context contains the following fields:</p>
-<ul>
-<li><strong>Frontmatter:</strong> the raw Markdown frontmatter as <code>map[string]any</code>.</li>
-<li><strong>Recipient:</strong> the raw message target as <code>map[string]any</code>. It
-will contain <code>name</code> and <code>email</code> fields and any other fields
-fromt the contact source.</li>
-<li><strong>Content:</strong> rendered Markdown body.</li>
-<li><strong>Schedule:</strong></li>
-</ul>
-<h2>Reify Templates</h2>
-<p>Special <code>reify</code> function stores the output of a</p>
-<!-- raw HTML omitted -->
+<h1>Load Recipient Lists</h1>
+<p>Target address fields, <code>to</code>, <code>cc</code>, and <code>bcc</code> support a list of entries. Any entry can also point to a configuration file in a variety of common formats that will be merged into the parent list.</p>
+<pre><code class="language-yaml">to: mailinglist.yaml
+cc:
+  - another_list.toml
+  - jsonIsFine.json
+  - cuelist.cue
+bcc:
+  - name: Named Entry
+    email: test@test.com
+    title: Mr.
+    first_name: First
+</code></pre>
+<p>Each entry is a map, regardless of how it was loaded. Any value of the map is accessible to the template engine through the context.</p>
+<pre><code class="language-markdown">Greeting &lt;no value&gt; &lt;no value&gt;,
+
+I am writing, because ...
+</code></pre>
+<h2>Footer</h2>
+<p>You may unsubscribe <!-- raw HTML omitted -->here<!-- raw HTML omitted -->.</p>
+<p>The CAN-SPAM act became law on Jan. 1, 2004. It says there many things you must do as a commercial email-er. Highlights are basically don't be deceptive, and that you <strong>MUST</strong> include a physical mailing address as well as a working unsubscribe link in the body.<!-- raw HTML omitted --></p>
 <h1>Extend One Letter with Another</h1>
 <p>Merge the content and frontmatter fields into a letter from another file by using the <code>extends</code> field.</p>
 <pre><code class="language-yaml">extends:

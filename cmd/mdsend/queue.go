@@ -132,6 +132,10 @@ func queueLetter(
 		return queued, err
 	}
 	rootDirectory := filepath.Dir(letterPath)
+	// rootDirectory, err = filepath.Abs(rootDirectory)
+	// if err != nil {
+	// 	return queued, fmt.Errorf("unable to convert path to absolute: %w", err)
+	// }
 	constraints, err := letter.GetMediaConstraints()
 	if err != nil {
 		return queued, err
@@ -152,11 +156,16 @@ func queueLetter(
 		}
 	}
 
-	for recipient := range address.Each(
+	for recipient, err := range address.Each(
 		letter.Frontmatter,
 		rootDirectory,
 		fs,
 	) {
+		if err != nil {
+			fmt.Println(rootDirectory)
+			return queued, err
+		}
+
 		email, _ := recipient[address.FieldEmail].(string)
 		if email == "" {
 			// spew.Dump(recipient)

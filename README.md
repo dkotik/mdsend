@@ -59,6 +59,7 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
   <summary>Click here to see a list of planned features.</summary>
 
 - [ ] Bug: example six extending example five produces a <nil> recipient.
+- [ ] word-wrap all the examples.
 - [ ] Letter expiration via schedule.expires.
 - [ ] `d` day unit for schedule duration parsing.
 - [ ] Queue clean up scanner - should be first added to sqlite Watermill driver.

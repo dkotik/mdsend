@@ -38,7 +38,9 @@ mdsend send 1-minimal.md
 
 ## 3. Separate Queuing
 
-Send command will continued to deliver any queued messages, which can be added to the queue with a separate command.
+Send command will continued to deliver any 
+queued messages, which can be added to the
+queue with a separate command.
 
 ```sh
 mdsend queue add 1-minimal.md
