@@ -27,6 +27,9 @@ homebrew_casks:
     url:
       template: "https://github.com/dkotik/mdsend/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
       verified: github.com/dkotik/mdsend/
+      # Never `using: ":homebrew_curl"` as it requires installing homebrew
+      # curl before the cask itself can be installed
+      # MacOS comes with curl installed already.
       using: ":post"
     repository:
       owner: dkotik

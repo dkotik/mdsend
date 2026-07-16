@@ -60,7 +60,7 @@ Annotated examples are the documentation:
 - MacOS:
   ```sh
   brew tap dkotik/tap
-  brew install curl mdsend
+  brew install mdsend
   ```
 - Build from source:
   ```sh
