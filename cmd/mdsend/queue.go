@@ -175,6 +175,7 @@ func queueLetter(
 		if err != nil {
 			if queue.IsSkipSentinelError(err) {
 				// template indicated that message should be skipped
+				err = nil
 				continue
 			}
 			return queued, err

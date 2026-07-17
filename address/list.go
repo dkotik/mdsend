@@ -2,6 +2,7 @@ package address
 
 import (
 	"bytes"
+	"context"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -173,8 +174,24 @@ func eachEntryFromFile(p string, fs fs.FS) iter.Seq2[any, error] {
 				}
 			}
 		default:
-			yield(nil, fmt.Errorf("unsupported file format for a recipient list: %s", p))
-			return
+			ok, err := isFileExecutable(p)
+			if err != nil {
+				yield(nil, err)
+				return
+			}
+			if !ok {
+				yield(nil, fmt.Errorf("unsupported file format for a recipient list: %s", p))
+				return
+			}
+			// ctx, cancel := context.WithTimeout(context.Background(), timeout time.Duration)
+			for entry, err := range eachEntryFromExecutable(
+				context.Background(),
+				p, fs,
+			) {
+				if !yield(entry, err) {
+					return
+				}
+			}
 		}
 	}
 }
