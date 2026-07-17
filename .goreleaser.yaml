@@ -44,6 +44,16 @@ homebrew_casks:
           if OS.mac?
             system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/mdsend"]
           end
+# nfpms:
+#   - id: mdsend.deb
+#     package_name: mdsend
+#     formats:
+#       - deb
+#     vendor: "Dmitry Kotik"
+#     homepage: "https://dkotik.com"
+#     # maintainer: "Your Email <support@example.com>"
+#     description: "Send markdown files as MIME-encoded electronic mail."
+#     license: "MIT"
 signs:
   - id: cosign
     cmd: cosign

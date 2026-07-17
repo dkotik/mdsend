@@ -29,6 +29,8 @@ Send markdown files as electronic mail.
 
 ## Examples
 
+Compose a letter as Markdown file. It must include the subject, the sender, and at least one recipient in the frontmatter:
+
 ```markdown
 ---
 subject: "Test Email"
@@ -41,9 +43,14 @@ to: "Recipient <test@gmail.com>"
 Write text in **Markdown** notation.
 ```
 
+Provide server credentials and point `mdsend` at the saved file.
+
 ```sh
-cd examples
-mdsend send 1-minimal.md
+export SMTP_SERVER=...
+export SMTP_PORT=...
+export SMTP_USERNAME=...
+export SMTP_PASSWORD=...
+mdsend send letter.md
 ```
 
 Annotated examples are the documentation:
@@ -85,6 +92,7 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 - [ ] Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
 - [ ] https://github.com/charmbracelet/glamour
 - [ ] add to https://github.com/rothgar/awesome-tuis and bubbletea list of apps
+- [ ] Publish Debian package to JFrog Artifactory or similar.
 
 </details>
 
