@@ -31,6 +31,19 @@ func (s Schedule) Next() Schedule {
 	return s
 }
 
+func (l Letter) GetExpiration() (t time.Duration, err error) {
+	m, ok := l.Frontmatter[FieldNameSchedule].(map[string]any)
+	if !ok {
+		return t, ErrFieldNotFound
+	}
+	duration, ok := m[FieldNameScheduleExpire]
+	if !ok {
+		return t, ErrFieldNotFound
+	}
+	t, err = parseDuration(duration)
+	return t, err
+}
+
 func (l Letter) GetSchedule() (s Schedule, err error) {
 	m, ok := l.Frontmatter[FieldNameSchedule]
 	if !ok {

@@ -7,9 +7,9 @@ on:
 
 permissions:
   contents: write
+  # id-token: write
   # packages: write
   # issues: write
-  # id-token: write
 
 jobs:
   goreleaser:
@@ -23,8 +23,8 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: stable
-      - name: Install Cosign
-        uses: sigstore/cosign-installer@v4.1.2
+      # - name: Install Cosign
+      #   uses: sigstore/cosign-installer@v4.1.2
       - name: Release
         uses: goreleaser/goreleaser-action@v7
         with:

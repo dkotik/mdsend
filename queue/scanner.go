@@ -3,6 +3,7 @@ package queue
 import (
 	"context"
 	"iter"
+	"log/slog"
 	"time"
 
 	"github.com/dkotik/mdsend"
@@ -14,11 +15,13 @@ type ContinuousScannerOptions struct {
 	LetterBatchSize       uint8
 	MessageBatchSize      uint16
 	BeginWithOlderLetters bool
+	Logger                *slog.Logger
 }
 
 type continuousScanner struct {
 	Queue     Queue
 	Scheduler Scheduler
+	Logger    *slog.Logger
 }
 
 func NewContinuousScanner(
@@ -64,9 +67,13 @@ func NewContinuousScanner(
 		letterCursor.Batch *= -1
 		messageCursor.Batch *= -1
 	}
+	if options.Logger == nil {
+		options.Logger = slog.Default()
+	}
 	cs := continuousScanner{
 		Queue:     q,
 		Scheduler: s,
+		Logger:    options.Logger,
 	}
 	pulse := time.NewTicker(options.Frequency).C
 	wg.Go(func() error {
@@ -126,11 +133,6 @@ func (s continuousScanner) Scan(
 				lc.ItemID = ""
 				break
 			}
-			if !letter.SentAt.IsZero() {
-				// skip letters that have already been sent
-				// TODO: try to expire the letter according to schedule
-				continue
-			}
 			letters = append(letters, letter)
 		}
 		letterStop()
@@ -140,6 +142,29 @@ func (s continuousScanner) Scan(
 		}
 
 		for _, letter := range letters {
+			if !letter.SentAt.IsZero() {
+				expiration, err := letter.GetExpiration()
+				if err == nil {
+					if letter.SentAt.Add(expiration).Before(time.Now()) {
+						if err = s.Queue.DeleteLetter(ctx, letter.ID); err != nil {
+							s.Logger.Error(
+								"unable to expire and delete letter",
+								slog.String("letter_id", letter.ID),
+								slog.Any("error", err),
+							)
+						}
+					}
+				} else {
+					s.Logger.Error(
+						"unable to obtain letter expiration",
+						slog.String("letter_id", letter.ID),
+						slog.Any("error", err),
+					)
+				}
+				// skip letters that have already been sent
+				continue
+			}
+
 			mc.ParentID = letter.ID
 			messages = messages[:0]
 			mc.Cursor.ItemID = ""

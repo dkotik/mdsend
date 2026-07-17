@@ -87,7 +87,7 @@ func (q sqliteQueue) RetrieveLetter(ctx context.Context, ID string) (result mdse
 		}
 	}
 	if result.CreatedAt.IsZero() {
-		return result, mdsend.ErrLetterNotFound
+		return result, mdsend.ErrNotFound
 	}
 	result.ID = ID
 	return result, nil

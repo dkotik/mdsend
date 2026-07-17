@@ -273,6 +273,7 @@ func send(
 				// Frequency:        time.Millisecond * 30,
 				Frequency:        time.Second * 2,
 				MessageBatchSize: 10,
+				Logger:           logger,
 			},
 		)
 
