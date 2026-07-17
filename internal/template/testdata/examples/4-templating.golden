@@ -1,5 +1,5 @@
 subject: example message for Full Name
-seed_key: 5arNgkhq7dF
+seed_key: MmC2QDziwcH
 X-Template-Test: test
 
 Hello FirstName,
@@ -25,6 +25,13 @@ will contain `name` and `email` fields and any other fields
 fromt the contact source.**Recipient:** the raw message target as `map[string]any`. Itwill contain `name` and `email` fields and any other fieldsfromt the contact source.
 - **Content:** rendered Markdown body.**Content:** rendered Markdown body.
 - **Schedule:** parsed scheduling directives.**Schedule:** parsed scheduling directives.
+
+
+Template Functions
+------------------
+
+
+- **skipMessageIfTrue:** skip current recipient is the argument to this function call evaluates to an unempty value.**skipMessageIfTrue:** skip current recipient is the argument to this function call evaluates to an unempty value.
 
 
 Reify Templates
@@ -74,6 +81,10 @@ will contain <code>name</code> and <code>email</code> fields and any other field
 fromt the contact source.</li>
 <li><strong>Content:</strong> rendered Markdown body.</li>
 <li><strong>Schedule:</strong> parsed scheduling directives.</li>
+</ul>
+<h2>Template Functions</h2>
+<ul>
+<li><strong>skipMessageIfTrue:</strong> skip current recipient is the argument to this function call evaluates to an unempty value.</li>
 </ul>
 <h2>Reify Templates</h2>
 <p>Special <code>reify</code> function stores the output of a named <code>Golang</code> block

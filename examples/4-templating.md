@@ -36,6 +36,10 @@ Template execution context contains the following fields:
 - **Content:** rendered Markdown body.
 - **Schedule:** parsed scheduling directives.
 
+## Template Functions
+
+- **skipMessageIfTrue:** skip current recipient is the argument to this function call evaluates to an unempty value.
+
 ## Reify Templates
 
 Special `reify` function stores the output of a named `Golang` block

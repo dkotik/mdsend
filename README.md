@@ -34,7 +34,7 @@ Send markdown files as electronic mail. Maintain mailing lists as templated text
     - [x] EmailLabs
     - [x] PurelyMail
 
-SMTP relay is often more robust than the provider API. For example, Resend API **does not** support multi-value headers, but its SMTP relay does.
+SMTP relay is often more robust than the provider API. For example, Resend API does not support multi-value headers, but its SMTP relay does.
 
 ## Examples
 
@@ -90,11 +90,14 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 <details>
   <summary>Click here to see a list of planned features.</summary>
 
+- [ ] subject should not be required - the first header can serve as a subject
+- [ ] add `--from` flag to send command that uses middleware to override
+  sender address, might be required by certain delivery methods
 - [ ] body template should be HTML template
 - [ ] Take shell output as valid recipient list
 - [ ] Per RFC 5321 rules, email body text lines must not exceed 1,000 characters.
-- [ ] skipMessageIfTrue template function
 - [ ] service package with HTTP unsubscribe endpoint package
+- [ ] list out templating functions in the example, including the default ones
 - [ ] mdsend <file> should be equivalent to mdsend send <file>?
 - [ ] Queue clean up scanner - should be first added to sqlite Watermill driver.
 - [ ] Sending message with scheduling delay (instead of only queuing) should prompt a confirmation.

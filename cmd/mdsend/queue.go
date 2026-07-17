@@ -120,7 +120,7 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 
 func queueLetter(
 	ctx context.Context,
-	queue queue.Queue,
+	q queue.Queue,
 	letter mdsend.Letter,
 	letterPath string,
 	fs fs.FS,
@@ -133,7 +133,7 @@ func queueLetter(
 	if err != nil {
 		return queued, err
 	}
-	if err = queue.CreateLetter(ctx, letter); err != nil {
+	if err = q.CreateLetter(ctx, letter); err != nil {
 		return queued, err
 	}
 	rootDirectory := filepath.Dir(letterPath)
@@ -152,7 +152,7 @@ func queueLetter(
 		}
 		attachment.LetterID = letter.ID
 		attachment.Name = src.Name
-		if err = queue.CreateAttachment(ctx, attachment); err != nil {
+		if err = q.CreateAttachment(ctx, attachment); err != nil {
 			return queued, err
 		}
 	}
@@ -163,7 +163,6 @@ func queueLetter(
 		fs,
 	) {
 		if err != nil {
-			fmt.Println(rootDirectory)
 			return queued, err
 		}
 
@@ -173,13 +172,14 @@ func queueLetter(
 		}
 
 		message, err := tmpl.RenderLetterForRecipient(recipient)
-		// if message.LetterID == "" {
-		// 	return errors.New("letter ID is not set")
-		// }
 		if err != nil {
+			if queue.IsSkipSentinelError(err) {
+				// template indicated that message should be skipped
+				continue
+			}
 			return queued, err
 		}
-		if err = queue.CreateMessage(ctx, message); err != nil {
+		if err = q.CreateMessage(ctx, message); err != nil {
 			if errors.Is(err, mdsend.ErrDuplicateMessage) {
 				logger.Warn(
 					"message has already been sent",
