@@ -2,6 +2,7 @@ package queue
 
 import (
 	"context"
+	"errors"
 	"iter"
 	"log/slog"
 	"time"
@@ -146,18 +147,28 @@ func (s continuousScanner) Scan(
 				expiration, err := letter.GetExpiration()
 				if err == nil {
 					if letter.SentAt.Add(expiration).Before(time.Now()) {
+						subject, _ := letter.GetSubject()
 						if err = s.Queue.DeleteLetter(ctx, letter.ID); err != nil {
 							s.Logger.Error(
 								"unable to expire and delete letter",
 								slog.String("letter_id", letter.ID),
+								slog.String("subject", subject),
 								slog.Any("error", err),
+							)
+						} else {
+							s.Logger.Info(
+								"removed expired letter from the database",
+								slog.String("letter_id", letter.ID),
+								slog.String("subject", subject),
 							)
 						}
 					}
-				} else {
+				} else if !errors.Is(err, mdsend.ErrFieldNotFound) {
+					subject, _ := letter.GetSubject()
 					s.Logger.Error(
 						"unable to obtain letter expiration",
 						slog.String("letter_id", letter.ID),
+						slog.String("subject", subject),
 						slog.Any("error", err),
 					)
 				}
