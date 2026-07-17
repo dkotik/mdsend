@@ -8,6 +8,7 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/mailer/mailgun"
+	"github.com/dkotik/mdsend/mailer/resend"
 	"github.com/dkotik/mdsend/mailer/smtp"
 	"github.com/dkotik/mdsend/queue"
 )
@@ -16,6 +17,7 @@ func New(q queue.Queue, mailerNamePriority ...string) (mdsend.Mailer, error) {
 	mailerNamePriority = append(
 		mailerNamePriority,
 		mailgun.MailerName,
+		resend.MailerName,
 		smtp.MailerName,
 	)
 	for _, mailerName := range mailerNamePriority {
@@ -24,6 +26,14 @@ func New(q queue.Queue, mailerNamePriority ...string) (mdsend.Mailer, error) {
 			apiKey := strings.TrimSpace(os.Getenv(mailgun.EnvironmentKey))
 			if apiKey != "" {
 				return mailgun.New(mailgun.Configuration{
+					Queue:  q,
+					APIKey: apiKey,
+				})
+			}
+		case resend.MailerName:
+			apiKey := strings.TrimSpace(os.Getenv(resend.EnvironmentKey))
+			if apiKey != "" {
+				return resend.New(resend.Configuration{
 					Queue:  q,
 					APIKey: apiKey,
 				})

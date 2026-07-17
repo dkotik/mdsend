@@ -10,8 +10,8 @@ Send markdown files as electronic mail.
   - Supports recipient list formats: `CSV`, `JSON`, `YAML`, `TOML`, and `Cue`.
   - Supports mailing services:
     - [x] **SMTP**
-    - [x] **Mailgun**
-    - [ ] Resend (soon)
+    - [x] **Mailgun** (MG_API_KEY, MG_API_DOMAIN)
+    - [x] **Resend** (RESEND_API_KEY) 
     - [ ] Loops (soon)
     - [ ] SendGrid (soon)
     - [ ] Amazon SES (soon)
@@ -46,7 +46,7 @@ Write text in **Markdown** notation.
 Provide server credentials and point `mdsend` at the saved file.
 
 ```sh
-export SMTP_SERVER=...
+export SMTP_HOST=...
 export SMTP_PORT=...
 export SMTP_USERNAME=...
 export SMTP_PASSWORD=...
@@ -93,6 +93,9 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 - [ ] https://github.com/charmbracelet/glamour
 - [ ] add to https://github.com/rothgar/awesome-tuis and bubbletea list of apps
 - [ ] Publish Debian package to JFrog Artifactory or similar.
+- [ ] CLI duration parser it its own from imported package in `schedule.go`.
+  - [ ] Add `y` and `mo` duration units and remove the sub-second ones.
+- [ ] Run some tests with <https://www.suped.com/tools/email-tester>
 
 </details>
 

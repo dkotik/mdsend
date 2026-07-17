@@ -165,6 +165,7 @@ var application = &cli.Command{
 				flagDelay,
 				flagFluctuate,
 				flagWorkerCount,
+				flagService,
 				flagVerbose,
 			},
 			Action: cmdSend,

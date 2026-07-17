@@ -20,6 +20,7 @@ require (
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/oklog/ulid/v2 v2.1.1
 	github.com/pelletier/go-toml/v2 v2.4.0
+	github.com/resendlabs/resend-go v1.7.0
 	github.com/sebdah/goldie/v2 v2.8.0
 	github.com/urfave/cli/v3 v3.10.0
 	github.com/xhit/go-str2duration/v2 v2.1.0
