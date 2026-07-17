@@ -30,7 +30,7 @@ homebrew_casks:
       # Never `using: ":homebrew_curl"` as it requires installing homebrew
       # curl before the cask itself can be installed
       # MacOS comes with curl installed already.
-      using: ":post"
+      using: ":homebrew_curl"
     repository:
       owner: dkotik
       name: homebrew-tap
@@ -44,9 +44,9 @@ homebrew_casks:
           if OS.mac?
             system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/mdsend"]
           end
-# signs:
-#   - id: cosign
-#     cmd: cosign
-#     args: ["sign-blob", "--bundle", "${signature}", "${artifact}", "--yes"]
-#     artifacts: checksum
-#     signature: "${artifact}.sigstore.json"
+signs:
+  - id: cosign
+    cmd: cosign
+    args: ["sign-blob", "--bundle", "${signature}", "${artifact}", "--yes"]
+    artifacts: checksum
+    signature: "${artifact}.sigstore.json"

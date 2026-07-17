@@ -7,8 +7,8 @@ on:
 
 permissions:
   contents: write
-  # id-token: write
-  # packages: write
+  packages: write
+  id-token: write # needed for signing the images with GitHub OIDC Token
   # issues: write
 
 jobs:
@@ -23,8 +23,8 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: stable
-      # - name: Install Cosign
-      #   uses: sigstore/cosign-installer@v4.1.2
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v4.1.2
       - name: Release
         uses: goreleaser/goreleaser-action@v7
         with:

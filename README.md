@@ -60,7 +60,7 @@ Annotated examples are the documentation:
 - MacOS:
   ```sh
   brew tap dkotik/tap
-  brew install mdsend
+  brew install curl mdsend
   ```
 - Build from source:
   ```sh
@@ -74,7 +74,6 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 <details>
   <summary>Click here to see a list of planned features.</summary>
 
-- [ ] Letter expiration via schedule.expires.
 - [ ] Queue clean up scanner - should be first added to sqlite Watermill driver.
 - [ ] Sending message with scheduling delay (instead of only queuing) should prompt a confirmation.
 - [ ] Ensure carbon copy list is in header.
@@ -92,7 +91,9 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 ## E-mail Tools
 
 - <https://www.caniemail.com/> - check what is template-appropriate
-- Use <https://www.mail-tester.com/> to check the deliverability of your mail.
+- E-mail message validators:
+  - <https://www.mail-tester.com/>
+  - <https://www.suped.com/tools/email-tester>
 - <https://www.htmlemailcheck.com/check/>
 - Address verification:
   - <https://github.com/AfterShip/email-verifier>
