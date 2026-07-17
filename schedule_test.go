@@ -20,7 +20,7 @@ func TestScheduleParsing(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if s.After.Truncate(time.Hour).Equal(time.Date(1999, 1, 1, 0, 0, 0, 0, time.Local)) {
+	if s.After.Truncate(time.Hour).Truncate(time.Minute).Truncate(time.Second).Equal(time.Date(1999, 1, 1, 0, 0, 0, 0, time.Local)) {
 		t.Fatalf("expected schedule to be 1999-1-1, got %v", s.After)
 	}
 	if s.Expire != 30*time.Minute {
