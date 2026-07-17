@@ -37,7 +37,7 @@ homebrew_casks:
       name: homebrew-tap
       branch: main
     homepage: "https://github.com/dkotik/mdsend"
-    description: "Send markdown files as MIME-encoded electronic mail."
+    description: "Send markdown files as electronic mail. Maintain mailing lists as templated text files."
     license: "MIT"
     hooks:
       post:
@@ -45,16 +45,16 @@ homebrew_casks:
           if OS.mac?
             system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/mdsend"]
           end
-# nfpms:
-#   - id: mdsend.deb
-#     package_name: mdsend
-#     formats:
-#       - deb
-#     vendor: "Dmitry Kotik"
-#     homepage: "https://dkotik.com"
-#     # maintainer: "Your Email <support@example.com>"
-#     description: "Send markdown files as MIME-encoded electronic mail."
-#     license: "MIT"
+nfpms:
+  - id: mdsend.deb
+    package_name: mdsend
+    formats:
+      - deb
+    vendor: "Dmitry Kotik"
+    homepage: "https://github.com/dkotik/mdsend"
+    # maintainer: "Your Email <support@example.com>"
+    description: "Send markdown files as electronic mail. Maintain mailing lists as templated text files."
+    license: "MIT"
 signs:
   - id: cosign
     cmd: cosign

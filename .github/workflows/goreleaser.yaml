@@ -1,6 +1,7 @@
 name: goreleaser
 
 on:
+  workflow_dispatch: # can be triggered manually
   push:
     tags:
       - "v*"
