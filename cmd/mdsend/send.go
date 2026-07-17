@@ -41,6 +41,12 @@ var (
 		Usage:   `The time fluctuation in delay between sending each electronic mail message.`,
 	}
 
+	flagService = &cli.BoolFlag{
+		Name:    `service`,
+		Aliases: []string{"s"},
+		Usage:   `Keep the process running and serving mail perpetually.`,
+	}
+
 	flagWorkerCount = &cli.IntFlag{
 		Name:    `worker_count`,
 		Aliases: []string{"w"},
@@ -66,9 +72,10 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 	}
 	logger := getLogger(c)
 
+	delay := c.Duration(flagDelay.Name)
 	middleware := []func(mdsend.Mailer) mdsend.Mailer{
 		mailer.NewDelay(
-			c.Duration(flagDelay.Name)+time.Millisecond*50,
+			delay+time.Millisecond*50,
 			c.Duration(flagFluctuate.Name)+time.Millisecond*20,
 		),
 	}
@@ -106,8 +113,18 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 	mailer := mailer.NewSemaphore(mailers...)
 
 	wg, ctx := errgroup.WithContext(ctx)
-	// tracker := newProgressTracker(logger)
-	tracker := newInterruptingProgressTracker(ctx, wg, logger)
+	tracker := newProgressTracker(logger)
+	if !c.Bool(flagService.Name) {
+		// interrupt send command once everything appears to have
+		// been sent
+		tracker = newInterruptingProgressTracker(
+			ctx,
+			wg,
+			(time.Second*2)+delay,
+			logger,
+		)
+	}
+
 	if err = send(
 		ctx,
 		wg,

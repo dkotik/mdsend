@@ -22,6 +22,7 @@ func newProgressTracker(
 func newInterruptingProgressTracker(
 	ctx context.Context,
 	eg *errgroup.Group,
+	frequency time.Duration,
 	logger *slog.Logger,
 ) queue.ProgressTracker {
 	if eg == nil {
@@ -33,7 +34,7 @@ func newInterruptingProgressTracker(
 	closer := make(chan queue.Progress, 100)
 	eg.Go(func() error {
 		var p queue.Progress
-		ticker := time.NewTicker(time.Second * 2)
+		ticker := time.NewTicker(frequency)
 		passed := 0
 		for {
 			select {
@@ -46,7 +47,7 @@ func newInterruptingProgressTracker(
 					continue
 				}
 				passed++
-				if passed > 4 {
+				if passed > 7 {
 					logger.Info("progress tracker detected that everything had been sent, closing the program...")
 					return context.Canceled
 				}
