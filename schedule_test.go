@@ -20,9 +20,24 @@ func TestScheduleParsing(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if s.After.Truncate(time.Hour).Truncate(time.Minute).Truncate(time.Second).Equal(time.Date(1999, 1, 1, 0, 0, 0, 0, time.Local)) {
-		t.Fatalf("expected schedule to be 1999-1-1, got %v", s.After)
+
+	if s.After.Year() != 1999 {
+		t.Fatal("unexpected year:", s.After.Year())
 	}
+	if s.After.Month() != time.January {
+		t.Fatal("unexpected month:", s.After.Month())
+	}
+	if s.After.Day() != 1 {
+		t.Fatal("unexpected day:", s.After.Day())
+	}
+	if s.After.Hour() != 0 {
+		t.Fatal("unexpected hour:", s.After.Hour())
+	}
+	if s.After.Minute() != 11 {
+		// minute is increased, because the delay is applied to the After
+		t.Fatal("unexpected minute:", s.After.Minute())
+	}
+
 	if s.Expire != 30*time.Minute {
 		t.Fatalf("expected expire to be 30m, got %d", s.Expire)
 	}
