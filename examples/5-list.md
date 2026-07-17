@@ -43,6 +43,71 @@ Greeting {{ .Recipient.title }} {{ .Recipient.first_name }},
 I am writing, because ...
 ```
 
+Carbon copy recipients (`cc`) are treated exactly the same as blind
+carbon copy recipients. The field exists for historic reasons. Those
+recipients will not be displayed in sent messages by design for
+the following reasons:
+
+- To prevent accidental exposure of private contact information.
+- To prevent possible message duplication in mailer APIs due to
+  implementation ambiguity in handling carbon copy recipients.
+
+## Load Recipient List From an Executable
+
+If the recipient file does not have a recognizable extension,
+like `.yaml`, and is executable, it will be executed. The standard
+output will be captured and parsed according to the `Content-Type`
+set in the first line of the output.
+
+```yaml
+to: script.sh
+bcc: program.exe
+```
+
+The first line of output must match the desired file format.
+This protects `mdsend` from malformed content of failing scripts
+and binary files, and precludes ambiguity in choosing between JSON and
+Cuelang, CSV and other formats.
+
+- *JSON:* Content-Type: application/json
+- *Cue:* Content-Type: application/cue
+- *YAML:* Content-Type: application/yaml
+- *TOML:* Content-Type: application/toml
+- *CSV:* Content-Type: text/csv
+
+```sh
+#!/bin/sh
+
+# example of an executable script returning JSON data.
+cat << EOF
+Content-type: application/json
+
+[
+  {
+    "name": "first",
+    "email": "first@testmail.json"
+  },
+  {
+    "name": "second",
+    "email": "second@testmail.json"
+  },
+  {
+    "name": "third",
+    "email": "third@testmail.json"
+  },
+  {
+    "name": "fourth",
+    "email": "fourth@testmail.json"
+  }
+]
+EOF
+```
+
+Sourcing recipients from an executable gives you the limitless
+flexibility to fetch private contact information from a remote
+database or encrypted location, to groom or combine and pre-process the
+contact list.
+
 ## Footer
 
 You may unsubscribe <a title="unsubscribe from the mailing list"

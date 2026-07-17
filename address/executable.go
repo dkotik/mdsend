@@ -8,12 +8,14 @@ import (
 	"io"
 	"io/fs"
 	"iter"
+	"mime"
 	"os/exec"
 	"regexp"
+	"strings"
 )
 
 var reCollectOutputContentType = regexp.MustCompile(
-	`^[Cc]ontent-[Tt]ype:([^\n]+)((\r?\n)+)`,
+	`(?i)^\s*Content-Type:([^\n]+)((\r?\n)+)`,
 )
 
 type ExecutableCommandError struct {
@@ -81,9 +83,9 @@ func eachEntryFromExecutable(
 			return
 		}
 
-		contentType, _, _ := bytes.Cut(data[m[2]:m[3]], []byte(";"))
+		contentType, _, err := mime.ParseMediaType(string(data[m[2]:m[3]]))
 		data = data[m[5]:] // skip content type and free lines
-		switch contentType := string(bytes.TrimSpace(bytes.ToLower(contentType))); contentType {
+		switch contentType := strings.ToLower(strings.TrimSpace(contentType)); contentType {
 		case `application/yaml`:
 			for entry, err := range eachEntryFromFileYAML(data) {
 				if !yield(entry, err) {

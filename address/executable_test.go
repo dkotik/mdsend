@@ -17,22 +17,36 @@ func TestTakingRecordsFromExecutable(t *testing.T) {
 	}
 
 	fs := os.DirFS(".")
-	for entry, err := range eachEntryFromExecutable(
-		t.Context(),
+	foundRecipients := 0
+	for _, file := range []string{
 		"./testdata/executable.yaml.sh",
-		fs,
-	) {
-		if err != nil {
-			t.Fatal("failed to read entry:", err)
-		}
-		entry, ok := entry.(map[string]any)
-		if !ok {
-			t.Fatalf("wrong type: %T", entry)
-		}
-		_, err := New(entry)
-		if err != nil {
-			t.Fatal("invalid contact entry:", err)
+		"./testdata/executable.json.sh",
+		"./testdata/executable.toml.sh",
+		"./testdata/executable.cue.sh",
+		"./testdata/executable.csv.sh",
+	} {
+		for entry, err := range eachEntryFromExecutable(
+			t.Context(),
+			file,
+			fs,
+		) {
+			if err != nil {
+				t.Fatal("failed to read entry:", err)
+			}
+			entry, ok := entry.(map[string]any)
+			if !ok {
+				t.Fatalf("wrong type: %T", entry)
+			}
+			_, err := New(entry)
+			if err != nil {
+				t.Fatal("invalid contact entry:", err)
+			}
+			foundRecipients++
 		}
 	}
-	// t.Fatal("check")
+
+	expectingRecipients := 20
+	if foundRecipients != expectingRecipients {
+		t.Fatal("unexpected number of recipients:", foundRecipients, "vs", expectingRecipients)
+	}
 }

@@ -1,5 +1,5 @@
 subject: extend one letter from letter
-seed_key: hGaFuZsXD5u
+seed_key: ChFDZtJXnQE
 List-Id: Some List <greatlist@test.com>
 List-Unsubscribe: <mailto:unsub@yourdomain.com>, <https://yourdomain.com/unsub?id=MLFhcxXQr1kWB3z3sCTTnUCVT3TzmoMg3BUfGTBM5>
 List-Unsubscribe-Post: token=MLFhcxXQr1kWB3z3sCTTnUCVT3TzmoMg3BUfGTBM5
@@ -28,6 +28,61 @@ Each entry is a map, regardless of how it was loaded. Any value ofthe map is acc
 Greeting <no value> <no value>,
 
 I am writing, because ...
+
+Carbon copy recipients (`cc`) are treated exactly the same as blindcarbon copy recipients. The field exists for historic reasons. Thoserecipients will not be displayed in sent messages by design forthe following reasons:
+
+
+- To prevent accidental exposure of private contact information.To prevent accidental exposure of private contact information.
+- To prevent possible message duplication in mailer APIs due to
+implementation ambiguity in handling carbon copy recipients.To prevent possible message duplication in mailer APIs due toimplementation ambiguity in handling carbon copy recipients.
+
+
+Load Recipient List From an Executable
+--------------------------------------
+
+If the recipient file does not have a recognizable extension,like `.yaml`, and is executable, it will be executed. The standardoutput will be captured and parsed according to the `Content-Type`set in the first line of the output.
+
+
+to: script.sh
+bcc: program.exe
+
+The first line of output must match the desired file format.This protects `mdsend` from malformed content of failing scriptsand binary files, and precludes ambiguity in choosing between JSON andCuelang, CSV and other formats.
+
+
+- *JSON:* Content-Type: application/json*JSON:* Content-Type: application/json
+- *Cue:* Content-Type: application/cue*Cue:* Content-Type: application/cue
+- *YAML:* Content-Type: application/yaml*YAML:* Content-Type: application/yaml
+- *TOML:* Content-Type: application/toml*TOML:* Content-Type: application/toml
+- *CSV:* Content-Type: text/csv*CSV:* Content-Type: text/csv
+
+
+#!/bin/sh
+
+# example of an executable script returning JSON data.
+cat << EOF
+Content-type: application/json
+
+[
+  {
+    "name": "first",
+    "email": "first@testmail.json"
+  },
+  {
+    "name": "second",
+    "email": "second@testmail.json"
+  },
+  {
+    "name": "third",
+    "email": "third@testmail.json"
+  },
+  {
+    "name": "fourth",
+    "email": "fourth@testmail.json"
+  }
+]
+EOF
+
+Sourcing recipients from an executable gives you the limitlessflexibility to fetch private contact information from a remotedatabase or encrypted location, to groom or combine and pre-process thecontact list.
 
 
 Footer
@@ -90,6 +145,64 @@ the map is accessible to the template engine through the context.</p>
 
 I am writing, because ...
 </code></pre>
+<p>Carbon copy recipients (<code>cc</code>) are treated exactly the same as blind
+carbon copy recipients. The field exists for historic reasons. Those
+recipients will not be displayed in sent messages by design for
+the following reasons:</p>
+<ul>
+<li>To prevent accidental exposure of private contact information.</li>
+<li>To prevent possible message duplication in mailer APIs due to
+implementation ambiguity in handling carbon copy recipients.</li>
+</ul>
+<h2>Load Recipient List From an Executable</h2>
+<p>If the recipient file does not have a recognizable extension,
+like <code>.yaml</code>, and is executable, it will be executed. The standard
+output will be captured and parsed according to the <code>Content-Type</code>
+set in the first line of the output.</p>
+<pre><code class="language-yaml">to: script.sh
+bcc: program.exe
+</code></pre>
+<p>The first line of output must match the desired file format.
+This protects <code>mdsend</code> from malformed content of failing scripts
+and binary files, and precludes ambiguity in choosing between JSON and
+Cuelang, CSV and other formats.</p>
+<ul>
+<li><em>JSON:</em> Content-Type: application/json</li>
+<li><em>Cue:</em> Content-Type: application/cue</li>
+<li><em>YAML:</em> Content-Type: application/yaml</li>
+<li><em>TOML:</em> Content-Type: application/toml</li>
+<li><em>CSV:</em> Content-Type: text/csv</li>
+</ul>
+<pre><code class="language-sh">#!/bin/sh
+
+# example of an executable script returning JSON data.
+cat &lt;&lt; EOF
+Content-type: application/json
+
+[
+  {
+    &quot;name&quot;: &quot;first&quot;,
+    &quot;email&quot;: &quot;first@testmail.json&quot;
+  },
+  {
+    &quot;name&quot;: &quot;second&quot;,
+    &quot;email&quot;: &quot;second@testmail.json&quot;
+  },
+  {
+    &quot;name&quot;: &quot;third&quot;,
+    &quot;email&quot;: &quot;third@testmail.json&quot;
+  },
+  {
+    &quot;name&quot;: &quot;fourth&quot;,
+    &quot;email&quot;: &quot;fourth@testmail.json&quot;
+  }
+]
+EOF
+</code></pre>
+<p>Sourcing recipients from an executable gives you the limitless
+flexibility to fetch private contact information from a remote
+database or encrypted location, to groom or combine and pre-process the
+contact list.</p>
 <h2>Footer</h2>
 <p>You may unsubscribe <!-- raw HTML omitted -->here<!-- raw HTML omitted -->.</p>
 <p>The CAN-SPAM act became law on Jan. 1, 2004. It says there many

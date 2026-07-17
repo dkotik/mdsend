@@ -1,0 +1,21 @@
+#!/bin/sh
+
+cat << EOF
+Content-type: application/toml
+
+[[entries]]
+name = "first"
+email = "first@testmail.toml"
+
+[[entries]]
+name = "second"
+email = "second@testmail.toml"
+
+[[entries]]
+name = "third"
+email = "third@testmail.toml"
+
+[[entries]]
+name = "fourth"
+email = "fourth@testmail.toml"
+EOF
