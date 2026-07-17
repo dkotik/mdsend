@@ -19,7 +19,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func eachEntryFromFileCSV(data []byte) iter.Seq2[any, error] {
+func eachEntryFromFileCSV(ctx context.Context, data []byte) iter.Seq2[any, error] {
 	return func(yield func(any, error) bool) {
 		r := csv.NewReader(bytes.NewReader(data))
 		headers, err := r.Read()
@@ -51,7 +51,7 @@ func eachEntryFromFileCSV(data []byte) iter.Seq2[any, error] {
 	}
 }
 
-func eachEntryFromFileJSON(data []byte) iter.Seq2[any, error] {
+func eachEntryFromFileJSON(ctx context.Context, data []byte) iter.Seq2[any, error] {
 	return func(yield func(any, error) bool) {
 		d := json.NewDecoder(bytes.NewReader(data))
 		var entries []any
@@ -67,7 +67,7 @@ func eachEntryFromFileJSON(data []byte) iter.Seq2[any, error] {
 	}
 }
 
-func eachEntryFromFileYAML(data []byte) iter.Seq2[any, error] {
+func eachEntryFromFileYAML(ctx context.Context, data []byte) iter.Seq2[any, error] {
 	return func(yield func(any, error) bool) {
 		d := yaml.NewDecoder(bytes.NewReader(data))
 		var entries []any
@@ -83,7 +83,7 @@ func eachEntryFromFileYAML(data []byte) iter.Seq2[any, error] {
 	}
 }
 
-func eachEntryFromFileTOML(data []byte) iter.Seq2[any, error] {
+func eachEntryFromFileTOML(ctx context.Context, data []byte) iter.Seq2[any, error] {
 	return func(yield func(any, error) bool) {
 		d := toml.NewDecoder(bytes.NewReader(data))
 		var entries map[string]any
@@ -107,7 +107,7 @@ func eachEntryFromFileTOML(data []byte) iter.Seq2[any, error] {
 	}
 }
 
-func eachEntryFromFileCue(data []byte) iter.Seq2[any, error] {
+func eachEntryFromFileCue(ctx context.Context, data []byte) iter.Seq2[any, error] {
 	return func(yield func(any, error) bool) {
 		ctx := cuecontext.New()
 		v := ctx.CompileBytes(data)
@@ -124,7 +124,7 @@ func eachEntryFromFileCue(data []byte) iter.Seq2[any, error] {
 	}
 }
 
-func eachEntryFromFile(p string, fs fs.FS) iter.Seq2[any, error] {
+func eachEntryFromFile(ctx context.Context, p string, fs fs.FS) iter.Seq2[any, error] {
 	return func(yield func(any, error) bool) {
 		file, err := fs.Open(p)
 		if err != nil {
@@ -144,31 +144,31 @@ func eachEntryFromFile(p string, fs fs.FS) iter.Seq2[any, error] {
 		ext := strings.ToLower(filepath.Ext(p))
 		switch ext {
 		case ".csv":
-			for recipient, err := range eachEntryFromFileCSV(data) {
+			for recipient, err := range eachEntryFromFileCSV(ctx, data) {
 				if !yield(recipient, err) {
 					return
 				}
 			}
 		case ".json":
-			for recipient, err := range eachEntryFromFileJSON(data) {
+			for recipient, err := range eachEntryFromFileJSON(ctx, data) {
 				if !yield(recipient, err) {
 					return
 				}
 			}
 		case ".yaml", ".yml":
-			for recipient, err := range eachEntryFromFileYAML(data) {
+			for recipient, err := range eachEntryFromFileYAML(ctx, data) {
 				if !yield(recipient, err) {
 					return
 				}
 			}
 		case ".toml":
-			for recipient, err := range eachEntryFromFileTOML(data) {
+			for recipient, err := range eachEntryFromFileTOML(ctx, data) {
 				if !yield(recipient, err) {
 					return
 				}
 			}
 		case ".cue":
-			for recipient, err := range eachEntryFromFileCue(data) {
+			for recipient, err := range eachEntryFromFileCue(ctx, data) {
 				if !yield(recipient, err) {
 					return
 				}
@@ -183,9 +183,8 @@ func eachEntryFromFile(p string, fs fs.FS) iter.Seq2[any, error] {
 				yield(nil, fmt.Errorf("unsupported file format for a recipient list: %s", p))
 				return
 			}
-			// ctx, cancel := context.WithTimeout(context.Background(), timeout time.Duration)
 			for entry, err := range eachEntryFromExecutable(
-				context.Background(),
+				ctx,
 				p, fs,
 			) {
 				if !yield(entry, err) {
@@ -197,6 +196,7 @@ func eachEntryFromFile(p string, fs fs.FS) iter.Seq2[any, error] {
 }
 
 func eachRecipientFromEntry(
+	ctx context.Context,
 	entry any,
 	rootDirectory string,
 	fs fs.FS,
@@ -215,12 +215,12 @@ func eachRecipientFromEntry(
 				v = path.Join(rootDirectory, v)
 				// fmt.Println(v)
 				subRoot := path.Dir(v)
-				for entry, err := range eachEntryFromFile(v, fs) {
+				for entry, err := range eachEntryFromFile(ctx, v, fs) {
 					if err != nil {
 						yield(nil, err)
 						continue
 					}
-					for recipient, err := range eachRecipientFromEntry(entry, subRoot, fs) {
+					for recipient, err := range eachRecipientFromEntry(ctx, entry, subRoot, fs) {
 						if !yield(recipient, err) {
 							return
 						}
@@ -230,12 +230,12 @@ func eachRecipientFromEntry(
 			case '/', '\\':
 				v = path.Clean(v)
 				subRoot := path.Dir(v)
-				for entry, err := range eachEntryFromFile(v, fs) {
+				for entry, err := range eachEntryFromFile(ctx, v, fs) {
 					if err != nil {
 						yield(nil, err)
 						continue
 					}
-					for recipient, err := range eachRecipientFromEntry(entry, subRoot, fs) {
+					for recipient, err := range eachRecipientFromEntry(ctx, entry, subRoot, fs) {
 						if !yield(recipient, err) {
 							return
 						}
@@ -267,7 +267,7 @@ func eachRecipientFromEntry(
 			}
 		case []any:
 			for _, v := range v {
-				for v, err := range eachRecipientFromEntry(v, rootDirectory, fs) {
+				for v, err := range eachRecipientFromEntry(ctx, v, rootDirectory, fs) {
 					if !yield(v, err) {
 						return
 					}
@@ -281,6 +281,7 @@ func eachRecipientFromEntry(
 }
 
 func Each(
+	ctx context.Context,
 	frontmatter map[string]any,
 	rootDirectory string,
 	fs fs.FS,
@@ -288,7 +289,7 @@ func Each(
 	return func(yield func(map[string]any, error) bool) {
 		to, ok := frontmatter[FieldTo]
 		if ok {
-			for recipient, err := range eachRecipientFromEntry(to, rootDirectory, fs) {
+			for recipient, err := range eachRecipientFromEntry(ctx, to, rootDirectory, fs) {
 				if !yield(recipient, err) {
 					return
 				}
@@ -297,7 +298,7 @@ func Each(
 
 		cc, ok := frontmatter[FieldCarbonCopy]
 		if ok {
-			for recipient, err := range eachRecipientFromEntry(cc, rootDirectory, fs) {
+			for recipient, err := range eachRecipientFromEntry(ctx, cc, rootDirectory, fs) {
 				if !yield(recipient, err) {
 					return
 				}
@@ -306,7 +307,7 @@ func Each(
 
 		bcc, ok := frontmatter[FieldBlindCarbonCopy]
 		if ok {
-			for recipient, err := range eachRecipientFromEntry(bcc, rootDirectory, fs) {
+			for recipient, err := range eachRecipientFromEntry(ctx, bcc, rootDirectory, fs) {
 				if !yield(recipient, err) {
 					return
 				}

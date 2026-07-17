@@ -36,7 +36,7 @@ func TestRecipientList(t *testing.T) {
 	cursor := 0
 	lastCursor := len(expected)
 
-	for recipient, err := range Each(map[string]any{
+	for recipient, err := range Each(t.Context(), map[string]any{
 		"to": []any{
 			// "first@testmail.com",
 			"./recipients.yaml",

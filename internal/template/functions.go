@@ -9,6 +9,8 @@ import (
 
 	"github.com/btcsuite/btcd/btcutil/base58"
 	"github.com/dkotik/mdsend/queue"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func functions() template.FuncMap {
@@ -26,6 +28,16 @@ func functions() template.FuncMap {
 		// "base64": func(in string) string {
 		// 	return base64.RawURLEncoding.EncodeToString([]byte(in))
 		// },
+		"lowercase": strings.ToLower,
+		"uppercase": strings.ToUpper,
+		// "camelcase": func(in string) string {
+		// 	caser := cases.Cam(language.English)
+		// 	return caser.String(strings.ToLower(in))
+		// },
+		"titlecase": func(in string) string {
+			caser := cases.Title(language.English)
+			return caser.String(strings.ToLower(in))
+		},
 		"skipMessageIfTrue": func(condition any) (any, error) {
 			switch v := condition.(type) {
 			case nil:

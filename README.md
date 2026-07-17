@@ -89,7 +89,6 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 <details>
   <summary>Click here to see a list of planned features.</summary>
 
-- [ ] Take shell output as valid recipient list
 - [ ] add `--from` flag to send command that uses middleware to override
   sender address, might be required by certain delivery methods
 - [ ] body template should be HTML template

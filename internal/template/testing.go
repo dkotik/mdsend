@@ -31,6 +31,7 @@ func NewLetterTest(
 			t.Fatal("unable to create template:", err)
 		}
 		for recipient, err := range address.Each(
+			t.Context(),
 			letter.Frontmatter,
 			filepath.Dir(p),
 			fs,

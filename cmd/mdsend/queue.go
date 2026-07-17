@@ -158,6 +158,7 @@ func queueLetter(
 	}
 
 	for recipient, err := range address.Each(
+		ctx,
 		letter.Frontmatter,
 		rootDirectory,
 		fs,

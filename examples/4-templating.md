@@ -14,7 +14,7 @@ headers:
 
 Hello {{ .Recipient.first_name }},
 
-# {{ .Frontmatter.subject }}
+# {{ titlecase .Frontmatter.subject }}
 
 The Markdown content itself is a `Golang` text template.
 To wrap the output of a letter into an `HTML` template, specify

@@ -87,31 +87,31 @@ func eachEntryFromExecutable(
 		data = data[m[5]:] // skip content type and free lines
 		switch contentType := strings.ToLower(strings.TrimSpace(contentType)); contentType {
 		case `application/yaml`:
-			for entry, err := range eachEntryFromFileYAML(data) {
+			for entry, err := range eachEntryFromFileYAML(ctx, data) {
 				if !yield(entry, err) {
 					return
 				}
 			}
 		case `application/toml`, `text/toml`:
-			for entry, err := range eachEntryFromFileTOML(data) {
+			for entry, err := range eachEntryFromFileTOML(ctx, data) {
 				if !yield(entry, err) {
 					return
 				}
 			}
 		case `application/json`:
-			for entry, err := range eachEntryFromFileJSON(data) {
+			for entry, err := range eachEntryFromFileJSON(ctx, data) {
 				if !yield(entry, err) {
 					return
 				}
 			}
 		case `application/cue`:
-			for entry, err := range eachEntryFromFileCue(data) {
+			for entry, err := range eachEntryFromFileCue(ctx, data) {
 				if !yield(entry, err) {
 					return
 				}
 			}
 		case `text/csv`:
-			for entry, err := range eachEntryFromFileCSV(data) {
+			for entry, err := range eachEntryFromFileCSV(ctx, data) {
 				if !yield(entry, err) {
 					return
 				}

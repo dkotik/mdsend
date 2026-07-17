@@ -1,11 +1,11 @@
 subject: example message for Full Name
-seed_key: MmC2QDziwcH
+seed_key: 7yEHnzrvi7W
 X-Template-Test: test
 
 Hello FirstName,
 
 
-example message for Full Name
+Example Message For Full Name
 =============================
 
 The Markdown content itself is a `Golang` text template.To wrap the output of a letter into an `HTML` template, specifythe list of files to load using the `template` field in thefrontmatter.
@@ -64,7 +64,7 @@ URL: https://test.com/?unsubscribe=
 <body style="color: #1d1d1d;">
   <div style="background-color: #e8ecfb; padding: 0.5em 1em 0.5em 1.5em;">
     <p>Hello FirstName,</p>
-<h1>example message for Full Name</h1>
+<h1>Example Message For Full Name</h1>
 <p>The Markdown content itself is a <code>Golang</code> text template.
 To wrap the output of a letter into an <code>HTML</code> template, specify
 the list of files to load using the <code>template</code> field in the
