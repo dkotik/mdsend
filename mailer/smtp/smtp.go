@@ -29,27 +29,29 @@ const (
 )
 
 type Configuration struct {
-	Server         string
+	Host           string
 	Port           string
 	Queue          queue.Queue
 	Authentication smtp.Auth
 }
 
 func (c Configuration) withDefaults() (_ Configuration, err error) {
-	c.Server = strings.TrimSpace(c.Server)
-	c.Port = strings.TrimSpace(c.Port)
-	if c.Server == "" {
-		c.Server = strings.TrimSpace(os.Getenv(EnvironmentServer))
+	c.Host = strings.TrimSpace(c.Host)
+	if c.Host == "" {
+		c.Host = strings.TrimSpace(os.Getenv(EnvironmentServer))
+		if c.Host == "" {
+			c.Host = "smtp.gmail.com"
+		}
 	}
+
+	c.Port = strings.TrimSpace(c.Port)
 	if c.Port == "" {
 		c.Port = strings.TrimSpace(os.Getenv(EnvironmentPort))
+		if c.Port == "" {
+			c.Port = "587" // modern standard
+		}
 	}
-	if c.Server == "" {
-		c.Server = "smtp.gmail.com"
-	}
-	if c.Port == "" {
-		c.Port = "587" // modern standard
-	}
+
 	if c.Authentication == nil {
 		c.Authentication, err = LoginAuth(os.Getenv(EnvironmentUsername), os.Getenv(EnvironmentPassword))
 		if err != nil {
@@ -74,7 +76,7 @@ func New(config Configuration) (_ mdsend.Mailer, err error) {
 		Buffer:         bytes.NewBuffer(nil),
 		Queue:          config.Queue,
 		Authentication: config.Authentication,
-		Connection:     config.Server + ":" + config.Port,
+		Connection:     config.Host + ":" + config.Port,
 	}, nil
 }
 

@@ -73,9 +73,9 @@ type mailgunSender struct {
 }
 
 // SendMail queues one message to one recipient.
-func (s mailgunSender) SendMail(ctx context.Context, d mdsend.Message) (_ string, err error) {
+func (s mailgunSender) SendMail(ctx context.Context, m mdsend.Message) (_ string, err error) {
 	// first returned value is human readable status, second is message ID
-	msg, err := s.prepareMessage(ctx, d)
+	msg, err := s.prepareMessage(ctx, m)
 	if err != nil {
 		return "", err
 	}

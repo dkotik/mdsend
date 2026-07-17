@@ -60,10 +60,10 @@ type sender struct {
 }
 
 // SendMail queues one message to one recipient.
-func (s sender) SendMail(ctx context.Context, d mdsend.Message) (_ string, err error) {
+func (s sender) SendMail(ctx context.Context, m mdsend.Message) (_ string, err error) {
 	// TODO: this could be cached by wrapping the queue?
 	attachments := make([]resend.Attachment, 0)
-	for attachment, err := range s.Queue.ListAttachments(ctx, d.LetterID) {
+	for attachment, err := range s.Queue.ListAttachments(ctx, m.LetterID) {
 		if err != nil {
 			return "", err
 		}
@@ -73,14 +73,23 @@ func (s sender) SendMail(ctx context.Context, d mdsend.Message) (_ string, err e
 		})
 	}
 
+	// TODO: resend does not support multi-value headers
+	// should use SMTP relay instead?
+	headers := make(map[string]string)
+	for _, header := range m.Headers {
+		headers[header.Name] = header.Value
+	}
+	headers["Resend-Idempotency-Key"] = m.SeedKey
+
 	request := &resend.SendEmailRequest{
-		From:    d.From.String(),
-		To:      []string{d.To.String()},
-		Subject: d.Subject,
+		From:    m.From.String(),
+		To:      []string{m.To.String()},
+		Subject: m.Subject,
+		Headers: headers,
 		// Cc:          cc,
 		// Bcc:         bcc,
-		Html:        d.HTML,
-		Text:        d.Text,
+		Html:        m.HTML,
+		Text:        m.Text,
 		Attachments: attachments,
 	}
 

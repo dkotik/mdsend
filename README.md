@@ -9,16 +9,15 @@ Send markdown files as electronic mail.
 - **Flexible:** select the mailer backend based on highest deliverability. Swap it out later without changing anything in your letters or templates.
   - Supports recipient list formats: `CSV`, `JSON`, `YAML`, `TOML`, and `Cue`.
   - Supports mailing services:
-    - [x] **SMTP**
+    - [x] **SMTP** (SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD)
     - [x] **Mailgun** (MG_API_KEY, MG_API_DOMAIN)
-    - [x] **Resend** (RESEND_API_KEY) 
+    - [x] **Resend** (RESEND_API_KEY) or via SMTP relay
+    - [x] **Brevo** via SMTP relay
+    - [ ] Amazon SES (soon)
     - [ ] Loops (soon)
     - [ ] SendGrid (soon)
-    - [ ] Amazon SES (soon)
     - [ ] Postmark (soon)
     - [ ] Sparkpost (soon)
-    - [ ] Brevo (soon)
-    - [ ] SendGrid (soon)
     - [ ] Mailchimp (soon)
     - [ ] HubSpot (soon)
     - [ ] Twilio (soon)
@@ -121,6 +120,7 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 ## Similar Projects
 
 - <https://github.com/domodwyer/mailyak>
-- <https://sendune.com/>
 - <https://github.com/charmbracelet/pop>
 - <https://github.com/wneessen/go-mail>
+- <https://github.com/go-gomail/gomail> (frozen?)
+- <https://sendune.com/>

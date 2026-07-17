@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/internal/media"
@@ -47,6 +48,7 @@ func TestLiveSend(t *testing.T) {
 	}
 
 	messageID, err := mg.SendMail(ctx, mdsend.Message{
+		SeedKey:  time.Now().Truncate(time.Minute).Format(time.RFC3339),
 		LetterID: testLetterID,
 		From: mail.Address{
 			Name:    "Test Sender",
@@ -56,7 +58,7 @@ func TestLiveSend(t *testing.T) {
 			Name:    "Test Recipient",
 			Address: destination,
 		},
-		Subject: "live Mailgun send test",
+		Subject: "live resent send test",
 		Text:    "test text",
 		HTML:    "<html><body><h1>test</h1><p>test paragraph</p><p>test paragraph 2</p><p><img src=\"cid:" + cat.Hash + "@testdomain.com\" alt=\"cat\" /></p></body></html>",
 	})
