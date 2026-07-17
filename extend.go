@@ -178,7 +178,7 @@ func extend(
 			return letter, fmt.Errorf("unsupported extension file type: %s", ext)
 		}
 
-		subLetter, err := NewLetter(data)
+		subLetter, err := newLetter(data)
 		if err != nil {
 			return letter, err
 		}

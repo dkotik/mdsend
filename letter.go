@@ -116,6 +116,29 @@ func NewLetterFromFile(
 }
 
 func NewLetter(b []byte) (letter Letter, err error) {
+	letter, err = newLetter(b)
+	if err != nil {
+		return letter, err
+	}
+
+	if _, err = newSubject(letter.Frontmatter[FieldNameSubject]); err != nil {
+		if errors.Is(err, ErrNoSubject) {
+			// pull the subject from the first heading text
+			letter.Frontmatter[FieldNameSubject] = markdown.GetFirstHeadingText([]byte(letter.Content))
+			if letter.Frontmatter[FieldNameSubject] == "" {
+				return letter, err
+			}
+		} else {
+			return letter, err
+		}
+	}
+
+	return letter, nil
+}
+
+// newLetter is a lighter version of NewLetter used for loading
+// Markdown documents meant for extension.
+func newLetter(b []byte) (letter Letter, err error) {
 	frontmatterRaw, body, delimeter, err := markdown.SplitFrontmatterFromContent(b)
 	if err != nil {
 		return letter, err
@@ -141,6 +164,7 @@ func NewLetter(b []byte) (letter Letter, err error) {
 			frontmatter[FieldNameAttachments] = append([]any{attachments}, maps...)
 		}
 	}
+
 	return Letter{
 		Frontmatter: frontmatter,
 		Content:     string(body),
@@ -171,8 +195,8 @@ func (l Letter) GetSeed() (string, error) {
 	}
 }
 
-func (l Letter) GetSubject() (string, error) {
-	switch subject := l.Frontmatter[FieldNameSubject].(type) {
+func newSubject(v any) (string, error) {
+	switch subject := v.(type) {
 	case int, uint, int64, uint64, uint16, int16, float32, float64:
 		numeric := fmt.Sprintf("%v", subject)
 		if len(numeric) == 0 {
@@ -188,6 +212,10 @@ func (l Letter) GetSubject() (string, error) {
 	default:
 		return "", ErrNoSubject
 	}
+}
+
+func (l Letter) GetSubject() (string, error) {
+	return newSubject(l.Frontmatter[FieldNameSubject])
 }
 
 // GetFrom returns the [address.FieldFrom] address from the frontmatter.
