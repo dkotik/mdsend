@@ -2,6 +2,7 @@ version: 2
 before:
   hooks:
     - go generate ./...
+    - go test ./...
 builds:
   - main: ./cmd/mdsend
     id: "mdsend"

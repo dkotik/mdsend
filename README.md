@@ -1,30 +1,37 @@
 # Mdsend
 [![Go Reference](https://camo.githubusercontent.com/f3bee28c74a644e266e819bedf0150b80af8a7d46292a8fa2837e42aff739ccc/68747470733a2f2f706b672e676f2e6465762f62616467652f6769746875622e636f6d2f5468726565446f74734c6162732f77617465726d696c6c2e737667)](https://pkg.go.dev/github.com/dkotik/mdsend)
 
-Send markdown files as electronic mail.
+Send markdown files as electronic mail. Maintain mailing lists as templated text files.
 
 ## Features
 
 - **Durable:** mail queues are fault tolerant and atomic, brokered by <Watermill.io> over SQLite3. Can handle any volume of mail without degredation.
+- **Portable:** runs on many kinds of systems. Will include an embeddable HTTP service and Posgres support in the future.
 - **Flexible:** select the mailer backend based on highest deliverability. Swap it out later without changing anything in your letters or templates.
   - Supports recipient list formats: `CSV`, `JSON`, `YAML`, `TOML`, and `Cue`.
   - Supports mailing services:
     - [x] **SMTP** (SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD)
-    - [x] **Mailgun** (MG_API_KEY, MG_API_DOMAIN)
-    - [x] **Resend** (RESEND_API_KEY) or via SMTP relay
-    - [x] **Brevo** via SMTP relay
+    - [x] **Mailgun** (MG_API_KEY, MG_API_DOMAIN) or SMTP relay
+    - [x] **Resend** via SMTP relay or (RESEND_API_KEY) 
     - [ ] Amazon SES (soon)
     - [ ] Loops (soon)
-    - [ ] SendGrid (soon)
-    - [ ] Postmark (soon)
-    - [ ] Sparkpost (soon)
-    - [ ] Mailchimp (soon)
     - [ ] HubSpot (soon)
-    - [ ] Twilio (soon)
-    - [ ] <https://purelymail.com/> (soon)
-    - [ ] <https://emaillabs.io/en/product/> (soon)
-    - [ ] <https://mailtrap.io/> (soon)
-- **Portable:** runs on many kinds of systems. Will include an embeddable HTTP service and Posgres support in the future.
+  - Supports additional mailing services by SMTP relay:
+    - [x] SMTP2GO
+    - [x] Brevo
+    - [x] Mailchimp
+    - [x] Twilio
+    - [x] SparkPost
+    - [x] Postmark
+    - [x] SendGrid
+    - [x] ZeptoMail
+    - [x] SendPulse
+    - [x] MailTrap
+    - [x] MailJet
+    - [x] EmailLabs
+    - [x] PurelyMail
+
+SMTP relay is often more robust than the provider API. For example, Resend API **does not** support multi-value headers, but its SMTP relay does.
 
 ## Examples
 
@@ -80,13 +87,16 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 <details>
   <summary>Click here to see a list of planned features.</summary>
 
+- [ ] body template should be HTML template
+- [ ] Per RFC 5321 rules, email body text lines must not exceed 1,000 characters.
+- [ ] skipMessageIfTrue template function
+- [ ] service package with HTTP unsubscribe endpoint package
+- [ ] mdsend <file> should be equivalent to mdsend send <file>?
 - [ ] Queue clean up scanner - should be first added to sqlite Watermill driver.
 - [ ] Sending message with scheduling delay (instead of only queuing) should prompt a confirmation.
 - [ ] Ensure carbon copy list is in header.
 - [ ] Write a better Goldmark 2.0 renderer that recognizes single-line youtube and image paragraphs, centers them.
 - [ ] Beautify the default template. Add `dark.html` one.
-- [x] Anticipate circular imports for recipient lists and extensions.
-- [x] Add queue.Marshaler interface and a JSON implementation?
 - [ ] Validate function should detect language and complain that `language` field is not set, if the content is not English.
 - [ ] Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
 - [ ] https://github.com/charmbracelet/glamour
@@ -116,11 +126,13 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
   - <https://github.com/willwhite/freemail>
 - Hosting:
   - <https://github.com/modoboa/modoboa>
+- Beautiful templates:
+  - <https://mjml.io/templates>
 
 ## Similar Projects
 
 - <https://github.com/domodwyer/mailyak>
 - <https://github.com/charmbracelet/pop>
 - <https://github.com/wneessen/go-mail>
-- <https://github.com/go-gomail/gomail> (frozen?)
+- <https://github.com/go-gomail/gomail>
 - <https://sendune.com/>

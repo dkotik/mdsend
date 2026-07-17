@@ -103,5 +103,4 @@ func TestMailgunSender(t *testing.T) {
 		t.Fatal("message ID is empty")
 	}
 	t.Log("message ID:", messageID)
-	// t.Fail()
 }
