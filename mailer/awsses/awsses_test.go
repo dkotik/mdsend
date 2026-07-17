@@ -14,7 +14,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/ses"
+	"github.com/aws/aws-sdk-go-v2/service/sesv2"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"zombiezen.com/go/sqlite"
@@ -87,7 +87,7 @@ func TestSendingWithAWSSES(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	sesMailer, err := New(q, ses.NewFromConfig(cfg))
+	sesMailer, err := New(q, sesv2.NewFromConfig(cfg))
 	if err != nil {
 		t.Fatal("unable to setup an AWS SES mailer:", err)
 	}

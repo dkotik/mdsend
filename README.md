@@ -13,9 +13,12 @@ Send markdown files as electronic mail. Maintain mailing lists as templated text
     - [x] **SMTP** (SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD)
     - [x] **Mailgun** (MG_API_KEY, MG_API_DOMAIN) or SMTP relay
     - [x] **Resend** via SMTP relay or (RESEND_API_KEY) 
-    - [ ] Amazon SES (soon)
+    - [x] **Amazon SES** (requires AWS configuration present)
+      - The author decoupled himself from AWS years ago and requests
+        help testing this implementation.
     - [ ] Loops (soon)
     - [ ] HubSpot (soon)
+    - [ ] Mailhog
   - Supports additional mailing services by SMTP relay:
     - [x] SMTP2GO
     - [x] Brevo
@@ -88,6 +91,7 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
   <summary>Click here to see a list of planned features.</summary>
 
 - [ ] body template should be HTML template
+- [ ] Take shell output as valid recipient list
 - [ ] Per RFC 5321 rules, email body text lines must not exceed 1,000 characters.
 - [ ] skipMessageIfTrue template function
 - [ ] service package with HTTP unsubscribe endpoint package

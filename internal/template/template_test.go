@@ -38,7 +38,7 @@ func TestValidMessageFromTemplate(t *testing.T) {
 	t.Run("interface conformity", NewTemplateTest(tmpl))
 }
 
-func TestTemplateRendering(t *testing.T) {
+func TestDefaultTemplateRendering(t *testing.T) {
 	defaultTemplate, err := defaultTemplates.ReadFile("html/default.html")
 	if err != nil {
 		t.Fatal(err)
