@@ -87,3 +87,13 @@ func moveAllSiblingsTo(target, source ast.Node) {
 		target.AppendChild(target, sibling)
 	}
 }
+
+func getListDepth(n ast.Node) int {
+	depth := 0
+	for p := n.Parent(); p != nil; p = p.Parent() {
+		if p.Kind() == ast.KindList {
+			depth++
+		}
+	}
+	return depth - 1
+}

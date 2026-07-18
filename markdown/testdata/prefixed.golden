@@ -8,11 +8,11 @@ Inside paragraph: ![](relativePathPrefix/inParagraph.jpg "In Paragraph") Tail of
 
 In List:
 
-- ![](relativePathPrefix/inList.jpg "In List")
+- ![list item](relativePathPrefix/inList.jpg "In List")
 
 
 ![flowing tail](relativePathPrefix/finalMash1.txt "fm1")
-[flowing tail](relativePathPrefix/finalMash2.txt "fm2")
+ [flowing tail](relativePathPrefix/finalMash2.txt "fm2")
 
 [refLink]: relativePathPrefix/greatRefLink "last title"
 

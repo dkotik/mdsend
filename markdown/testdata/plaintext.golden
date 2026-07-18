@@ -1,21 +1,25 @@
-![sm](perfect)
+🖼 sm: <perfect> (sm)
+
 
 
 Subtitle
 --------
 
 
-Title 🔗 [](inTitle.jpg)
+Title 🔗 <inTitle.jpg> (In Title)
 ======
 
-Inside paragraph: ![](inParagraph.jpg) Tail of the paragraph. And just a reference 🔗 [refLink](greatRefLink)!
+Inside paragraph: 🖼 : <inParagraph.jpg> (In Paragraph)
+ Tail of the paragraph. And just a reference 🔗 refLink<greatRefLink> (last title)!
 
 In List:
 
 
-- ![](inList.jpg "In List")![](inList.jpg)
+- 🖼 list item: <inList.jpg> (In List)
 
-![flowing tail](finalMash1.txt)🔗 [flowing tail](finalMash2.txt)
+
+🖼 flowing tail: <finalMash1.txt> (fm1)
+🔗 flowing tail<finalMash2.txt> (fm2)
 
 
 Heading Level 1 (Document Title)
@@ -61,28 +65,30 @@ You can combine them for ***bold and italic text*** or ***alternative bold and i
 ### Unordered List
 
 
-- First itemFirst item
-- Second itemSecond item
-- Indented sub-item (use 2 or 4 spaces)Indented sub-item (use 2 or 4 spaces)
-- Another sub-itemAnother sub-item
+- First item
+- Second item
+
+- Indented sub-item (use 2 or 4 spaces)
+- Another sub-item
 
 
 
 
-- Alternative bullet styleAlternative bullet style
+- Alternative bullet style
 
 
-- Another alternative bullet styleAnother alternative bullet style
+- Another alternative bullet style
 
 
 ### Ordered List
 
 
-1. First itemFirst item
-2. Second itemSecond item
-3. Third itemThird item
-1. Nested ordered itemNested ordered item
-2. Another nested itemAnother nested item
+1. First item
+2. Second item
+3. Third item
+
+   1. Nested ordered item
+   2. Another nested item
 
 
 
@@ -90,9 +96,9 @@ You can combine them for ***bold and italic text*** or ***alternative bold and i
 ### Task List (Extended Syntax)
 
 
-- [x] This task is completed[x] This task is completed
-- [ ] This task is not completed yet[ ] This task is not completed yet
-- [ ] This task is also pending[ ] This task is also pending
+- [x] This task is completed
+- [ ] This task is not completed yet
+- [ ] This task is also pending
 
 
 ---
@@ -104,14 +110,15 @@ You can combine them for ***bold and italic text*** or ***alternative bold and i
 ### Links
 
 
-- Inline link: [Visit the Markdown Guide Official Site](https://www.markdownguide.org)Inline link: 🔗 [Visit the Markdown Guide Official Site](https://www.markdownguide.org)
-- Link with hover title: [Google Search](https://www.google.com "Go to Google")Link with hover title: 🔗 [Google Search](https://www.google.com)
-- Automatic URL link: <https://www.example.com>Automatic URL link: https://www.example.com
+- Inline link: 🔗 Visit the Markdown Guide Official Site<https://www.markdownguide.org>
+- Link with hover title: 🔗 Google Search<https://www.google.com> (Go to Google)
+- Automatic URL link: https://www.example.com
 
 
 ### Images
 
-![Markdown Logo](https://wikimedia.org)
+🖼 Markdown Logo: <https://wikimedia.org>
+
 
 
 ---

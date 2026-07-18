@@ -1,6 +1,8 @@
 package markdown
 
 import (
+	"bytes"
+
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/renderer"
 	"github.com/yuin/goldmark/util"
@@ -136,6 +138,12 @@ func (p *plaintextRenderer) renderListItem(w util.BufWriter, source []byte, node
 						break
 					}
 				}
+				// Calculate indentation based on the list's nesting level
+				depth := getListDepth(node)
+				indentation := bytes.Repeat([]byte("   "), depth)
+
+				// Write the indentation and a plain text marker
+				w.Write(indentation)
 				_, _ = w.WriteString(itoa(index))
 				_, _ = w.WriteString(". ")
 			} else {
@@ -163,13 +171,10 @@ func (p *plaintextRenderer) renderText(w util.BufWriter, source []byte, node ast
 	return ast.WalkContinue, nil
 }
 
-func (p *plaintextRenderer) renderTextBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
-	if entering {
-		tb := node.(*ast.TextBlock)
-		lines := tb.Lines()
-		for i := 0; i < lines.Len(); i++ {
-			line := lines.At(i)
-			_, _ = w.Write(line.Value(source))
+func (p *plaintextRenderer) renderTextBlock(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+	if !entering {
+		if n.NextSibling() != nil && n.FirstChild() != nil {
+			_ = w.WriteByte('\n')
 		}
 	}
 	return ast.WalkContinue, nil
@@ -232,12 +237,18 @@ func (p *plaintextRenderer) renderEmphasis(w util.BufWriter, source []byte, node
 
 func (p *plaintextRenderer) renderLink(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
-		_, _ = w.WriteString("🔗 [")
+		_, _ = w.WriteString("🔗 ")
 	} else {
 		l := node.(*ast.Link)
-		_, _ = w.WriteString("](")
+		_, _ = w.WriteString("<")
 		_, _ = w.Write(l.Destination)
-		_ = w.WriteByte(')')
+		_ = w.WriteByte('>')
+		if len(l.Title) > 0 {
+			_ = w.WriteByte(' ')
+			_ = w.WriteByte('(')
+			_, _ = w.Write(l.Title)
+			_ = w.WriteByte(')')
+		}
 	}
 	return ast.WalkContinue, nil
 }
@@ -262,13 +273,20 @@ func (p *plaintextRenderer) renderAction(w util.BufWriter, source []byte, node a
 }
 
 func (p *plaintextRenderer) renderImage(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
-	img := node.(*ast.Image)
 	if entering {
-		_, _ = w.WriteString("![")
+		_, _ = w.WriteString("🖼 ")
 	} else {
-		_, _ = w.WriteString("](")
-		_, _ = w.Write(img.Destination)
-		_ = w.WriteByte(')')
+		l := node.(*ast.Image)
+		_, _ = w.WriteString(": <")
+		_, _ = w.Write(l.Destination)
+		_ = w.WriteByte('>')
+		if len(l.Title) > 0 {
+			_ = w.WriteByte(' ')
+			_ = w.WriteByte('(')
+			_, _ = w.Write(l.Title)
+			_ = w.WriteByte(')')
+		}
+		_, _ = w.WriteString("\n")
 	}
 	return ast.WalkContinue, nil
 }

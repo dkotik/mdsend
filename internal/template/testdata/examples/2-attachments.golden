@@ -11,16 +11,16 @@ List added files under `attachments` frontmatter section.Images are automaticall
 Inline Attachments
 ------------------
 
-Inline attachments are placed into message body,when linked like so:🔗 [cat](../internal/media/testdata/cat.jpg).
+Inline attachments are placed into message body,when linked like so:🔗 cat<../internal/media/testdata/cat.jpg> (Cat Photo by Cindy vanHeerden).
 
 
 Creative Commons Credits
 ------------------------
 
 
-- **cat.jpg:** Cindy vanHeerden.**cat.jpg:** Cindy vanHeerden.
-- **panda.jpg:** Snow Chang.**panda.jpg:** Snow Chang.
-- **camillion.jpg:** Regan Dsouza.**camillion.jpg:** Regan Dsouza.
+- **cat.jpg:** Cindy vanHeerden.
+- **panda.jpg:** Snow Chang.
+- **camillion.jpg:** Regan Dsouza.
 
 
 

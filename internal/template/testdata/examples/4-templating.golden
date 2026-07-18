@@ -19,19 +19,17 @@ Context
 Template execution context contains the following fields:
 
 
-- **Frontmatter:** the raw Markdown frontmatter as `map[string]any`.**Frontmatter:** the raw Markdown frontmatter as `map[string]any`.
-- **Recipient:** the raw message target as `map[string]any`. It
-will contain `name` and `email` fields and any other fields
-fromt the contact source.**Recipient:** the raw message target as `map[string]any`. Itwill contain `name` and `email` fields and any other fieldsfromt the contact source.
-- **Content:** rendered Markdown body.**Content:** rendered Markdown body.
-- **Schedule:** parsed scheduling directives.**Schedule:** parsed scheduling directives.
+- **Frontmatter:** the raw Markdown frontmatter as `map[string]any`.
+- **Recipient:** the raw message target as `map[string]any`. Itwill contain `name` and `email` fields and any other fieldsfromt the contact source.
+- **Content:** rendered Markdown body.
+- **Schedule:** parsed scheduling directives.
 
 
 Template Functions
 ------------------
 
 
-- **skipMessageIfTrue:** skip current recipient is the argument to this function call evaluates to an unempty value.**skipMessageIfTrue:** skip current recipient is the argument to this function call evaluates to an unempty value.
+- **skipMessageIfTrue:** skip current recipient is the argument to this function call evaluates to an unempty value.
 
 
 Reify Templates

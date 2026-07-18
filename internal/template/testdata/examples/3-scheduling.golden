@@ -9,25 +9,21 @@ Schedule Messages for Later Delivery
 Queued messages can be delayed by providing `schedule` frontmatter instructions:
 
 
-- **after:** time until the message can be sent.
-Must be in ISO format `YYYY-MM-DD hh:mm`.**after:** time until the message can be sent.Must be in ISO format `YYYY-MM-DD hh:mm`.
-- **delay:** time duration added to `after` or current time.**delay:** time duration added to `after` or current time.
-- **step:** time duration added for each recipient.**step:** time duration added for each recipient.
-- **fluctuate:** normalized random time duration added for each
-mailing step, including the first message.**fluctuate:** normalized random time duration added for eachmailing step, including the first message.
-- **expire:** time duration, after all the messages have been sent,
-to keep the letter and message records in the database before they
-are deleted.**expire:** time duration, after all the messages have been sent,to keep the letter and message records in the database before theyare deleted.
+- **after:** time until the message can be sent.Must be in ISO format `YYYY-MM-DD hh:mm`.
+- **delay:** time duration added to `after` or current time.
+- **step:** time duration added for each recipient.
+- **fluctuate:** normalized random time duration added for eachmailing step, including the first message.
+- **expire:** time duration, after all the messages have been sent,to keep the letter and message records in the database before theyare deleted.
 
 
 Time Duration Units
 -------------------
 
 
-- `m`: Minute`m`: Minute
-- `h`: Hour`h`: Hour
-- `d`: Day`d`: Day
-- `w`: Week`w`: Week
+- `m`: Minute
+- `h`: Hour
+- `d`: Day
+- `w`: Week
 
 Units can be combined together. For example, to delay the messageby eight weeks, four days, and seven hours, add to the front matter:
 

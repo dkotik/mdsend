@@ -8,8 +8,8 @@ Introduction
 This is the simplest letter that can be sent. It has one recipient.
 
 
-- _Letter_: this file.*Letter*: this file.
-- _Message_: a rendered copy of this file for each recipient.*Message*: a rendered copy of this file for each recipient.
+- *Letter*: this file.
+- *Message*: a rendered copy of this file for each recipient.
 
 Sending requires a set of mailing service credentialsprovided as environment variables.
 
