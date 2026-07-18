@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"iter"
 	"log/slog"
 	"path"
@@ -72,24 +71,6 @@ func NewAttachment(b []byte, constraints media.Constraints) (a Attachment, err e
 	}
 	a.Hash = media.DeterministicHashStringOf(a.Content)
 	return a, nil
-}
-
-func NewAttachmentFromFile(fs fs.FS, p string, constraints media.Constraints) (a Attachment, err error) {
-	file, err := fs.Open(p)
-	if err != nil {
-		return a, err
-	}
-	defer func() { err = errors.Join(err, file.Close()) }()
-	b, err := io.ReadAll(file)
-	if err != nil {
-		return a, err
-	}
-	a, err = NewAttachment(b, constraints)
-	if err != nil {
-		return a, err
-	}
-	a.Name = path.Base(p)
-	return a, err
 }
 
 func (a Attachment) Validate() (err error) {

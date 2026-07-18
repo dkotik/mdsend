@@ -89,6 +89,7 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 <details>
   <summary>Click here to see a list of planned features.</summary>
 
+- [ ] Validate function should detect language and complain that `language` field is not set, if the content is not English.
 - [ ] Beautify the default template. Add `dark.html` one.
 - [ ] add `--from` flag to send command that uses middleware to override
   sender address, might be required by certain delivery methods
@@ -100,7 +101,6 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 - [ ] list out templating functions in the example, including the default ones
 - [ ] Write a better Goldmark 2.0 renderer that recognizes single-line youtube and image paragraphs, centers them.
 - [ ] body template should be HTML template?
-- [ ] Validate function should detect language and complain that `language` field is not set, if the content is not English.
 - [ ] Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
 - [ ] https://github.com/charmbracelet/glamour
 - [ ] Run some tests with <https://www.suped.com/tools/email-tester>

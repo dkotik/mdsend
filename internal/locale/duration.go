@@ -5,10 +5,6 @@ import (
 	"time"
 )
 
-// Some code is taken from https://github.com/xhit/go-str2duration
-// and the tests as well.
-// Most of the code is taken from the standard library.
-
 // parseDurationError describes a problem parsing a duration string.
 type parseDurationError struct {
 	message string

@@ -1,6 +1,7 @@
 package mdsend
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"strconv"
@@ -15,6 +16,19 @@ type Schedule struct {
 	Step      time.Duration `json:"step"`
 	Fluctuate time.Duration `json:"fluctuate"`
 	Expire    time.Duration `json:"expire"`
+}
+
+func (s Schedule) Validate() error {
+	if s.Step < 0 {
+		return errors.New("step duration cannot be less than zero")
+	}
+	if s.Fluctuate < 0 {
+		return errors.New("fluctuate duration cannot be less than zero")
+	}
+	if s.Expire < 0 {
+		return errors.New("expire duration cannot be less than zero")
+	}
+	return nil
 }
 
 func fluctuateDuration(d time.Duration) time.Duration {

@@ -1,14 +1,10 @@
 package mdsend
 
 import (
-	"context"
 	"errors"
 	"fmt"
-	"io"
-	"io/fs"
 	"log/slog"
 	"net/mail"
-	"path"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -60,59 +56,6 @@ type Letter struct {
 	Content     string
 	CreatedAt   time.Time
 	SentAt      time.Time
-}
-
-func NewLetterFromFile(
-	ctx context.Context,
-	fs fs.FS,
-	p string,
-) (letter Letter, err error) {
-	file, err := fs.Open(p)
-	if err != nil {
-		return letter, err
-	}
-	data, err := io.ReadAll(file)
-	if err != nil {
-		return letter, errors.Join(err, file.Close())
-	}
-	if err = file.Close(); err != nil {
-		return letter, err
-	}
-	letter, err = NewLetter(data)
-	if err != nil {
-		return letter, err
-	}
-	rootDirectory := path.Dir(p)
-	letter, err = extend(ctx, letter, rootDirectory, media.NewCyclicalImportPreventingFileSystem(fs))
-	if err != nil {
-		return letter, err
-	}
-	templates, err := getTemplates(letter.Frontmatter, rootDirectory)
-	if err != nil {
-		return letter, err
-	}
-	for _, t := range templates {
-		// if media.IsPathLocal(t) {
-		// 	t = path.Join(path.Dir(p), t)
-		// }
-		file, err := fs.Open(t)
-		if err != nil {
-			return letter, err
-		}
-		data, err := io.ReadAll(file)
-		if err != nil {
-			return letter, errors.Join(err, file.Close())
-		}
-		if err = file.Close(); err != nil {
-			return letter, err
-		}
-		letter.Templates = append(letter.Templates, Attachment{
-			Name:        t,
-			Content:     data,
-			ContentType: media.ContentTypeTextHTML,
-		})
-	}
-	return letter, nil
 }
 
 func NewLetter(b []byte) (letter Letter, err error) {
@@ -315,13 +258,13 @@ func (l Letter) GetLanguage() (lang language.Tag, err error) {
 		// languageTag = strings.TrimSpace(languageTag)
 		lang, err = language.Parse(languageTag)
 		if err != nil {
-			return language.English, err
+			return lang, err
 		}
 		return lang, nil
 	default:
-		return language.English, fmt.Errorf("invalid language type: %T", languageTag)
+		return lang, fmt.Errorf("invalid language type: %T", languageTag)
 	}
-	return language.English, nil
+	return lang, nil
 }
 
 func (l Letter) GetMediaConstraints() (m media.Constraints, err error) {

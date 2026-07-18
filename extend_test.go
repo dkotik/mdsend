@@ -11,11 +11,14 @@ import (
 )
 
 func TestLetterExtensions(t *testing.T) {
-	letter, err := NewLetterFromFile(
+	loader, err := New(media.NewCyclicalImportPreventingFileSystem(
+		os.DirFS("testdata/extend"),
+	), Defaults{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	letter, _, err := loader.LoadLetter(
 		t.Context(),
-		media.NewCyclicalImportPreventingFileSystem(
-			os.DirFS("testdata/extend"),
-		),
 		"xedletter.md",
 	)
 	if err != nil {

@@ -25,16 +25,6 @@ type Template interface {
 	RenderLetterForRecipient(map[string]any) (mdsend.Message, error)
 }
 
-type IdentifierGenerator interface {
-	GenerateID() (string, error)
-}
-
-type IdentifierGeneratorFunc func() (string, error)
-
-func (f IdentifierGeneratorFunc) GenerateID() (string, error) {
-	return f()
-}
-
 type tmpl struct {
 	LetterID            string
 	SeedKey             string
@@ -47,14 +37,14 @@ type tmpl struct {
 	ContentParser       parser.Parser
 	RendererForText     renderer.Renderer
 	RendererForHTML     renderer.Renderer
-	IdentifierGenerator IdentifierGenerator
+	IdentifierGenerator mdsend.IdentifierGenerator
 
 	// mu      *sync.Mutex
 	context Context
 }
 
 type Options struct {
-	IdentifierGenerator IdentifierGenerator
+	IdentifierGenerator mdsend.IdentifierGenerator
 	ContentParser       parser.Parser
 	RendererForText     renderer.Renderer
 	RendererForHTML     renderer.Renderer
@@ -63,7 +53,7 @@ type Options struct {
 
 func (o Options) withDefaults() Options {
 	if o.IdentifierGenerator == nil {
-		o.IdentifierGenerator = IdentifierGeneratorFunc(func() (string, error) {
+		o.IdentifierGenerator = mdsend.IdentifierGeneratorFunc(func() (string, error) {
 			return uuid.NewString(), nil
 		})
 	}

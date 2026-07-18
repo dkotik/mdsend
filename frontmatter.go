@@ -82,3 +82,13 @@ func getPercentageFromMap(m map[string]interface{}, key string, defaultValue int
 		return 0, fmt.Errorf("invalid type for %s: %T", key, v)
 	}
 }
+
+type FieldComparisonMismatchError struct {
+	FieldName     string
+	ExpectedValue any
+	ActualValue   any
+}
+
+func (e FieldComparisonMismatchError) Error() string {
+	return fmt.Sprintf("field %q does not match: %q vs %q", e.FieldName, e.ExpectedValue, e.ActualValue)
+}

@@ -24,3 +24,15 @@ func TestContextAwareness(t *testing.T) {
 		t.Error("recovered a <nil> localizer from context")
 	}
 }
+
+func TestDefaultLangaugeTag(t *testing.T) {
+	tag := language.Tag{}
+	// tag := language.English
+	if tag.String() != "und" {
+		t.Fatal(tag.String())
+	}
+
+	if IsValidLanguageTag(tag) {
+		t.Fatal("default language tag must be recognized as invalid")
+	}
+}

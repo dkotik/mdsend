@@ -21,8 +21,12 @@ func NewLetterTest(
 	fs fs.FS,
 	p string,
 ) func(*testing.T) {
+	loader, err := mdsend.New(fs, mdsend.Defaults{})
+	if err != nil {
+		panic(err)
+	}
 	return func(t *testing.T) {
-		letter, err := mdsend.NewLetterFromFile(t.Context(), fs, p)
+		letter, _, err := loader.LoadLetter(t.Context(), p)
 		if err != nil {
 			t.Fatal("unable to load letter:", err)
 		}

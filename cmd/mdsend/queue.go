@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"iter"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -15,7 +16,6 @@ import (
 	"github.com/dkotik/mdsend/internal/template"
 	"github.com/dkotik/mdsend/queue"
 	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
-	"github.com/oklog/ulid/v2"
 	"github.com/urfave/cli/v3"
 )
 
@@ -24,8 +24,13 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 		return errors.New(`no Markdown letters selected to add`)
 	}
 	fs := media.NewUnsafeUnconstrainedFileSystem()
+	fs = media.NewCyclicalImportPreventingFileSystem(fs)
 	p := c.Args().First()
-	letter, err := mdsend.NewLetterFromFile(ctx, fs, p)
+	loader, err := mdsend.New(fs, mdsend.Defaults{})
+	if err != nil {
+		return err
+	}
+	letter, attachments, err := loader.LoadLetter(ctx, p)
 	if err != nil {
 		return fmt.Errorf(`unable to parse letter from file %q: %w`, p, err)
 	}
@@ -70,6 +75,7 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 		ctx,
 		queue,
 		letter,
+		attachments,
 		p,
 		fs,
 		logger,
@@ -82,7 +88,7 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 	}
 
 	for _, p = range c.Args().Slice()[1:] {
-		letter, err := mdsend.NewLetterFromFile(ctx, fs, p)
+		letter, attachments, err := loader.LoadLetter(ctx, p)
 		if err != nil {
 			return fmt.Errorf(`unable to parse letter from file %q: %w`, p, err)
 		}
@@ -104,6 +110,7 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 			ctx,
 			queue,
 			letter,
+			attachments,
 			p,
 			fs,
 			logger,
@@ -122,13 +129,11 @@ func queueLetter(
 	ctx context.Context,
 	q queue.Queue,
 	letter mdsend.Letter,
+	attachments iter.Seq2[mdsend.Attachment, error],
 	letterPath string,
 	fs fs.FS,
 	logger *slog.Logger,
 ) (queued int, err error) {
-	if letter.ID == "" {
-		letter.ID = ulid.Make().String()
-	}
 	tmpl, err := template.New(letter, template.Options{})
 	if err != nil {
 		return queued, err
@@ -137,21 +142,7 @@ func queueLetter(
 		return queued, err
 	}
 	rootDirectory := filepath.Dir(letterPath)
-	constraints, err := letter.GetMediaConstraints()
-	if err != nil {
-		return queued, err
-	}
-	for src := range letter.EachAttachmentSource() {
-		attachment, err := mdsend.NewAttachmentFromFile(
-			fs,
-			src.Location,
-			constraints,
-		)
-		if err != nil {
-			return queued, err
-		}
-		attachment.LetterID = letter.ID
-		attachment.Name = src.Name
+	for attachment, err := range attachments {
 		if err = q.CreateAttachment(ctx, attachment); err != nil {
 			return queued, err
 		}

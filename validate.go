@@ -84,6 +84,7 @@ func (l Letter) IsValid(cxt context.Context, logger *slog.Logger) (ok bool) {
 		logger.ErrorContext(cxt, "invalid schedule:", slog.Any("error", err))
 		ok = false
 	}
+	// for recipient, err := address.Each(ctx, l.Frontmatter, rootDirectory string, fs fs.FS)
 	// if listID, err := l.GetListID(); err != nil {
 	// 	logger.ErrorContext(cxt, "invalid list ID:", slog.Any("error", err))
 	// 	ok = false

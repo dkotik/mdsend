@@ -2,6 +2,7 @@ package media
 
 import (
 	"bytes"
+	"errors"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
@@ -22,12 +23,29 @@ const (
 	ContentTypeImageGIF    = "image/gif"
 	ContentTypeImageWEBP   = "image/webp"
 	ContentTypeZip         = "application/zip"
+
+	Width4K        = 3840
+	Height4K       = 2160
+	DefaultQuality = 85
 )
 
 type Constraints struct {
 	Width   int
 	Height  int
 	Quality int
+}
+
+func (m Constraints) WithDefaults() Constraints {
+	if m.Quality == 0 {
+		m.Quality = DefaultQuality
+	}
+	if m.Width == 0 {
+		m.Width = Width4K
+	}
+	if m.Height == 0 {
+		m.Height = Height4K
+	}
+	return m
 }
 
 func (m Constraints) WithResolution(resolution int) Constraints {
@@ -111,4 +129,26 @@ func (m Constraints) ApplyTo(b []byte) (_ []byte, contentType string, err error)
 	default:
 		return b, contentType, nil
 	}
+}
+
+func (m Constraints) Validate() (err error) {
+	if m.Quality < 0 {
+		return errors.New("media quality must not be less than 0")
+	}
+	if m.Quality > 100 {
+		return errors.New("media quality must not be great than 100")
+	}
+	if m.Width < 20 {
+		return errors.New("media width constraint must not be less than 20")
+	}
+	if m.Width > Width4K*4 {
+		return errors.New("media width constraint is too big")
+	}
+	if m.Height < 20 {
+		return errors.New("media height constraint must not be less than 20")
+	}
+	if m.Height > Height4K*4 {
+		return errors.New("media height constraint is too big")
+	}
+	return nil
 }
