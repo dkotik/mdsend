@@ -89,24 +89,20 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 <details>
   <summary>Click here to see a list of planned features.</summary>
 
+- [ ] Beautify the default template. Add `dark.html` one.
 - [ ] add `--from` flag to send command that uses middleware to override
   sender address, might be required by certain delivery methods
-- [ ] body template should be HTML template
 - [ ] Per RFC 5321 rules, email body text lines must not exceed 1,000 characters.
 - [ ] service package with HTTP unsubscribe endpoint package
-- [ ] list out templating functions in the example, including the default ones
 - [ ] mdsend <file> should be equivalent to mdsend send <file>?
 - [ ] Queue clean up scanner - should be first added to sqlite Watermill driver.
 - [ ] Sending message with scheduling delay (instead of only queuing) should prompt a confirmation.
-- [ ] Ensure carbon copy list is in header?
+- [ ] list out templating functions in the example, including the default ones
 - [ ] Write a better Goldmark 2.0 renderer that recognizes single-line youtube and image paragraphs, centers them.
-- [ ] Beautify the default template. Add `dark.html` one.
+- [ ] body template should be HTML template?
 - [ ] Validate function should detect language and complain that `language` field is not set, if the content is not English.
 - [ ] Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
 - [ ] https://github.com/charmbracelet/glamour
-- [ ] Publish Debian package to JFrog Artifactory or similar.
-- [ ] CLI duration parser it its own from imported package in `schedule.go`.
-  - [ ] Add `y` and `mo` duration units and remove the sub-second ones.
 - [ ] Run some tests with <https://www.suped.com/tools/email-tester>
 - [ ] add to https://github.com/rothgar/awesome-tuis and bubbletea list of apps
 

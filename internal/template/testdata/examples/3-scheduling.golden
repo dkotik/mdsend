@@ -1,5 +1,5 @@
 subject: scheduling deliveries
-seed_key: G1j7TmbWjTh
+seed_key: aTe4oSM2hps
 schedule_after: 2026-12-30T00:30:00Z
 
 
@@ -20,10 +20,12 @@ Time Duration Units
 -------------------
 
 
-- `m`: Minute
-- `h`: Hour
-- `d`: Day
-- `w`: Week
+- `m`: Minute.
+- `h`: Hour.
+- `d`: Day.
+- `w`: Week.
+- `mo`: Month, that is 31 days.
+- `y`: Year, that is 365 days.
 
 Units can be combined together. For example, to delay the messageby eight weeks, four days, and seven hours, add to the front matter:
 
@@ -131,10 +133,12 @@ are deleted.</li>
 </ul>
 <h2>Time Duration Units</h2>
 <ul>
-<li><code>m</code>: Minute</li>
-<li><code>h</code>: Hour</li>
-<li><code>d</code>: Day</li>
-<li><code>w</code>: Week</li>
+<li><code>m</code>: Minute.</li>
+<li><code>h</code>: Hour.</li>
+<li><code>d</code>: Day.</li>
+<li><code>w</code>: Week.</li>
+<li><code>mo</code>: Month, that is 31 days.</li>
+<li><code>y</code>: Year, that is 365 days.</li>
 </ul>
 <p>Units can be combined together. For example, to delay the message
 by eight weeks, four days, and seven hours, add to the front matter:</p>

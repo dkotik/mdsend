@@ -26,10 +26,12 @@ Queued messages can be delayed by providing `schedule` frontmatter instructions:
 
 ## Time Duration Units
 
-- `m`: Minute
-- `h`: Hour
-- `d`: Day
-- `w`: Week
+- `m`: Minute.
+- `h`: Hour.
+- `d`: Day.
+- `w`: Week.
+- `mo`: Month, that is 31 days.
+- `y`: Year, that is 365 days.
 
 Units can be combined together. For example, to delay the message
 by eight weeks, four days, and seven hours, add to the front matter:

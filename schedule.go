@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/xhit/go-str2duration/v2"
+	"github.com/dkotik/mdsend/internal/locale"
 )
 
 type Schedule struct {
@@ -197,7 +197,7 @@ func parseDuration(v any) (time.Duration, error) {
 	switch v := v.(type) {
 	case string:
 		// return time.ParseDuration(v)
-		return str2duration.ParseDuration(v)
+		return locale.ParseDuration(v)
 	default:
 		return 0, fmt.Errorf("invalid duration value: %v (%T)", v, v)
 	}

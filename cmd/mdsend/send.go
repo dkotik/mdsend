@@ -23,19 +23,19 @@ import (
 )
 
 var (
-	flagGraceTimeout = &cli.DurationFlag{
+	flagGraceTimeout = &extendedDurationFlag{
 		Name:    "grace-timeout",
 		Aliases: []string{`gt`},
 		Value:   time.Second,
 	}
 
-	flagDelay = &cli.DurationFlag{
+	flagDelay = &extendedDurationFlag{
 		Name:    `delay`,
 		Aliases: []string{"d"},
 		Usage:   `The minimum time delay between sending each electronic mail message.`,
 	}
 
-	flagFluctuate = &cli.DurationFlag{
+	flagFluctuate = &extendedDurationFlag{
 		Name:    `fluctuate`,
 		Aliases: []string{"f"},
 		Usage:   `The time fluctuation in delay between sending each electronic mail message.`,
