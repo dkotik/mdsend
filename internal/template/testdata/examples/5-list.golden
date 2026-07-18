@@ -177,7 +177,7 @@ The CAN-SPAM act became law on Jan. 1, 2004. It says there manythings you must d
                     </tr>
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1;text-align:left;color:#11226a;"><h1>Load Recipient Lists</h1>
+                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><h1>Load Recipient Lists</h1>
 <p>Target address fields, <code>to</code>, <code>cc</code>, and <code>bcc</code> support a list of
 entries. Any entry can also point to a configuration file in a
 variety of common formats that will be merged into the parent list.</p>

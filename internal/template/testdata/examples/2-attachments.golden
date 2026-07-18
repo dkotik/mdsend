@@ -11,7 +11,7 @@ List added files under `attachments` frontmatter section.Images are automaticall
 Inline Attachments
 ------------------
 
-Inline attachments are placed into message body,when linked like so:[cat](../internal/media/testdata/cat.jpg).
+Inline attachments are placed into message body,when linked like so:🔗 [cat](../internal/media/testdata/cat.jpg).
 
 
 Creative Commons Credits
@@ -107,7 +107,7 @@ Creative Commons Credits
                     </tr>
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1;text-align:left;color:#11226a;"><h1>Attach Files to the Message</h1>
+                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><h1>Attach Files to the Message</h1>
 <p>List added files under <code>attachments</code> frontmatter section.
 Images are automatically compressed. Control the size
 with <code>media_constraints</code> frontmatter section.</p>

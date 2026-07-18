@@ -39,6 +39,7 @@ func (p *plaintextRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegistere
 	reg.Register(ast.KindLink, p.renderLink)
 	reg.Register(ast.KindImage, p.renderImage)
 	reg.Register(ast.KindAutoLink, p.renderAutoLink)
+	reg.Register(KindActionButton, p.renderAction)
 
 	// Other inline elements
 	reg.Register(ast.KindThematicBreak, p.renderThematicBreak)
@@ -230,13 +231,32 @@ func (p *plaintextRenderer) renderEmphasis(w util.BufWriter, source []byte, node
 }
 
 func (p *plaintextRenderer) renderLink(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
-	l := node.(*ast.Link)
 	if entering {
-		_ = w.WriteByte('[')
+		_, _ = w.WriteString("🔗 [")
 	} else {
+		l := node.(*ast.Link)
 		_, _ = w.WriteString("](")
 		_, _ = w.Write(l.Destination)
 		_ = w.WriteByte(')')
+	}
+	return ast.WalkContinue, nil
+}
+
+func (p *plaintextRenderer) renderAction(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	if entering {
+		_, _ = w.WriteString(" 👉 ")
+	} else {
+		l := node.(*ActionButtonNode)
+		_, _ = w.WriteString(": <")
+		_, _ = w.Write(l.Link.Destination)
+		_ = w.WriteByte('>')
+		if len(l.Link.Title) > 0 {
+			_ = w.WriteByte(' ')
+			_ = w.WriteByte('(')
+			_, _ = w.Write(l.Link.Title)
+			_ = w.WriteByte(')')
+		}
+		_, _ = w.WriteString("\n")
 	}
 	return ast.WalkContinue, nil
 }

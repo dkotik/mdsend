@@ -1,29 +1,36 @@
 <h1>Title</h1>
 <p>&lt;www.plain.com&gt;</p>
-<p><table border="0" cellspacing="0" cellpadding="0">
+<p>Normal link will be ignored inside text: <a href="www.ignore.com" title="ignore" style="color: #0066cc; text-decoration: underline;">normal</a></p>
+
+		<table border="0" cellspacing="0" cellpadding="0">
+			<tr>
+        <td align="center" style="border-radius: 5px; background-color:#3a86ff;">
+		<table border="0" cellspacing="0" cellpadding="0">
       <tr>
           <td align="center" style="border-radius: 5px; background-color:#3a86ff;">
-              <a rel="noopener" target="_blank" target="_blank" href="www.action.com" title="title1" target="_blank" style="font-size: 18px; color: #ffffff; font-weight: bold; text-decoration: none;border-radius: 5px; padding: 12px 18px; border: 1px solid #3a86ff; display: inline-block;">
-			action1 ahem &rarr;</a>
+              <a rel="noopener" target="_blank" href="www.action.com" title="title1" style="font-size: 18px; color: #ffffff; font-weight: bold; text-decoration: none;border-radius: 5px; padding: 12px 18px; border: 1px solid #3a86ff; display: inline-block;">action1 ahem &rarr;</a>
                       </td>
                   </tr>
-              </table></p>
-<p>Lorem.</p>
-<p><table border="0" cellspacing="0" cellpadding="0">
+              </table></td></tr></table><p>Lorem.</p>
+
+		<table border="0" cellspacing="0" cellpadding="0">
+			<tr>
+        <td align="center" style="border-radius: 5px; background-color:#3a86ff;">
+		<table border="0" cellspacing="0" cellpadding="0">
       <tr>
           <td align="center" style="border-radius: 5px; background-color:#3a86ff;">
-              <a rel="noopener" target="_blank" target="_blank" href="www.action2.com" title="title2" target="_blank" style="font-size: 18px; color: #ffffff; font-weight: bold; text-decoration: none;border-radius: 5px; padding: 12px 18px; border: 1px solid #3a86ff; display: inline-block;">
-			action2 something &rarr;</a>
+              <a rel="noopener" target="_blank" href="www.action2.com" title="title2" style="font-size: 18px; color: #ffffff; font-weight: bold; text-decoration: none;border-radius: 5px; padding: 12px 18px; border: 1px solid #3a86ff; display: inline-block;">action2 something &rarr;</a>
                       </td>
                   </tr>
-              </table></p>
-<p>Ipsum.</p>
-<p><table border="0" cellspacing="0" cellpadding="0">
+              </table></td></tr></table><p>Ipsum.</p>
+
+		<table border="0" cellspacing="0" cellpadding="0">
+			<tr>
+        <td align="center" style="border-radius: 5px; background-color:#3a86ff;">
+		<table border="0" cellspacing="0" cellpadding="0">
       <tr>
           <td align="center" style="border-radius: 5px; background-color:#3a86ff;">
-              <a rel="noopener" target="_blank" target="_blank" href="www.action3.com" title="action3" target="_blank" style="font-size: 18px; color: #ffffff; font-weight: bold; text-decoration: none;border-radius: 5px; padding: 12px 18px; border: 1px solid #3a86ff; display: inline-block;">
-			action3 &rarr;</a>
+              <a rel="noopener" target="_blank" href="www.action3.com" title="action3" style="font-size: 18px; color: #ffffff; font-weight: bold; text-decoration: none;border-radius: 5px; padding: 12px 18px; border: 1px solid #3a86ff; display: inline-block;">action3 &rarr;</a>
                       </td>
                   </tr>
-              </table></p>
-<p>Dolor.</p>
+              </table></td></tr></table><p>Dolor.</p>

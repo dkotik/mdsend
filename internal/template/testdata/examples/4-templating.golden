@@ -133,7 +133,7 @@ URL: https://test.com/?unsubscribe=
                     </tr>
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1;text-align:left;color:#11226a;"><p>Hello FirstName,</p>
+                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><p>Hello FirstName,</p>
 <h1>Example Message For Full Name</h1>
 <p>The Markdown content itself is a <code>Golang</code> text template.
 To wrap the output of a letter into an <code>HTML</code> template, specify

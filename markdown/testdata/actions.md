@@ -2,6 +2,8 @@
 
 <www.plain.com>
 
+Normal link will be ignored inside text: [normal](www.ignore.com "ignore")
+
 [action1 ahem](www.action.com "title1")
 
 Lorem.

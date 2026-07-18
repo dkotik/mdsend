@@ -5,17 +5,17 @@ Subtitle
 --------
 
 
-Title [](inTitle.jpg)
+Title 🔗 [](inTitle.jpg)
 ======
 
-Inside paragraph: ![](inParagraph.jpg) Tail of the paragraph. And just a reference [refLink](greatRefLink)!
+Inside paragraph: ![](inParagraph.jpg) Tail of the paragraph. And just a reference 🔗 [refLink](greatRefLink)!
 
 In List:
 
 
 - ![](inList.jpg "In List")![](inList.jpg)
 
-![flowing tail](finalMash1.txt)[flowing tail](finalMash2.txt)
+![flowing tail](finalMash1.txt)🔗 [flowing tail](finalMash2.txt)
 
 
 Heading Level 1 (Document Title)
@@ -104,8 +104,8 @@ You can combine them for ***bold and italic text*** or ***alternative bold and i
 ### Links
 
 
-- Inline link: [Visit the Markdown Guide Official Site](https://www.markdownguide.org)Inline link: [Visit the Markdown Guide Official Site](https://www.markdownguide.org)
-- Link with hover title: [Google Search](https://www.google.com "Go to Google")Link with hover title: [Google Search](https://www.google.com)
+- Inline link: [Visit the Markdown Guide Official Site](https://www.markdownguide.org)Inline link: 🔗 [Visit the Markdown Guide Official Site](https://www.markdownguide.org)
+- Link with hover title: [Google Search](https://www.google.com "Go to Google")Link with hover title: 🔗 [Google Search](https://www.google.com)
 - Automatic URL link: <https://www.example.com>Automatic URL link: https://www.example.com
 
 
@@ -198,3 +198,4 @@ Here is a sentence that requires a formal citation.[^1]And here is a second note
 
 Most engines allow basic HTML for features like colored text, underlined text, or formatting formatting text with superscript and subscript elements.
 
+ 👉 action2 something: <www.action2.com> (title2)

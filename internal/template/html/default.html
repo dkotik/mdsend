@@ -107,24 +107,11 @@
                     {{- end }}
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:{{ $font }};font-size:20px;line-height:1;text-align:left;color:{{ $textColor }};">
+                        <div style="font-family:{{ $font }};font-size:20px;line-height:1.2;text-align:left;color:{{ $textColor }};">
                           {{- .Content -}}
                         </div>
                       </td>
                     </tr>
-                    {{- if 0 }}
-                    <tr>
-                      <td align="center" style="font-size:0px;padding:34px 22px;word-break:break-word;">
-                        <table border="0" cellspacing="0" cellpadding="0">
-                            <tr>
-                                <td align="center" style="border-radius: 5px; background-color:{{ $actionColor }};">
-                                    <a rel="noopener" target="_blank" rel="noopener" target="_blank" href="https://litmus.com" target="_blank" style="font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; font-weight: bold; text-decoration: none;border-radius: 5px; padding: 12px 18px; border: 1px solid {{ $actionColor }}; display: inline-block;">I am a button &rarr;</a>
-                                </td>
-                            </tr>
-                        </table>
-                      </td>
-                    </tr>
-                    {{- end }}
                   </tbody>
                 </table>
               </div>
@@ -151,3 +138,19 @@
   </div>
 </body>
 </html>
+
+{{- define "actionButton" }}
+<table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+<td align="center" style="font-size:0px;padding:34px 22px;word-break:break-word;">
+  <table border="0" cellspacing="0" cellpadding="0">
+      <tr>
+          <td align="center" style="border-radius: 5px; background-color:{{ .BackgroundColor }};">
+              <a rel="noopener" target="_blank" rel="noopener" href="{{ .URL }}" style="font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: {{ .TextColor }}; font-weight: bold; text-decoration: none;border-radius: 5px; padding: 12px 18px; border: 1px solid {{ .BackgroundColor }}; display: inline-block;" title="{{ .Title }}">{{ .Label }} &rarr;</a>
+          </td>
+      </tr>
+  </table>
+</td>
+    </tr>
+</table>
+{{- end }}

@@ -193,7 +193,7 @@ Any Markdown content below the last horizontal rule is added as afooter to the c
                     </tr>
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1;text-align:left;color:#11226a;"><!-- raw HTML omitted -->
+                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><!-- raw HTML omitted -->
 <h1>Load Recipient Lists</h1>
 <p>Target address fields, <code>to</code>, <code>cc</code>, and <code>bcc</code> support a list of
 entries. Any entry can also point to a configuration file in a

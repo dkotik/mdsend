@@ -17,6 +17,7 @@ func TestPlaintextRenderer(t *testing.T) {
 	}
 	md := goldmark.New(
 		goldmark.WithRenderer(NewPlaintextRenderer()),
+		goldmark.WithParser(NewParser()),
 	)
 
 	b := &bytes.Buffer{}

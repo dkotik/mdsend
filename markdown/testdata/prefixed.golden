@@ -139,3 +139,5 @@ And here is a second note reference.[^2]
 
 ### HTML Workarounds (Renderer Dependent)
 Most engines allow basic HTML for features like <span style="color:red">colored text</span>, <ins>underlined text</ins>, or formatting formatting text with <sup>superscript</sup> and <sub>subscript</sub> elements.
+
+[action2 something](relativePathPrefix/www.action2.com "title2")
