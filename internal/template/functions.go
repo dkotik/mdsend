@@ -34,6 +34,9 @@ func functions() template.FuncMap {
 		// 	caser := cases.Cam(language.English)
 		// 	return caser.String(strings.ToLower(in))
 		// },
+		"safeCSS": func(s string) template.CSS {
+			return template.CSS(s)
+		},
 		"titlecase": func(in string) string {
 			caser := cases.Title(language.English)
 			return caser.String(strings.ToLower(in))

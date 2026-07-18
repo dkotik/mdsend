@@ -43,7 +43,7 @@ func TestDefaultTemplateRendering(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	tmpl, err := template.New("").Parse(string(defaultTemplate))
+	tmpl, err := template.New("").Funcs(functions()).Parse(string(defaultTemplate))
 	if err != nil {
 		t.Fatal(err)
 	}
