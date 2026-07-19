@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+// func (t *tmpl) Lookup(templateName string) bool {
+// 	return t.HTML.Lookup(templateName) != nil
+// }
+
 func (t *tmpl) Reify(templateName string) (v string, err error) {
 	templateName = strings.TrimSpace(templateName)
 	if templateName == "" {

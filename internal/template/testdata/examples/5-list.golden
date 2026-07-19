@@ -1,7 +1,7 @@
 subject: typical mailing list message
-seed_key: Vp99VwCrBgh
+seed_key: URUeprCcv4J
 List-Id: Some List <greatlist@test.com>
-List-Unsubscribe: <mailto:unsub@yourdomain.com>, <https://yourdomain.com/unsub?id=orMDSH9upTqMfMZfPwwAuCReRxaZiQqvDy>
+List-Unsubscribe: <mailto:unsub@yourdomain.com>, &lt;https://yourdomain.com/unsub?id=orMDSH9upTqMfMZfPwwAuCReRxaZiQqvDy>
 List-Unsubscribe-Post: token=orMDSH9upTqMfMZfPwwAuCReRxaZiQqvDy
 
 
@@ -25,7 +25,7 @@ bcc:
 Each entry is a map, regardless of how it was loaded. Any value ofthe map is accessible to the template engine through the context.
 
 
-Greeting <no value> <no value>,
+Greeting  ,
 
 I am writing, because ...
 
@@ -58,7 +58,7 @@ The first line of output must match the desired file format.This protects `mdsen
 #!/bin/sh
 
 # example of an executable script returning JSON data.
-cat << EOF
+cat &lt;&lt; EOF
 Content-type: application/json
 
 [
@@ -168,7 +168,8 @@ The CAN-SPAM act became law on Jan. 1, 2004. It says there manythings you must d
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
                           <tbody>
                             <tr>
-                              <td style="width:100px;color:#e8ecfb;font-size: 32px;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;"></td>
+                              <td style="width:100px;color:#e8ecfb;font-size: 32px;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;">
+                              </td>
                             </tr>
                           </tbody>
                         </table>
@@ -193,7 +194,7 @@ bcc:
 </code></pre>
 <p>Each entry is a map, regardless of how it was loaded. Any value of
 the map is accessible to the template engine through the context.</p>
-<pre><code class="language-markdown">Greeting &lt;no value&gt; &lt;no value&gt;,
+<pre><code class="language-markdown">Greeting  ,
 
 I am writing, because ...
 </code></pre>
@@ -228,7 +229,7 @@ Cuelang, CSV and other formats.</p>
 <pre><code class="language-sh">#!/bin/sh
 
 # example of an executable script returning JSON data.
-cat &lt;&lt; EOF
+cat &amp;lt;&amp;lt; EOF
 Content-type: application/json
 
 [

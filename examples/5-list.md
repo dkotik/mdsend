@@ -11,7 +11,7 @@ bcc:
 language: en
 headers:
   List-ID: Some List <greatlist@test.com>
-  List-Unsubscribe: <mailto:unsub@yourdomain.com>, <{{ reify "unsubscribe_url" }}>
+  List-Unsubscribe: <mailto:unsub@yourdomain.com>, < {{- reify "unsubscribe_url" -}} >
   List-Unsubscribe-Post: token={{ reify "unsubscribe_token" }}
 ---
 

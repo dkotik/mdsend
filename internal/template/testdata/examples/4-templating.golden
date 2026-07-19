@@ -1,50 +1,84 @@
 subject: example message for Full Name
-seed_key: 7yEHnzrvi7W
+seed_key: 2QN6svWdo7u
 X-Template-Test: test
 
-Hello FirstName,
+<!doctype html>
 
 
-Example Message For Full Name
-=============================
+table, td {
+  border-collapse: collapse;
+  mso-table-lspace: 0pt;
+  mso-table-rspace: 0pt;
+}
 
-The Markdown content itself is a `Golang` text template.To wrap the output of a letter into an `HTML` template, specifythe list of files to load using the `template` field in thefrontmatter.
+img {
+  border: 0;
+  height: auto;
+  line-height: 100%;
+  outline: none;
+  text-decoration: none;
+  -ms-interpolation-mode: bicubic;
+}
 
-The frontmatter subject and the header values are also treatedas text templates. If the header template is rendered empty,it will be ommitted from the sent message.
+p {
+  display: block;
+  margin: 11px 0;
+}
 
-
-Context
--------
-
-Template execution context contains the following fields:
-
-
-- **Frontmatter:** the raw Markdown frontmatter as `map[string]any`.
-- **Recipient:** the raw message target as `map[string]any`. Itwill contain `name` and `email` fields and any other fieldsfromt the contact source.
-- **Content:** rendered Markdown body.
-- **Schedule:** parsed scheduling directives.
-
-
-Template Functions
-------------------
-
-
-- **skipMessageIfTrue:** skip current recipient is the argument to this function call evaluates to an unempty value.
-
-
-Reify Templates
----------------
-
-Special `reify` function stores the output of a named `Golang` blockor template. Calling `reify` again on the same template, returnsthe initial output. Each recipient starts with an empty output cache.
-
-Here is an example of declaring a template that encodes recipientaddress as a URL-safe field once to be used several times:
+a { padding: 0; }
 
 
 
 
-URL: https://test.com/?unsubscribe=
-  to%40test.com
-
+<div style="margin:0px auto;max-width:600px;">
+  <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+    <tbody>
+      <tr>
+        <td style="font-size:0px;text-align:center;">
+          
+          <div class="main" style="font-size:0px;text-align:left;display:inline-block;vertical-align:top;width:100%;background-color:#fefeff;-webkit-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); -moz-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15);">
+            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+              <tbody>
+                <tr>
+                  <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;background-color:#6784ff;">
+                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+                      <tbody>
+                        <tr>
+                          <td style="width:100px;color:#e8ecfb;font-size: 32px;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;">
+                              <h1 style="margin: 0; padding: 0 0 16px 0; font-size: 28px; line-height: 34px; font-weight: bold;">
+                                This is Template-Specific Title to Display above Content
+                              </h1>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
+                    <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+        </td>
+      </tr>
+      <tr>
+        <td align="center" style="font-size:0px;padding: 24px 26px 10px 26px;word-break:break-word;">
+          <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+            <tbody>
+              <tr>
+                <td style="color:#41629a;font-size: 11px;align: center"></td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 
 
@@ -123,7 +157,11 @@ URL: https://test.com/?unsubscribe=
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
                           <tbody>
                             <tr>
-                              <td style="width:100px;color:#e8ecfb;font-size: 32px;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;"></td>
+                              <td style="width:100px;color:#e8ecfb;font-size: 32px;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;">
+                                  <h1 style="margin: 0; padding: 0 0 16px 0; font-size: 28px; line-height: 34px; font-weight: bold;">
+                                    This is Template-Specific Title to Display above Content
+                                  </h1>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
@@ -131,41 +169,88 @@ URL: https://test.com/?unsubscribe=
                     </tr>
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><p>Hello FirstName,</p>
-<h1>Example Message For Full Name</h1>
-<p>The Markdown content itself is a <code>Golang</code> text template.
-To wrap the output of a letter into an <code>HTML</code> template, specify
-the list of files to load using the <code>template</code> field in the
-frontmatter.</p>
-<p>The frontmatter subject and the header values are also treated
-as text templates. If the header template is rendered empty,
-it will be ommitted from the sent message.</p>
-<h2>Context</h2>
-<p>Template execution context contains the following fields:</p>
-<ul>
-<li><strong>Frontmatter:</strong> the raw Markdown frontmatter as <code>map[string]any</code>.</li>
-<li><strong>Recipient:</strong> the raw message target as <code>map[string]any</code>. It
-will contain <code>name</code> and <code>email</code> fields and any other fields
-fromt the contact source.</li>
-<li><strong>Content:</strong> rendered Markdown body.</li>
-<li><strong>Schedule:</strong> parsed scheduling directives.</li>
-</ul>
-<h2>Template Functions</h2>
-<ul>
-<li><strong>skipMessageIfTrue:</strong> skip current recipient is the argument to this function call evaluates to an unempty value.</li>
-</ul>
-<h2>Reify Templates</h2>
-<p>Special <code>reify</code> function stores the output of a named <code>Golang</code> block
-or template. Calling <code>reify</code> again on the same template, returns
-the initial output. Each recipient starts with an empty output cache.</p>
-<p>Here is an example of declaring a template that encodes recipient
-address as a URL-safe field once to be used several times:</p>
-<pre><code>
+                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><p>&lt;!doctype html&gt;<!-- raw HTML omitted --></p>
+<!-- raw HTML omitted -->
+<pre><code>table, td {
+  border-collapse: collapse;
+  mso-table-lspace: 0pt;
+  mso-table-rspace: 0pt;
+}
 
-URL: https://test.com/?unsubscribe=
-  to%40test.com
+img {
+  border: 0;
+  height: auto;
+  line-height: 100%;
+  outline: none;
+  text-decoration: none;
+  -ms-interpolation-mode: bicubic;
+}
 
+p {
+  display: block;
+  margin: 11px 0;
+}
+
+a { padding: 0; }
 </code></pre>
+<p><!-- raw HTML omitted --></p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<pre><code>&lt;div style=&quot;margin:0px auto;max-width:600px;&quot;&gt;
+  &lt;table align=&quot;center&quot; border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; role=&quot;presentation&quot; style=&quot;width:100%;&quot;&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;
+        &lt;td style=&quot;font-size:0px;text-align:center;&quot;&gt;
+          
+          &lt;div class=&quot;main&quot; style=&quot;font-size:0px;text-align:left;display:inline-block;vertical-align:top;width:100%;background-color:#fefeff;-webkit-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); -moz-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15);&quot;&gt;
+            &lt;table border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; role=&quot;presentation&quot; style=&quot;vertical-align:top;&quot; width=&quot;100%&quot;&gt;
+              &lt;tbody&gt;
+                &lt;tr&gt;
+                  &lt;td align=&quot;center&quot; style=&quot;font-size:0px;padding:10px 25px;word-break:break-word;background-color:#6784ff;&quot;&gt;
+                    &lt;table border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; role=&quot;presentation&quot; style=&quot;border-collapse:collapse;border-spacing:0px;&quot;&gt;
+                      &lt;tbody&gt;
+                        &lt;tr&gt;
+                          &lt;td style=&quot;width:100px;color:#e8ecfb;font-size: 32px;font-family:Georgia, &amp;#39;Times New Roman&amp;#39;, Helvetica, serif;&quot;&gt;
+                              &lt;h1 style=&quot;margin: 0; padding: 0 0 16px 0; font-size: 28px; line-height: 34px; font-weight: bold;&quot;&gt;
+                                This is Template-Specific Title to Display above Content
+                              &lt;/h1&gt;
+                          &lt;/td&gt;
+                        &lt;/tr&gt;
+                      &lt;/tbody&gt;
+                    &lt;/table&gt;
+                  &lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td align=&quot;left&quot; style=&quot;font-size:0px;padding:14px 22px;word-break:break-word;&quot;&gt;
+                    &lt;div style=&quot;font-family:Georgia, &amp;#39;Times New Roman&amp;#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;&quot;&gt;&lt;/div&gt;
+                  &lt;/td&gt;
+                &lt;/tr&gt;
+              &lt;/tbody&gt;
+            &lt;/table&gt;
+          &lt;/div&gt;
+          
+        &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td align=&quot;center&quot; style=&quot;font-size:0px;padding: 24px 26px 10px 26px;word-break:break-word;&quot;&gt;
+          &lt;table border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; role=&quot;presentation&quot; style=&quot;border-collapse:collapse;border-spacing:0px;&quot;&gt;
+            &lt;tbody&gt;
+              &lt;tr&gt;
+                &lt;td style=&quot;color:#41629a;font-size: 11px;align: center&quot;&gt;&lt;/td&gt;
+              &lt;/tr&gt;
+            &lt;/tbody&gt;
+          &lt;/table&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;
+</code></pre>
+<!-- raw HTML omitted -->
 </div>
                       </td>
                     </tr>

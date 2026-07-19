@@ -1,5 +1,5 @@
 subject: example message with attachments
-seed_key: HbSRoAxM7o6
+seed_key: TZSZQBfvmuz
 
 
 Attach Files to the Message
@@ -99,7 +99,8 @@ Creative Commons Credits
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
                           <tbody>
                             <tr>
-                              <td style="width:100px;color:#e8ecfb;font-size: 32px;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;"></td>
+                              <td style="width:100px;color:#e8ecfb;font-size: 32px;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;">
+                              </td>
                             </tr>
                           </tbody>
                         </table>

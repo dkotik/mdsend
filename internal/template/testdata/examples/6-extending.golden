@@ -1,7 +1,7 @@
 subject: extend one letter from letter
-seed_key: ChFDZtJXnQE
+seed_key: MMP3XBghrqD
 List-Id: Some List <greatlist@test.com>
-List-Unsubscribe: <mailto:unsub@yourdomain.com>, <https://yourdomain.com/unsub?id=MLFhcxXQr1kWB3z3sCTTnUCVT3TzmoMg3BUfGTBM5>
+List-Unsubscribe: <mailto:unsub@yourdomain.com>, &lt;https://yourdomain.com/unsub?id=MLFhcxXQr1kWB3z3sCTTnUCVT3TzmoMg3BUfGTBM5>
 List-Unsubscribe-Post: token=MLFhcxXQr1kWB3z3sCTTnUCVT3TzmoMg3BUfGTBM5
 
 
@@ -25,7 +25,7 @@ bcc:
 Each entry is a map, regardless of how it was loaded. Any value ofthe map is accessible to the template engine through the context.
 
 
-Greeting <no value> <no value>,
+Greeting  ,
 
 I am writing, because ...
 
@@ -58,7 +58,7 @@ The first line of output must match the desired file format.This protects `mdsen
 #!/bin/sh
 
 # example of an executable script returning JSON data.
-cat << EOF
+cat &lt;&lt; EOF
 Content-type: application/json
 
 [
@@ -184,7 +184,8 @@ Any Markdown content below the last horizontal rule is added as afooter to the c
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
                           <tbody>
                             <tr>
-                              <td style="width:100px;color:#e8ecfb;font-size: 32px;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;"></td>
+                              <td style="width:100px;color:#e8ecfb;font-size: 32px;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;">
+                              </td>
                             </tr>
                           </tbody>
                         </table>
@@ -192,8 +193,7 @@ Any Markdown content below the last horizontal rule is added as afooter to the c
                     </tr>
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><!-- raw HTML omitted -->
-<h1>Load Recipient Lists</h1>
+                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><h1>Load Recipient Lists</h1>
 <p>Target address fields, <code>to</code>, <code>cc</code>, and <code>bcc</code> support a list of
 entries. Any entry can also point to a configuration file in a
 variety of common formats that will be merged into the parent list.</p>
@@ -210,7 +210,7 @@ bcc:
 </code></pre>
 <p>Each entry is a map, regardless of how it was loaded. Any value of
 the map is accessible to the template engine through the context.</p>
-<pre><code class="language-markdown">Greeting &lt;no value&gt; &lt;no value&gt;,
+<pre><code class="language-markdown">Greeting  ,
 
 I am writing, because ...
 </code></pre>
@@ -245,7 +245,7 @@ Cuelang, CSV and other formats.</p>
 <pre><code class="language-sh">#!/bin/sh
 
 # example of an executable script returning JSON data.
-cat &lt;&lt; EOF
+cat &amp;lt;&amp;lt; EOF
 Content-type: application/json
 
 [
@@ -278,7 +278,7 @@ contact list.</p>
 things you must do as a commercial email-er. Highlights are
 basically don't be deceptive, and that you <strong>MUST</strong> include a
 physical mailing address as well as a working unsubscribe link in
-the body.<!-- raw HTML omitted --></p>
+the body.</p>
 <h1>Extend One Letter with Another</h1>
 <p>Merge the content and frontmatter fields into a letter from another
 file by using the <code>extends</code> field.</p>

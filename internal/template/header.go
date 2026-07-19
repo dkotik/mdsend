@@ -1,6 +1,6 @@
 package template
 
-import "text/template"
+import "html/template"
 
 type headerTemplate struct {
 	Name     string

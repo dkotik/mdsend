@@ -97,7 +97,11 @@
                           <tbody>
                             <tr>
                               <td style="width:100px;color:{{ $headerTextColor }};font-size: 32px;font-family:{{ $font }};">
-                                {{- block "title" . -}}{{- end -}}
+                                {{- with .Frontmatter.title }}
+                                  <h1 style="margin: 0; padding: 0 0 16px 0; font-size: 28px; line-height: 34px; font-weight: bold;">
+                                    {{ . }}
+                                  </h1>
+                                {{- end }}
                               </td>
                             </tr>
                           </tbody>

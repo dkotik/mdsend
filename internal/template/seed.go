@@ -2,7 +2,7 @@ package template
 
 import (
 	"fmt"
-	ttemplate "text/template"
+	"html/template"
 
 	"github.com/btcsuite/btcd/btcutil/base58"
 	"github.com/cespare/xxhash/v2"
@@ -19,7 +19,7 @@ func newSeedKey(ctx Context, l mdsend.Letter) (string, error) {
 	if seedString == "" {
 		seedString = DefaultSeedTemplate
 	}
-	seedTemplate, err := ttemplate.New("").Parse(seedString)
+	seedTemplate, err := template.New("").Parse(seedString)
 	if err != nil {
 		return "", fmt.Errorf("invalid seed template: %w", err)
 	}

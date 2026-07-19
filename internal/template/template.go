@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"html/template"
 	"net/mail"
+	"path/filepath"
 	"strings"
-	ttemplate "text/template"
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/internal"
@@ -30,10 +30,10 @@ type tmpl struct {
 	SeedKey             string
 	From                mail.Address
 	Headers             []headerTemplate
-	Subject             *ttemplate.Template
-	Text                *ttemplate.Template
-	ReifiedCache        map[string]string
+	Subject             *template.Template
+	Text                *template.Template
 	HTML                *template.Template
+	ReifiedCache        map[string]string
 	ContentParser       parser.Parser
 	RendererForText     renderer.Renderer
 	RendererForHTML     renderer.Renderer
@@ -77,6 +77,10 @@ func New(
 	l mdsend.Letter,
 	options Options,
 ) (_ Template, err error) {
+	l.Content = strings.TrimSpace(l.Content)
+	if l.Content == "" {
+		return nil, errors.New("empty letter content")
+	}
 	options = options.withDefaults()
 	internal.MapMergeLeft(options.Frontmatter, l.Frontmatter)
 	t := &tmpl{
@@ -91,6 +95,10 @@ func New(
 			Content:     template.HTML(l.Content), // for initial templates only
 		},
 	}
+	t.From, err = l.GetFrom()
+	if err != nil {
+		return nil, err
+	}
 	if t.context.Frontmatter == nil {
 		t.context.Frontmatter = make(map[string]any)
 	}
@@ -102,27 +110,54 @@ func New(
 	if err != nil {
 		return nil, err
 	}
-	t.From, err = l.GetFrom()
-	if err != nil {
-		return nil, err
-	}
 
 	templateFunctions := functions()
 	templateFunctions["reify"] = t.Reify
-	l.Content = strings.TrimSpace(l.Content)
-	if l.Content == "" {
-		return nil, errors.New("empty letter content")
-	}
-	t.Text, err = ttemplate.New("").Funcs(templateFunctions).Parse(l.Content)
+	// templateFunctions["lookup"] = t.Lookup
+	t.HTML, err = template.New("").Funcs(templateFunctions).Parse(l.Content)
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse letter content as a template: %w", err)
+	}
+	if len(l.Templates) == 0 {
+		defaultTemplate, err := defaultTemplates.ReadFile("html/default.html")
+		if err != nil {
+			return nil, fmt.Errorf("unable to load default template: %w", err)
+		}
+		t.Text, err = t.HTML.Clone()
+		if err != nil {
+			return nil, fmt.Errorf("unable to clone letter content as a template: %w", err)
+		}
+		t.HTML, err = t.HTML.Parse(string(defaultTemplate))
+		if err != nil {
+			return nil, fmt.Errorf("unable to parse default template: %w", err)
+		}
+	} else {
+		var subTemplate mdsend.Attachment
+		for _, subTemplate = range l.Templates {
+			t.HTML, err = t.HTML.New(
+				filepath.Base(subTemplate.Name),
+			).Parse(string(subTemplate.Content))
+			if err != nil {
+				return nil, fmt.Errorf("unable to parse template %q: %w", subTemplate.Name, err)
+			}
+		}
+		t.Text, err = t.HTML.Clone()
+		if err != nil {
+			return nil, fmt.Errorf("unable to clone letter content as a template: %w", err)
+		}
+		// the latest template becomes the root template
+		t.HTML, err = t.HTML.New("").Parse(string(subTemplate.Content))
 	}
 
 	subject, err := l.GetSubject()
 	if err != nil {
 		return nil, err
 	}
-	t.Subject, err = t.Text.New("").Parse(subject)
+	clone, err := t.Text.Clone()
+	if err != nil {
+		return nil, fmt.Errorf("unable to clone content template: %w", err)
+	}
+	t.Subject, err = clone.New("").Parse(subject)
 	if err != nil {
 		return nil, fmt.Errorf("invalid subject template: %w", err)
 	}
@@ -132,32 +167,17 @@ func New(
 	}
 	t.Headers = make([]headerTemplate, len(headers))
 	for i, header := range headers {
-		value, err := t.Text.New("").Parse(header.Value)
+		clone, err = t.Text.Clone()
+		if err != nil {
+			return nil, fmt.Errorf("unable to clone content template: %w", err)
+		}
+		value, err := clone.New("").Parse(header.Value)
 		if err != nil {
 			return nil, fmt.Errorf("unable to parse header %q as template: %w", header.Name, err)
 		}
 		t.Headers[i] = headerTemplate{
 			Name:     header.Name,
 			Template: value,
-		}
-	}
-
-	t.HTML = template.New("").Funcs(templateFunctions)
-	for _, subTemplate := range l.Templates {
-		t.HTML, err = t.HTML.Parse(string(subTemplate.Content))
-		if err != nil {
-			return nil, fmt.Errorf("unable to parse template %q: %w", subTemplate.Name, err)
-		}
-	}
-
-	if len(l.Templates) == 0 {
-		defaultTemplate, err := defaultTemplates.ReadFile("html/default.html")
-		if err != nil {
-			return nil, fmt.Errorf("unable to load default template: %w", err)
-		}
-		t.HTML, err = t.HTML.Parse(string(defaultTemplate))
-		if err != nil {
-			return nil, fmt.Errorf("unable to parse default template: %w", err)
 		}
 	}
 	return t, nil

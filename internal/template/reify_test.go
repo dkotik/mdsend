@@ -30,8 +30,11 @@ func TestReifyTemplate(t *testing.T) {
 		template := template.(*tmpl)
 		template.Reset()
 		b := &bytes.Buffer{}
+		if template.Text.Lookup("") == nil {
+			t.Fatal("content template is nil")
+		}
 		if err = template.Text.Execute(b, nil); err != nil {
-			t.Fatal("unable to execute template")
+			t.Fatal("unable to execute template", err)
 		}
 		early := b.String()
 		first, second, ok := strings.Cut(early, "||")

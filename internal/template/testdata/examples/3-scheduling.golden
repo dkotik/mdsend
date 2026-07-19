@@ -1,5 +1,5 @@
 subject: scheduling deliveries
-seed_key: aTe4oSM2hps
+seed_key: L52cNZaPYnH
 schedule_after: 2026-12-30T00:30:00Z
 
 
@@ -110,7 +110,8 @@ schedule:
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
                           <tbody>
                             <tr>
-                              <td style="width:100px;color:#e8ecfb;font-size: 32px;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;"></td>
+                              <td style="width:100px;color:#e8ecfb;font-size: 32px;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;">
+                              </td>
                             </tr>
                           </tbody>
                         </table>

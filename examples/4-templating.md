@@ -1,5 +1,6 @@
 ---
 subject: example message for {{ .Recipient.name }}
+title: This is Template-Specific Title to Display above Content
 from: Test Author <joedoe@test.com>
 to:
   - name: Full Name
@@ -19,7 +20,16 @@ Hello {{ .Recipient.first_name }},
 The Markdown content itself is a `Golang` text template.
 To wrap the output of a letter into an `HTML` template, specify
 the list of files to load using the `template` field in the
-frontmatter.
+frontmatter. The last template in the list becomes the root
+template. Other templates can be called by their base file
+name:
+
+```
+{{ template "default.html" . }}
+```
+
+Any sub-templates and blocks defined here, in the contents
+of the letter are available in all other templates.
 
 The frontmatter subject and the header values are also treated
 as text templates. If the header template is rendered empty,
