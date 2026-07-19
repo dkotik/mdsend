@@ -18,7 +18,6 @@ Send markdown files as electronic mail. Maintain mailing lists as templated text
         help testing this implementation.
     - [ ] Loops
   - Supports additional mailing services by SMTP relay:
-    - [ ] HubSpot? (smtp.hubapi.com)
     - [x] SMTP2GO
     - [x] Brevo
     - [x] Mailchimp
@@ -32,6 +31,7 @@ Send markdown files as electronic mail. Maintain mailing lists as templated text
     - [x] MailJet
     - [x] EmailLabs
     - [x] PurelyMail
+    - [ ] HubSpot? (smtp.hubapi.com)
 
 SMTP relay is often more robust than the provider API. For example, Resend API does not support multi-value headers, but its SMTP relay does.
 
@@ -77,6 +77,9 @@ More usage examples are here:
   brew tap dkotik/tap
   brew install curl mdsend
   ```
+- Debian Package: [latest release](releases)
+- Linux Binary: [latest release](releases)
+- Windows Binary: [latest release](releases)
 - Build from source:
   ```sh
   go install github.com/dkotik/mdsend@latest
@@ -89,18 +92,16 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 <details>
   <summary>Click here to see a list of planned features.</summary>
 
+- [ ] body template should be HTML template? currently Markdown
+      content templates do not penetrate the outer HTML template
 - [ ] Validate function should detect language and complain that `language` field is not set, if the content is not English.
 - [ ] Beautify the default template. Add `dark.html` one.
-- [ ] add `--from` flag to send command that uses middleware to override
-  sender address, might be required by certain delivery methods
-- [ ] Per RFC 5321 rules, email body text lines must not exceed 1,000 characters.
 - [ ] service package with HTTP unsubscribe endpoint package
 - [ ] mdsend <file> should be equivalent to mdsend send <file>?
 - [ ] Queue clean up scanner - should be first added to sqlite Watermill driver.
 - [ ] Sending message with scheduling delay (instead of only queuing) should prompt a confirmation.
 - [ ] list out templating functions in the example, including the default ones
 - [ ] Write a better Goldmark 2.0 renderer that recognizes single-line youtube and image paragraphs, centers them.
-- [ ] body template should be HTML template?
 - [ ] Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
 - [ ] https://github.com/charmbracelet/glamour
 - [ ] Run some tests with <https://www.suped.com/tools/email-tester>

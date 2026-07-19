@@ -96,6 +96,7 @@ var application = &cli.Command{
 					Usage: `Adds a letter to the queue.`,
 					Flags: []cli.Flag{
 						flagQueue,
+						flagFrom,
 						flagVerbose,
 					},
 					Action: cmdQueueAdd,
@@ -161,6 +162,7 @@ var application = &cli.Command{
 			Aliases: []string{`s`},
 			Flags: []cli.Flag{
 				flagQueue,
+				flagFrom,
 				flagGraceTimeout,
 				flagDelay,
 				flagFluctuate,

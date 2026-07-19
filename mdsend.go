@@ -10,6 +10,7 @@ import (
 	"path"
 
 	"github.com/dkotik/mdsend/internal/media"
+	"github.com/dkotik/mdsend/markdown"
 	"github.com/oklog/ulid/v2"
 )
 
@@ -97,7 +98,8 @@ func (loader loader) loadLetterFromFile(
 	if err = file.Close(); err != nil {
 		return letter, err
 	}
-	letter, err = NewLetter(data)
+
+	letter, err = newLetter(data)
 	if err != nil {
 		return letter, err
 	}
@@ -112,6 +114,19 @@ func (loader loader) loadLetterFromFile(
 	if err != nil {
 		return letter, err
 	}
+
+	if _, err = newSubject(letter.Frontmatter[FieldNameSubject]); err != nil {
+		if errors.Is(err, ErrNoSubject) {
+			// pull the subject from the first heading text
+			letter.Frontmatter[FieldNameSubject] = markdown.GetFirstHeadingText([]byte(letter.Content))
+			if letter.Frontmatter[FieldNameSubject] == "" {
+				return letter, err
+			}
+		} else {
+			return letter, err
+		}
+	}
+
 	templates, err := getTemplates(letter.Frontmatter, rootDirectory)
 	if err != nil {
 		return letter, err

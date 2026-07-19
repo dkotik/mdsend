@@ -344,3 +344,15 @@ func EachUnique(
 		}
 	}
 }
+
+func EachJoin(in ...iter.Seq2[map[string]any, error]) iter.Seq2[map[string]any, error] {
+	return func(yield func(map[string]any, error) bool) {
+		for _, in := range in {
+			for recipient, err := range in {
+				if !yield(recipient, err) {
+					return
+				}
+			}
+		}
+	}
+}

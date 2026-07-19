@@ -58,29 +58,6 @@ type Letter struct {
 	SentAt      time.Time
 }
 
-func NewLetter(b []byte) (letter Letter, err error) {
-	letter, err = newLetter(b)
-	if err != nil {
-		return letter, err
-	}
-
-	if _, err = newSubject(letter.Frontmatter[FieldNameSubject]); err != nil {
-		if errors.Is(err, ErrNoSubject) {
-			// pull the subject from the first heading text
-			letter.Frontmatter[FieldNameSubject] = markdown.GetFirstHeadingText([]byte(letter.Content))
-			if letter.Frontmatter[FieldNameSubject] == "" {
-				return letter, err
-			}
-		} else {
-			return letter, err
-		}
-	}
-
-	return letter, nil
-}
-
-// newLetter is a lighter version of NewLetter used for loading
-// Markdown documents meant for extension.
 func newLetter(b []byte) (letter Letter, err error) {
 	frontmatterRaw, body, delimeter, err := markdown.SplitFrontmatterFromContent(b)
 	if err != nil {

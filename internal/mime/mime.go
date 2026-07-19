@@ -27,6 +27,12 @@ The packages uses this approach to ensure compatibility with older clients:
 
 Inline images can be encoded into the HTML image tag as base64 encoded data. However, Outlook completely blocks such images. Therefore, this
 package always encodes inline images as attachments and references them via a content ID in the HTML image source attribute.
+
+All output of this package is wrapped to [LineLengthLimit], not just the
+headers. RFC 5321 requires that electronic mail text lines must not exceed
+1,000 characters. This requirement is full satisfied. The content of plain
+text and HTML sections are wrapped by `mime/quotedprintable` encoding
+of the stardard library.
 */
 package mime
 
@@ -40,7 +46,8 @@ const (
 	// LineLengthLimit is the maximum length of a line
 	// for MIME encoding.
 	//
-	// RFC 5322 2.1.1 limits to 78, excluding CRLF. mime/quotedprintable sets this to 76.
+	// RFC 5322 2.1.1 limits to 78, excluding CRLF.
+	// `mime/quotedprintable` sets this to 76.
 	LineLengthLimit = 76
 
 	// BoundaryLengthLimit is the maximum length of a boundary string

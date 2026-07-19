@@ -14,13 +14,15 @@ import (
 
 var entropy = rand.New(rand.NewPCG(0, 0))
 
+const longText = "Ut non ipsum orci. Sed vel sollicitudin lectus. Sed quis arcu laoreet, euismod enim ac, gravida justo. Vivamus sed nunc nec orci dignissim consequat aliquam consequat massa. Sed et porta leo. Pellentesque gravida enim vel dui vulputate, quis vulputate turpis gravida. Integer lacinia, elit at venenatis posuere, odio turpis fringilla ipsum, eget tempor magna lacus sit amet nunc. Vivamus elementum massa non sapien luctus ornare. Etiam mattis est eu diam porttitor suscipit. Phasellus tortor tellus, porta sit amet sagittis nec, rhoncus tincidunt sem. Cras porttitor pharetra turpis sit amet viverra. Nulla egestas leo metus, quis tincidunt dui varius non. Fusce vel eros leo. Suspendisse iaculis pulvinar elementum. In nec dapibus lacus. Curabitur viverra, nisi sit amet sagittis aliquet, ligula quam consectetur enim, et malesuada sapien nulla sed metus. Ut non ipsum orci. Sed vel sollicitudin lectus. Sed quis arcu laoreet, euismod enim ac, gravida justo. Vivamus sed nunc nec orci dignissim consequat aliquam consequat massa. Sed et porta leo. Pellentesque gravida enim vel dui vulputate, quis vulputate turpis gravida. Integer lacinia, elit at venenatis posuere, odio turpis fringilla ipsum, eget tempor magna lacus sit amet nunc. Vivamus elementum massa non sapien luctus ornare. Etiam mattis est eu diam porttitor suscipit. Phasellus tortor tellus, porta sit amet sagittis nec, rhoncus tincidunt sem. Cras porttitor pharetra turpis sit amet viverra. Nulla egestas leo metus, quis tincidunt dui varius non. Fusce vel eros leo. Suspendisse iaculis pulvinar elementum. In nec dapibus lacus. Curabitur viverra, nisi sit amet sagittis aliquet, ligula quam consectetur enim, et malesuada sapien nulla sed metus. Ut non ipsum orci. Sed vel sollicitudin lectus. Sed quis arcu laoreet, euismod enim ac, gravida justo. Vivamus sed nunc nec orci dignissim consequat aliquam consequat massa. Sed et porta leo. Pellentesque gravida enim vel dui vulputate, quis vulputate turpis gravida. Integer lacinia, elit at venenatis posuere, odio turpis fringilla ipsum, eget tempor magna lacus sit amet nunc. Vivamus elementum massa non sapien luctus ornare. Etiam mattis est eu diam porttitor suscipit. Phasellus tortor tellus, porta sit amet sagittis nec, rhoncus tincidunt sem. Cras porttitor pharetra turpis sit amet viverra. Nulla egestas leo metus, quis tincidunt dui varius non. Fusce vel eros leo. Suspendisse iaculis pulvinar elementum. In nec dapibus lacus. Curabitur viverra, nisi sit amet sagittis aliquet, ligula quam consectetur enim, et malesuada sapien nulla sed metus."
+
 func TestPlainMessageEncoding(t *testing.T) {
 	b := &bytes.Buffer{}
 	err := NewWriter(newMockAttachmentRepository(), entropy).Write(t.Context(), b, mdsend.Message{
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},
 		To:      mail.Address{Name: "Recipient", Address: "recipient@example.com"},
 		Subject: "Test Subject Перший",
-		Text:    "text",
+		Text:    longText,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -56,7 +58,7 @@ func TestPlainMixedMessageEncoding(t *testing.T) {
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},
 		To:      mail.Address{Name: "Recipient", Address: "recipient@example.com"},
 		Subject: "Test Subject 3",
-		Text:    "text",
+		Text:    longText,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -96,8 +98,8 @@ func TestAlternativeMessageEncoding(t *testing.T) {
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},
 		To:      mail.Address{Name: "Recipient", Address: "recipient@example.com"},
 		Subject: "😁 Test Subject",
-		Text:    "text",
-		HTML:    "<b>text</b>",
+		Text:    longText,
+		HTML:    "<b>" + longText + "</b>",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -156,8 +158,8 @@ func TestMixedMessageEncoding(t *testing.T) {
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},
 		To:      mail.Address{Name: "Recipient", Address: "recipient@example.com"},
 		Subject: "😁 Test Subject",
-		Text:    "text",
-		HTML:    "<b>text</b>",
+		Text:    longText,
+		HTML:    "<b>" + longText + "</b>",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -238,8 +240,8 @@ func TestRelatedMessageEncoding(t *testing.T) {
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},
 		To:      mail.Address{Name: "Recipient", Address: "recipient@example.com"},
 		Subject: "😁 Test Subject",
-		Text:    "text",
-		HTML:    "<b>text</b> <img src=\"cid:string@gmail.com\" alt=\"cat\" />",
+		Text:    longText,
+		HTML:    "<b>" + longText + "</b> <img src=\"cid:string@gmail.com\" alt=\"cat\" />",
 	})
 	if err != nil {
 		t.Fatal(err)

@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"iter"
 	"log/slog"
+	"net/mail"
 	"os"
 	"path/filepath"
 
@@ -79,6 +80,7 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 		p,
 		fs,
 		logger,
+		c,
 	); err != nil {
 		return fmt.Errorf(
 			"unable to queue letter: %s: %w",
@@ -114,6 +116,7 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 			p,
 			fs,
 			logger,
+			c,
 		); err != nil {
 			return fmt.Errorf(
 				"unable to queue letter: %s: %w",
@@ -133,7 +136,12 @@ func queueLetter(
 	letterPath string,
 	fs fs.FS,
 	logger *slog.Logger,
+	cmd *cli.Command,
 ) (queued int, err error) {
+	if cmd.IsSet(flagFrom.Name) {
+		from, _ := cmd.Value(flagFrom.Name).(mail.Address)
+		letter.Frontmatter[address.FieldFrom] = (&from).String()
+	}
 	tmpl, err := template.New(letter, template.Options{})
 	if err != nil {
 		return queued, err
@@ -148,11 +156,24 @@ func queueLetter(
 		}
 	}
 
-	for recipient, err := range address.Each(
-		ctx,
-		letter.Frontmatter,
-		rootDirectory,
-		fs,
+	for recipient, err := range address.EachJoin(
+		func(yield func(map[string]any, error) bool) {
+			toSlice, _ := cmd.Value(flagTo.Name).([]mail.Address)
+			for _, recipient := range toSlice {
+				if !yield(map[string]any{
+					address.FieldName:  recipient.Name,
+					address.FieldEmail: recipient.Address,
+				}, nil) {
+					return
+				}
+			}
+		},
+		address.Each(
+			ctx,
+			letter.Frontmatter,
+			rootDirectory,
+			fs,
+		),
 	) {
 		if err != nil {
 			return queued, err

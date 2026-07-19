@@ -1,5 +1,5 @@
 subject: minimal example message
-seed_key: Up7e8XiuQw9
+seed_key: 8UoFNK4qw9h
 
 
 Introduction
@@ -30,6 +30,29 @@ Send command will continued to deliver anyqueued messages, which can be added to
 mdsend queue add 1-minimal.md
 mdsend queue add 2-attachments.md
 mdsend send
+
+
+Command Line Flags
+------------------
+
+
+- mdsend queue
+
+- `--queue`: change database where the messages are stored.
+- `--from`: override the author of the messages.
+- `--to`: add another recipient to each queued letter. Repeat the flagas many times as needed.
+- `--cc`: equivalent to `--to` flag. Kept for historic reasons.
+- `--bcc`: equivalent to `--to` flag. Kept for historic reasons.
+
+
+- mdsend send
+
+- `--queue`: change database where the messages are stored.
+- `--from`: override the author of the messages.
+- `--service`: keep the process perpetually alive. If moreletters are added to the queue at any time, they will be sent.
+- If the send command is called targetting one or more letters,all those letters will be queued before the sending operationsbegin. All the flags of the `mdsend queue` command come intoeffect while queuing.
+
+
 
 
 Sample Content
@@ -152,6 +175,31 @@ queue with a separate command.</p>
 mdsend queue add 2-attachments.md
 mdsend send
 </code></pre>
+<h2>Command Line Flags</h2>
+<ul>
+<li>mdsend queue
+<ul>
+<li><code>--queue</code>: change database where the messages are stored.</li>
+<li><code>--from</code>: override the author of the messages.</li>
+<li><code>--to</code>: add another recipient to each queued letter. Repeat the flag
+as many times as needed.</li>
+<li><code>--cc</code>: equivalent to <code>--to</code> flag. Kept for historic reasons.</li>
+<li><code>--bcc</code>: equivalent to <code>--to</code> flag. Kept for historic reasons.</li>
+</ul>
+</li>
+<li>mdsend send
+<ul>
+<li><code>--queue</code>: change database where the messages are stored.</li>
+<li><code>--from</code>: override the author of the messages.</li>
+<li><code>--service</code>: keep the process perpetually alive. If more
+letters are added to the queue at any time, they will be sent.</li>
+<li>If the send command is called targetting one or more letters,
+all those letters will be queued before the sending operations
+begin. All the flags of the <code>mdsend queue</code> command come into
+effect while queuing.</li>
+</ul>
+</li>
+</ul>
 <h1>Sample Content</h1>
 <blockquote>
 <p>A Markdown file requires valid 'from', 'to', and 'subject' fields

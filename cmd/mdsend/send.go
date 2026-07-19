@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/mail"
 	"runtime"
 	"time"
 
@@ -23,24 +24,6 @@ import (
 )
 
 var (
-	flagGraceTimeout = &extendedDurationFlag{
-		Name:    "grace-timeout",
-		Aliases: []string{`gt`},
-		Value:   time.Second,
-	}
-
-	flagDelay = &extendedDurationFlag{
-		Name:    `delay`,
-		Aliases: []string{"d"},
-		Usage:   `The minimum time delay between sending each electronic mail message.`,
-	}
-
-	flagFluctuate = &extendedDurationFlag{
-		Name:    `fluctuate`,
-		Aliases: []string{"f"},
-		Usage:   `The time fluctuation in delay between sending each electronic mail message.`,
-	}
-
 	flagService = &cli.BoolFlag{
 		Name:    `service`,
 		Aliases: []string{"s"},
@@ -78,6 +61,11 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 			delay+time.Millisecond*50,
 			c.Duration(flagFluctuate.Name)+time.Millisecond*20,
 		),
+	}
+	if c.IsSet(flagFrom.Name) {
+		middleware = append(middleware, mailer.NewFromOverride(
+			c.Value(flagFrom.Name).(mail.Address),
+		))
 	}
 	if c.Bool(flagVerbose.Name) {
 		middleware = append(middleware, mailer.NewLogger(logger))
