@@ -6,30 +6,13 @@ import (
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/parser"
+	"github.com/yuin/goldmark/renderer"
+	"github.com/yuin/goldmark/renderer/html"
 	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
 )
 
-var gm = goldmark.New(
-	// goldmark.WithExtensions(
-	// 	meta.Meta,
-	// ),
-	goldmark.WithRendererOptions(
-	// renderer.WithNodeRenderers(
-	// 	util.Prioritized(&imageRenderer{
-	// 		attachmentProvider: func(source string) (contentID string, err error) {
-	// 			return "", errors.New("attachment provided is not implemented")
-	// 		},
-	// 	}, 500),
-	// ),
-	),
-)
-
-func New() goldmark.Markdown {
-	return gm
-}
-
-func NewParser() parser.Parser {
+func NewParser(theme Theme) parser.Parser {
 	return parser.NewParser(parser.WithBlockParsers(parser.DefaultBlockParsers()...),
 		parser.WithInlineParsers(parser.DefaultInlineParsers()...),
 		parser.WithParagraphTransformers(
@@ -37,13 +20,23 @@ func NewParser() parser.Parser {
 		),
 		parser.WithASTTransformers(
 			util.Prioritized(&ActionButtonInjector{}, 100),
+			util.Prioritized(theme, 1000),
+		),
+	)
+}
+
+func NewRendererHTML() renderer.Renderer {
+	return renderer.NewRenderer(
+		renderer.WithNodeRenderers(
+			util.Prioritized(&ActionButtonInjector{}, 100),
+			util.Prioritized(html.NewRenderer(), 1000),
 		),
 	)
 }
 
 func GetFirstHeadingText(source []byte) (result string) {
 	_ = ast.Walk(
-		gm.Parser().Parse(text.NewReader(source)),
+		goldmark.DefaultParser().Parse(text.NewReader(source)),
 		ast.Walker(func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 			if entering && n.Kind() == ast.KindHeading {
 				result = string(bytes.TrimSpace(

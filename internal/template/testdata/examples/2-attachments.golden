@@ -108,15 +108,15 @@ Creative Commons Credits
                     </tr>
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><h1>Attach Files to the Message</h1>
-<p>List added files under <code>attachments</code> frontmatter section.
+                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><h1 style="color:#11267;font-family:Georgia;font-size: 24px;">Attach Files to the Message</h1>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">List added files under <code style="font-family:monospace;background-color:#e8ecfb;">attachments</code> frontmatter section.
 Images are automatically compressed. Control the size
-with <code>media_constraints</code> frontmatter section.</p>
-<h2>Inline Attachments</h2>
-<p>Inline attachments are placed into message body,
+with <code style="font-family:monospace;background-color:#e8ecfb;">media_constraints</code> frontmatter section.</p>
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Inline Attachments</h2>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Inline attachments are placed into message body,
 when linked like so:
-<a href="../internal/media/testdata/cat.jpg" title="Cat Photo by Cindy vanHeerden">cat</a>.</p>
-<h2>Creative Commons Credits</h2>
+<a href="../internal/media/testdata/cat.jpg" title="Cat Photo by Cindy vanHeerden" style="color:#335c9c;">cat</a>.</p>
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Creative Commons Credits</h2>
 <ul>
 <li><strong>cat.jpg:</strong> Cindy vanHeerden.</li>
 <li><strong>panda.jpg:</strong> Snow Chang.</li>

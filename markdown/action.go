@@ -3,7 +3,10 @@ package markdown
 import (
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/parser"
+	"github.com/yuin/goldmark/renderer"
+	"github.com/yuin/goldmark/renderer/html"
 	"github.com/yuin/goldmark/text"
+	"github.com/yuin/goldmark/util"
 )
 
 var KindActionButton = ast.NewNodeKind("ActionButton")
@@ -45,8 +48,8 @@ func (g *ActionButtonInjector) Transform(node *ast.Document, reader text.Reader,
 			BaseBlock: ast.BaseBlock{},
 			Link:      *link,
 		}
-		// moveAllSiblingsTo(action, n)
-		moveAllChildrenTo(action, link)
+		// moveAllSiblingsTo(action, p)
+		moveAllChildrenTo(action, p)
 		replacements = append(replacements, actionReplacement{
 			Paragraph: p,
 			Action:    action,
@@ -62,4 +65,29 @@ func (g *ActionButtonInjector) Transform(node *ast.Document, reader text.Reader,
 		)
 	}
 	return
+}
+
+func (g *ActionButtonInjector) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
+	reg.Register(KindActionButton, g.renderActioButtonNodeHTML)
+}
+
+func (g *ActionButtonInjector) renderActioButtonNodeHTML(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+	n := node.(*ActionButtonNode)
+	if entering {
+		_, _ = w.WriteString(`
+		<table border="0" cellspacing="0" cellpadding="0">
+			<tr>
+        <td align="center">`)
+		_, _ = w.WriteString(`
+		<table border="0" cellspacing="0" cellpadding="0">
+      <tr>
+          <td align="center"`)
+		if n.Attributes() != nil {
+			html.RenderAttributes(w, n, html.LinkAttributeFilter)
+		}
+		_, _ = w.WriteString(`>`)
+	} else {
+		_, _ = w.WriteString(`</td></tr></table></td></tr></table>`)
+	}
+	return ast.WalkContinue, nil
 }

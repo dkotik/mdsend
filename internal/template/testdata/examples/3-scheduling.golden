@@ -119,12 +119,12 @@ schedule:
                     </tr>
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><h1>Schedule Messages for Later Delivery</h1>
-<p>Queued messages can be delayed by providing <code>schedule</code> frontmatter instructions:</p>
+                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><h1 style="color:#11267;font-family:Georgia;font-size: 24px;">Schedule Messages for Later Delivery</h1>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Queued messages can be delayed by providing <code style="font-family:monospace;background-color:#e8ecfb;">schedule</code> frontmatter instructions:</p>
 <ul>
 <li><strong>after:</strong> time until the message can be sent.
-Must be in ISO format <code>YYYY-MM-DD hh:mm</code>.</li>
-<li><strong>delay:</strong> time duration added to <code>after</code> or current time.</li>
+Must be in ISO format <code style="font-family:monospace;background-color:#e8ecfb;">YYYY-MM-DD hh:mm</code>.</li>
+<li><strong>delay:</strong> time duration added to <code style="font-family:monospace;background-color:#e8ecfb;">after</code> or current time.</li>
 <li><strong>step:</strong> time duration added for each recipient.</li>
 <li><strong>fluctuate:</strong> normalized random time duration added for each
 mailing step, including the first message.</li>
@@ -132,16 +132,16 @@ mailing step, including the first message.</li>
 to keep the letter and message records in the database before they
 are deleted.</li>
 </ul>
-<h2>Time Duration Units</h2>
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Time Duration Units</h2>
 <ul>
-<li><code>m</code>: Minute.</li>
-<li><code>h</code>: Hour.</li>
-<li><code>d</code>: Day.</li>
-<li><code>w</code>: Week.</li>
-<li><code>mo</code>: Month, that is 31 days.</li>
-<li><code>y</code>: Year, that is 365 days.</li>
+<li><code style="font-family:monospace;background-color:#e8ecfb;">m</code>: Minute.</li>
+<li><code style="font-family:monospace;background-color:#e8ecfb;">h</code>: Hour.</li>
+<li><code style="font-family:monospace;background-color:#e8ecfb;">d</code>: Day.</li>
+<li><code style="font-family:monospace;background-color:#e8ecfb;">w</code>: Week.</li>
+<li><code style="font-family:monospace;background-color:#e8ecfb;">mo</code>: Month, that is 31 days.</li>
+<li><code style="font-family:monospace;background-color:#e8ecfb;">y</code>: Year, that is 365 days.</li>
 </ul>
-<p>Units can be combined together. For example, to delay the message
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Units can be combined together. For example, to delay the message
 by eight weeks, four days, and seven hours, add to the front matter:</p>
 <pre><code class="language-yaml">schedule:
   delay: 8w4d7h

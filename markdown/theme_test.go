@@ -9,11 +9,7 @@ import (
 
 	"github.com/sebdah/goldie/v2"
 	"github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/renderer"
-	"github.com/yuin/goldmark/renderer/html"
 	"github.com/yuin/goldmark/text"
-	"github.com/yuin/goldmark/util"
 )
 
 func TestThemeRendering(t *testing.T) {
@@ -21,43 +17,10 @@ func TestThemeRendering(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	document := parser.NewParser(parser.WithBlockParsers(parser.DefaultBlockParsers()...),
-		parser.WithInlineParsers(parser.DefaultInlineParsers()...),
-		parser.WithParagraphTransformers(
-			parser.DefaultParagraphTransformers()...,
-		),
-		parser.WithASTTransformers(
-			// util.Prioritized(&ActionButtonInjector{}, 100),
-			util.Prioritized(Theme{
-				Color: Color{
-					Action:     "#5454",
-					Heading:    "#5454",
-					Text:       "#5454",
-					Link:       "#5454",
-					BlockQuote: "#5454",
-					Border:     "#5454",
-					Table:      "#5454",
-					Shadow:     "#5454",
-				},
-				FontFamily: "Georgia",
-				FontSize:   12,
-			}, 1000),
-		),
-	).Parse(text.NewReader(data))
+	document := NewParser(DefaultLightTheme).Parse(text.NewReader(data))
 
 	b := bytes.Buffer{}
-	err = renderer.NewRenderer(
-		renderer.WithNodeRenderers(
-			// util.Prioritized(&htmlRenderer{
-			// 	BlockQuoteStyle:      options.BlockQuoteStyle,
-			// 	LinkStyle:            options.LinkStyle,
-			// 	ActionContainerStyle: options.ActionContainerStyle,
-			// 	ActionStyle:          options.ActionStyle,
-			// 	Writer:               html.DefaultWriter,
-			// }, 1000),
-			util.Prioritized(html.NewRenderer(), 1000),
-		),
-	).Render(&b, data, document)
+	err = NewRendererHTML().Render(&b, data, document)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -66,7 +29,7 @@ func TestThemeRendering(t *testing.T) {
 }
 
 func TestStyleInjection(t *testing.T) {
-	document := NewParser().Parse(text.NewReader([]byte(`
+	document := NewParser(DefaultLightTheme).Parse(text.NewReader([]byte(`
 # heading
 
 par1

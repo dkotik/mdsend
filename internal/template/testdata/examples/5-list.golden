@@ -189,8 +189,8 @@ This is very handy if you do not want to pester subscribers withmessages sourced
                     </tr>
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><h1>Load Recipient Lists</h1>
-<p>Target address fields, <code>to</code>, <code>cc</code>, and <code>bcc</code> support a list of
+                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><h1 style="color:#11267;font-family:Georgia;font-size: 24px;">Load Recipient Lists</h1>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Target address fields, <code style="font-family:monospace;background-color:#e8ecfb;">to</code>, <code style="font-family:monospace;background-color:#e8ecfb;">cc</code>, and <code style="font-family:monospace;background-color:#e8ecfb;">bcc</code> support a list of
 entries. Any entry can also point to a configuration file in a
 variety of common formats that will be merged into the parent list.</p>
 <pre><code class="language-yaml">to: mailinglist.yaml
@@ -204,13 +204,13 @@ bcc:
     title: Mr.
     first_name: First
 </code></pre>
-<p>Each entry is a map, regardless of how it was loaded. Any value of
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Each entry is a map, regardless of how it was loaded. Any value of
 the map is accessible to the template engine through the context.</p>
 <pre><code class="language-markdown">Greeting  ,
 
 I am writing, because ...
 </code></pre>
-<p>Carbon copy recipients (<code>cc</code>) are treated exactly the same as blind
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Carbon copy recipients (<code style="font-family:monospace;background-color:#e8ecfb;">cc</code>) are treated exactly the same as blind
 carbon copy recipients. The field exists for historic reasons. Those
 recipients will not be displayed in sent messages by design for
 the following reasons:</p>
@@ -219,16 +219,16 @@ the following reasons:</p>
 <li>To prevent possible message duplication in mailer APIs due to
 implementation ambiguity in handling carbon copy recipients.</li>
 </ul>
-<h2>Load Recipient List From an Executable</h2>
-<p>If the recipient file does not have a recognizable extension,
-like <code>.yaml</code>, and is executable, it will be executed. The standard
-output will be captured and parsed according to the <code>Content-Type</code>
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Load Recipient List From an Executable</h2>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">If the recipient file does not have a recognizable extension,
+like <code style="font-family:monospace;background-color:#e8ecfb;">.yaml</code>, and is executable, it will be executed. The standard
+output will be captured and parsed according to the <code style="font-family:monospace;background-color:#e8ecfb;">Content-Type</code>
 set in the first line of the output.</p>
 <pre><code class="language-yaml">to: script.sh
 bcc: program.exe
 </code></pre>
-<p>The first line of output must match the desired file format.
-This protects <code>mdsend</code> from malformed content of failing scripts
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">The first line of output must match the desired file format.
+This protects <code style="font-family:monospace;background-color:#e8ecfb;">mdsend</code> from malformed content of failing scripts
 and binary files, and precludes ambiguity in choosing between JSON and
 Cuelang, CSV and other formats.</p>
 <ul>
@@ -264,23 +264,23 @@ Content-type: application/json
 ]
 EOF
 </code></pre>
-<p>Sourcing recipients from an executable gives you the limitless
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Sourcing recipients from an executable gives you the limitless
 flexibility to fetch private contact information from a remote
 database or encrypted location, to groom or combine and pre-process the
 contact list.</p>
-<h2>Footer</h2>
-<p>You may unsubscribe <!-- raw HTML omitted -->here<!-- raw HTML omitted -->.</p>
-<p>The CAN-SPAM act became law on Jan. 1, 2004. It says there many
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Footer</h2>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">You may unsubscribe <!-- raw HTML omitted -->here<!-- raw HTML omitted -->.</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">The CAN-SPAM act became law on Jan. 1, 2004. It says there many
 things you must do as a commercial email-er. Highlights are
 basically don't be deceptive, and that you <strong>MUST</strong> include a
 physical mailing address as well as a working unsubscribe link in
 the body.## Message Duplication</p>
-<p>Mdsend uses a seed template to protect you from accidentally sending
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Mdsend uses a seed template to protect you from accidentally sending
 the same message to the same recipient. The default seed template
-is <code>typical mailing list message||</code>. That is, a message
+is <code style="font-family:monospace;background-color:#e8ecfb;">typical mailing list message||</code>. That is, a message
 with the same subject and content will have the same seed key.</p>
-<p>The queue will reject any message with a duplicate seed key for each
-recipient. Setting a seed template to a static value like <code>reminder</code>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">The queue will reject any message with a duplicate seed key for each
+recipient. Setting a seed template to a static value like <code style="font-family:monospace;background-color:#e8ecfb;">reminder</code>
 will block any message with the same seed until those
 messages expire by schedule:</p>
 <pre><code class="language-yaml">subject: this is a message to remind you to leave feedback
@@ -288,7 +288,7 @@ seed: reminder
 schedule:
   expires: 1mo
 </code></pre>
-<p>This is very handy if you do not want to pester subscribers with
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">This is very handy if you do not want to pester subscribers with
 messages sourced from different letters for different reasons.</p>
 </div>
                       </td>

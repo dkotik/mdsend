@@ -169,7 +169,7 @@ a { padding: 0; }
                     </tr>
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><p>&lt;!doctype html&gt;<!-- raw HTML omitted --></p>
+                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">&lt;!doctype html&gt;<!-- raw HTML omitted --></p>
 <!-- raw HTML omitted -->
 <pre><code>table, td {
   border-collapse: collapse;
@@ -193,7 +193,7 @@ p {
 
 a { padding: 0; }
 </code></pre>
-<p><!-- raw HTML omitted --></p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;"><!-- raw HTML omitted --></p>
 <!-- raw HTML omitted -->
 <!-- raw HTML omitted -->
 <!-- raw HTML omitted -->

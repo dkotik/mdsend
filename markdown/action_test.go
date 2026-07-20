@@ -16,7 +16,7 @@ func TestActionParsingAndRendering(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	parser := NewParser()
+	parser := NewParser(DefaultLightTheme)
 	document := parser.Parse(text.NewReader(data))
 
 	expectActions := 3
@@ -36,10 +36,7 @@ func TestActionParsingAndRendering(t *testing.T) {
 		t.Fatal("action count mismatch:", expectActions, "vs", foundActions)
 	}
 
-	renderer, err := NewRendererHTML(OptionsHTML{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	renderer := NewRendererHTML()
 
 	b := &bytes.Buffer{}
 	if err = renderer.Render(b, data, document); err != nil {

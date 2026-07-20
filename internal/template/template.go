@@ -13,7 +13,6 @@ import (
 	"github.com/dkotik/mdsend/internal"
 	"github.com/dkotik/mdsend/markdown"
 	"github.com/google/uuid"
-	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer"
 )
@@ -58,13 +57,13 @@ func (o Options) withDefaults() Options {
 		})
 	}
 	if o.ContentParser == nil {
-		o.ContentParser = goldmark.DefaultParser()
+		o.ContentParser = markdown.NewParser(markdown.DefaultLightTheme)
 	}
 	if o.RendererForText == nil {
 		o.RendererForText = markdown.NewPlaintextRenderer()
 	}
 	if o.RendererForHTML == nil {
-		o.RendererForHTML = markdown.New().Renderer()
+		o.RendererForHTML = markdown.NewRendererHTML()
 	}
 	if o.Frontmatter == nil {
 		o.Frontmatter = make(map[string]any)

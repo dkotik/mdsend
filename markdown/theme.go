@@ -26,6 +26,23 @@ type Theme struct {
 	FontSize   uint8
 }
 
+var (
+	DefaultLightTheme = Theme{
+		Color: Color{
+			Action:     "#3a86ff",
+			Heading:    "#11267",
+			Text:       "#11226a",
+			Link:       "#335c9c",
+			BlockQuote: "#e8ecfb",
+			Border:     "#335c4c",
+			Table:      "#e8ecfb",
+			Shadow:     "#e8ecfb",
+		},
+		FontFamily: "Georgia",
+		FontSize:   12,
+	}
+)
+
 func (t Theme) Transform(node *ast.Document, reader text.Reader, pc parser.Context) {
 	err := ast.Walk(node, func(node ast.Node, enter bool) (ast.WalkStatus, error) {
 		switch node.Kind() {
@@ -113,9 +130,11 @@ func (t Theme) Transform(node *ast.Document, reader text.Reader, pc parser.Conte
 			}
 			ApplyStyle(node, style)
 		case KindActionButton:
+			// 	options.ActionContainerStyle = "border-radius: 5px; background-color:#3a86ff;"
+			// 	options.ActionStyle = "font-size: 18px; color: #ffffff; font-weight: bold; text-decoration: none;border-radius: 5px; padding: 12px 18px; border: 1px solid #3a86ff; display: inline-block;"
 			style := ""
 			if t.Color.Action != "" {
-				style += "border-radius:5px;background-color:" + t.Color.Action + ";"
+				style += "border-radius:5px;background-color:" + t.Color.Action + ";width:80%;max-width:250px;"
 			}
 			ApplyStyle(node, style)
 			style = fmt.Sprintf("font-size:%dpx;", min(18, t.FontSize+6))
@@ -126,8 +145,8 @@ func (t Theme) Transform(node *ast.Document, reader text.Reader, pc parser.Conte
 			if t.FontFamily != "" {
 				style += "font-family:" + t.FontFamily + ";"
 			}
-			// link := node.FirstChild().(*ast.Link)
-			// ApplyStyle(link, style)
+			link := node.FirstChild().(*ast.Link)
+			ApplyStyle(link, style)
 			return ast.WalkSkipChildren, nil
 			// case ast.KindDocument:
 			// case ast.KindEmphasis:

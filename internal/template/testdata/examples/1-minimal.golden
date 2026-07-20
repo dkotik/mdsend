@@ -154,13 +154,13 @@ Suspendisse iaculis tortor at massa congue condimentum. Ut interdumleo vel digni
                     </tr>
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><h1>Introduction</h1>
-<p>This is the simplest letter that can be sent. It has one recipient.</p>
+                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><h1 style="color:#11267;font-family:Georgia;font-size: 24px;">Introduction</h1>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">This is the simplest letter that can be sent. It has one recipient.</p>
 <ul>
 <li><em>Letter</em>: this file.</li>
 <li><em>Message</em>: a rendered copy of this file for each recipient.</li>
 </ul>
-<p>Sending requires a set of mailing service credentials
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Sending requires a set of mailing service credentials
 provided as environment variables.</p>
 <pre><code class="language-sh">export SMTP_HOST=...
 export SMTP_PORT=...
@@ -168,60 +168,59 @@ export SMTP_USERNAME=...
 export SMTP_PASSWORD=...
 mdsend send 1-minimal.md
 </code></pre>
-<h2>Separate Queuing</h2>
-<p>Send command will continued to deliver any
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Separate Queuing</h2>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Send command will continued to deliver any
 queued messages, which can be added to the
 queue with a separate command.</p>
 <pre><code class="language-sh">mdsend queue add 1-minimal.md
 mdsend queue add 2-attachments.md
 mdsend send
 </code></pre>
-<h2>Command Line Flags</h2>
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Command Line Flags</h2>
 <ul>
 <li>mdsend queue
 <ul>
-<li><code>--queue</code>: change database where the messages are stored.</li>
-<li><code>--from</code>: override the author of the messages.</li>
-<li><code>--to</code>: add another recipient to each queued letter. Repeat the flag
+<li><code style="font-family:monospace;background-color:#e8ecfb;">--queue</code>: change database where the messages are stored.</li>
+<li><code style="font-family:monospace;background-color:#e8ecfb;">--from</code>: override the author of the messages.</li>
+<li><code style="font-family:monospace;background-color:#e8ecfb;">--to</code>: add another recipient to each queued letter. Repeat the flag
 as many times as needed.</li>
-<li><code>--cc</code>: equivalent to <code>--to</code> flag. Kept for historic reasons.</li>
-<li><code>--bcc</code>: equivalent to <code>--to</code> flag. Kept for historic reasons.</li>
+<li><code style="font-family:monospace;background-color:#e8ecfb;">--cc</code>: equivalent to <code style="font-family:monospace;background-color:#e8ecfb;">--to</code> flag. Kept for historic reasons.</li>
+<li><code style="font-family:monospace;background-color:#e8ecfb;">--bcc</code>: equivalent to <code style="font-family:monospace;background-color:#e8ecfb;">--to</code> flag. Kept for historic reasons.</li>
 </ul>
 </li>
 <li>mdsend send
 <ul>
-<li><code>--queue</code>: change database where the messages are stored.</li>
-<li><code>--from</code>: override the author of the messages.</li>
-<li><code>--service</code>: keep the process perpetually alive. If more
+<li><code style="font-family:monospace;background-color:#e8ecfb;">--queue</code>: change database where the messages are stored.</li>
+<li><code style="font-family:monospace;background-color:#e8ecfb;">--from</code>: override the author of the messages.</li>
+<li><code style="font-family:monospace;background-color:#e8ecfb;">--service</code>: keep the process perpetually alive. If more
 letters are added to the queue at any time, they will be sent.</li>
 <li>If the send command is called targetting one or more letters,
 all those letters will be queued before the sending operations
-begin. All the flags of the <code>mdsend queue</code> command come into
+begin. All the flags of the <code style="font-family:monospace;background-color:#e8ecfb;">mdsend queue</code> command come into
 effect while queuing.</li>
 </ul>
 </li>
 </ul>
-<h1>Sample Content</h1>
-<blockquote>
-<p>A Markdown file requires valid 'from', 'to', and 'subject' fields
+<h1 style="color:#11267;font-family:Georgia;font-size: 24px;">Sample Content</h1>
+<blockquote style="padding: 6px 14px 6px 12px;color:#e8ecfb;border:none;border-left:2px solid #335c4c;background-color:#e8ecfb;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">A Markdown file requires valid 'from', 'to', and 'subject' fields
 in the frontmatter.</p>
 </blockquote>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce
 commodo sapien sed magna eleifend, a aliquam nunc condimentum.
 Sed feugiat nibh at lorem malesuada, lobortis tincidunt urna
 bibendum. Maecenas pulvinar, quam id tincidunt auctor, sem est
 tincidunt nulla, ac fringilla velit sapien eget nisl.</p>
-<p>Integer fringilla ipsum in elit <code>tempus varius</code>. Phasellus viverra
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Integer fringilla ipsum in elit <code style="font-family:monospace;background-color:#e8ecfb;">tempus varius</code>. Phasellus viverra
 velit in pulvinar bibendum. Pellentesque non varius est, in faucibus
 felis. Praesent sem tellus, consequat id sem nec, tempor efficitur
 mi. Proin et sem condimentum, dictum dolor vitae, blandit mi.
 Vestibulum eget diam ante. Etiam facilisis mi non augue malesuada
 placerat. Maecenas porttitor nulla a sem mattis eleifend. Fusce at
 neque augue.</p>
-<p>Integer at odio laoreet orci iaculis hendrerit. Curabitur
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Integer at odio laoreet orci iaculis hendrerit. Curabitur
 sollicitudin volutpat dui at sodales. Vestibulum elit magna, semper
 nec dolor eget, pharetra tempus augue.</p>
-<p>Suspendisse iaculis tortor at massa congue condimentum. Ut interdum
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Suspendisse iaculis tortor at massa congue condimentum. Ut interdum
 leo vel dignissim feugiat. Pellentesque volutpat molestie interdum.
 Vivamus vel purus sem. In eu hendrerit purus, vel gravida libero.</p>
 </div>
