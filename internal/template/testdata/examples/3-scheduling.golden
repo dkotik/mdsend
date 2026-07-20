@@ -4,7 +4,7 @@ schedule_after: 2026-12-30T00:30:00Z
 
 
 Schedule Messages for Later Delivery
-====================================
+===========================
 
 Queued messages can be delayed by providing `schedule` frontmatter instructions:
 
@@ -17,7 +17,7 @@ Queued messages can be delayed by providing `schedule` frontmatter instructions:
 
 
 Time Duration Units
--------------------
+-------------
 
 
 - `m`: Minute.

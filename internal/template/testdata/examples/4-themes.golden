@@ -3,7 +3,7 @@ seed_key: 3h7ajXxaKyF
 
 
 Styling Your Letters
-====================
+============
 
 Markdown text can be stylized with `theme` frontmatter sectionand with templates.
 

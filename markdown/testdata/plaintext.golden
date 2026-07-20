@@ -23,11 +23,11 @@ In List:
 
 
 Heading Level 1 (Document Title)
-================================
+=========================
 
 
 Heading Level 2 (Major Sections)
---------------------------------
+----------------------
 
 
 ### Heading Level 3 (Subsections)
@@ -45,7 +45,7 @@ Heading Level 2 (Major Sections)
 ---
 
 1. Text Emphasis
-----------------
+-------
 
 This is standard paragraph text.
 
@@ -59,7 +59,7 @@ You can combine them for ***bold and italic text*** or ***alternative bold and i
 ---
 
 2. Lists
---------
+-----
 
 
 ### Unordered List
@@ -104,7 +104,7 @@ You can combine them for ***bold and italic text*** or ***alternative bold and i
 ---
 
 3. Links and Images
--------------------
+------------
 
 
 ### Links
@@ -124,7 +124,7 @@ You can combine them for ***bold and italic text*** or ***alternative bold and i
 ---
 
 4. Blockquotes
---------------
+-----
 
 > This is a standard blockquote. It is used to highlight quotes, notes, or referenced text.
 
@@ -134,7 +134,7 @@ You can combine them for ***bold and italic text*** or ***alternative bold and i
 ---
 
 5. Code Formatting
-------------------
+-------
 
 
 ### Inline Code
@@ -162,15 +162,13 @@ print(calculate_sum(5, 10))
 ---
 
 6. Tables (Extended Syntax)
----------------------------
+-------------------
 
-| Feature | Markdown | Rich Text | Alignment || :--- | :---: | ---: | :--- || **Parsing** | Plain Text | Binary/JSON | Left-aligned || **Portability** | Universal | Application-based | Centered || **Speed** | Fast | Slow | Right-aligned |
-
-
+FeatureMarkdownRich TextAlignment**Parsing**Plain TextBinary/JSONLeft-aligned**Portability**UniversalApplication-basedCentered**Speed**FastSlowRight-aligned
 ---
 
 7. Extended & Miscellaneous Formatting
---------------------------------------
+---------------------------
 
 
 ### Strikethrough

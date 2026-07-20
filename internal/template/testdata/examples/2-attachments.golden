@@ -3,19 +3,19 @@ seed_key: TZSZQBfvmuz
 
 
 Attach Files to the Message
-===========================
+===================
 
 List added files under `attachments` frontmatter section.Images are automatically compressed. Control the sizewith `media_constraints` frontmatter section.
 
 
 Inline Attachments
-------------------
+------
 
 Inline attachments are placed into message body,when linked like so:🔗 cat<../internal/media/testdata/cat.jpg> (Cat Photo by Cindy vanHeerden).
 
 
 Creative Commons Credits
-------------------------
+----------------
 
 
 - **cat.jpg:** Cindy vanHeerden.

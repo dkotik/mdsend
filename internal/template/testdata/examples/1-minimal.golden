@@ -22,7 +22,7 @@ mdsend send 1-minimal.md
 
 
 Separate Queuing
-----------------
+--------
 
 Send command will continued to deliver anyqueued messages, which can be added to thequeue with a separate command.
 
@@ -33,7 +33,7 @@ mdsend send
 
 
 Command Line Flags
-------------------
+------------
 
 
 - mdsend queue
@@ -56,9 +56,9 @@ Command Line Flags
 
 
 Sample Content
-==============
+======
 
-> A Markdown file requires valid 'from', 'to', and 'subject' fieldsin the frontmatter.
+> A Markdown file requires valid from, to, and subject fieldsin the frontmatter.
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fuscecommodo sapien sed magna eleifend, a aliquam nunc condimentum.Sed feugiat nibh at lorem malesuada, lobortis tincidunt urnabibendum. Maecenas pulvinar, quam id tincidunt auctor, sem esttincidunt nulla, ac fringilla velit sapien eget nisl.
 
@@ -202,7 +202,7 @@ effect while queuing.</li>
 </li>
 </ul>
 <h1 style="color:#11267;font-family:Georgia;font-size: 24px;">Sample Content</h1>
-<blockquote style="padding: 6px 14px 6px 12px;color:#e8ecfb;border:none;border-left:2px solid #335c4c;background-color:#e8ecfb;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">A Markdown file requires valid 'from', 'to', and 'subject' fields
+<blockquote style="padding: 6px 14px 6px 12px;background-color:#e8ecfb;border:none;border-left:2px solid #335c4c;background-color:#e8ecfb;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">A Markdown file requires valid &lsquo;from&rsquo;, &rsquo;to&rsquo;, and &lsquo;subject&rsquo; fields
 in the frontmatter.</p>
 </blockquote>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce

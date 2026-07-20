@@ -175,7 +175,7 @@ func (t Theme) Transform(node *ast.Document, reader text.Reader, pc parser.Conte
 		case ast.KindBlockquote:
 			style := "padding: 6px 14px 6px 12px;"
 			if t.Color.BlockQuote != "" {
-				style += "color:" + t.Color.BlockQuote + ";"
+				style += "background-color:" + t.Color.BlockQuote + ";"
 			}
 			if t.Color.Border != "" {
 				style += "border:none;border-left:2px solid " + t.Color.Border + ";"

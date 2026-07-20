@@ -64,7 +64,7 @@ var flagQueue = &cli.StringFlag{
 
 var application = &cli.Command{
 	Name:      `mdsend`,
-	Usage:     `Sends markdown documents as templated emails.`,
+	Usage:     `Send markdown files as electronic mail. Maintain mailing lists as templated text files.`,
 	Copyright: "Copyright 2022 Dmitry Kotik",
 	Version:   version(),
 	Commands: []*cli.Command{

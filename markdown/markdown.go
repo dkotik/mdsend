@@ -5,6 +5,7 @@ import (
 
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
+	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer"
 	"github.com/yuin/goldmark/renderer/html"
@@ -13,13 +14,27 @@ import (
 )
 
 func NewParser(theme Theme) parser.Parser {
-	return parser.NewParser(parser.WithBlockParsers(parser.DefaultBlockParsers()...),
+	return parser.NewParser(
+		parser.WithBlockParsers(parser.DefaultBlockParsers()...),
+		parser.WithBlockParsers(
+			util.Prioritized(extension.NewDefinitionDescriptionParser(), 700),
+		),
 		parser.WithInlineParsers(parser.DefaultInlineParsers()...),
+		parser.WithInlineParsers(
+			util.Prioritized(extension.NewLinkifyParser(), 500),
+			util.Prioritized(extension.NewFootnoteParser(), 600),
+			util.Prioritized(extension.NewTaskCheckBoxParser(), 700),
+			util.Prioritized(extension.NewTypographerParser(), 9999),
+		),
 		parser.WithParagraphTransformers(
 			parser.DefaultParagraphTransformers()...,
 		),
+		parser.WithParagraphTransformers(
+			util.Prioritized(extension.NewTableParagraphTransformer(), 500),
+		),
 		parser.WithASTTransformers(
 			util.Prioritized(&ActionButtonInjector{}, 100),
+			util.Prioritized(extension.NewTableASTTransformer(), 200),
 			util.Prioritized(theme, 1000),
 		),
 	)
@@ -30,6 +45,9 @@ func NewRendererHTML() renderer.Renderer {
 		renderer.WithNodeRenderers(
 			util.Prioritized(&ActionButtonInjector{}, 100),
 			util.Prioritized(html.NewRenderer(), 1000),
+			util.Prioritized(extension.NewTaskCheckBoxHTMLRenderer(), 200),
+			util.Prioritized(extension.NewTableHTMLRenderer(), 300),
+			util.Prioritized(extension.NewDefinitionListHTMLRenderer(), 400),
 		),
 	)
 }

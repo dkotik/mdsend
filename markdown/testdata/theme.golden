@@ -11,9 +11,9 @@
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Typographic replacements</h2>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Enable typographer option to see result.</p>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">(c) (C) (r) (R) (tm) (TM) +-</p>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">test.. test... test..... test?..... test!....</p>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">!!!!!! ???? ,,  -- ---</p>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">&quot;Smartypants, double quotes&quot; and 'single quotes'</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">test.. test&hellip; test&hellip;.. test?&hellip;.. test!&hellip;.</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">!!!!!! ???? ,,  &ndash; &mdash;</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">&ldquo;Smartypants, double quotes&rdquo; and &lsquo;single quotes&rsquo;</p>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Emphasis</h2>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>This is bold text</strong></p>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>This is bold text</strong></p>
@@ -21,9 +21,9 @@
 <p style="font-size:12px;font-family:Georgia;color:#11226a;"><em>This is italic text</em></p>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">~~Strikethrough~~</p>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Blockquotes</h2>
-<blockquote style="padding: 6px 14px 6px 12px;color:#e8ecfb;border:none;border-left:2px solid #335c4c;background-color:#e8ecfb;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">Blockquotes can also be nested...</p>
-<blockquote style="padding: 6px 14px 6px 12px;color:#e8ecfb;border:none;border-left:2px solid #335c4c;background-color:#e8ecfb;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">...by using additional greater-than signs right next to each other...</p>
-<blockquote style="padding: 6px 14px 6px 12px;color:#e8ecfb;border:none;border-left:2px solid #335c4c;background-color:#e8ecfb;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">...or with spaces between arrows.</p>
+<blockquote style="padding: 6px 14px 6px 12px;background-color:#e8ecfb;border:none;border-left:2px solid #335c4c;background-color:#e8ecfb;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">Blockquotes can also be nested&hellip;</p>
+<blockquote style="padding: 6px 14px 6px 12px;background-color:#e8ecfb;border:none;border-left:2px solid #335c4c;background-color:#e8ecfb;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">&hellip;by using additional greater-than signs right next to each other&hellip;</p>
+<blockquote style="padding: 6px 14px 6px 12px;background-color:#e8ecfb;border:none;border-left:2px solid #335c4c;background-color:#e8ecfb;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">&hellip;or with spaces between arrows.</p>
 </blockquote>
 </blockquote>
 </blockquote>
@@ -60,10 +60,10 @@
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Integer molestie lorem at massa</p>
 </li>
 <li>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">You can use sequential numbers...</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">You can use sequential numbers&hellip;</p>
 </li>
 <li>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">...or keep all the numbers as <code style="font-family:monospace;background-color:#e8ecfb;">1.</code></p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">&hellip;or keep all the numbers as <code style="font-family:monospace;background-color:#e8ecfb;">1.</code></p>
 </li>
 </ol>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Start numbering with offset:</p>
@@ -79,7 +79,7 @@ line 1 of code
 line 2 of code
 line 3 of code
 </code></pre>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">Block code &quot;fences&quot;</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Block code &ldquo;fences&rdquo;</p>
 <pre><code>Sample text here...
 </code></pre>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Syntax highlighting</p>
@@ -90,18 +90,53 @@ line 3 of code
 console.log(foo(5));
 </code></pre>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Tables</h2>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">| Option | Description |
-| ------ | ----------- |
-| data   | path to data files to supply the data that will be passed into templates. |
-| engine | engine to be used for processing templates. Handlebars is the default. |
-| ext    | extension to be used for dest files. |</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data</td>
+<td>path to data files to supply the data that will be passed into templates.</td>
+</tr>
+<tr>
+<td>engine</td>
+<td>engine to be used for processing templates. Handlebars is the default.</td>
+</tr>
+<tr>
+<td>ext</td>
+<td>extension to be used for dest files.</td>
+</tr>
+</tbody>
+</table>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Right aligned columns</p>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">| Option | Description |
-| ------:| -----------:|
-| data   | path to data files to supply the data that will be passed into templates. |
-| engine | engine to be used for processing templates. Handlebars is the default. |
-| ext    | extension to be used for dest files. |</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">Option</th>
+<th style="text-align:right">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">data</td>
+<td style="text-align:right">path to data files to supply the data that will be passed into templates.</td>
+</tr>
+<tr>
+<td style="text-align:right">engine</td>
+<td style="text-align:right">engine to be used for processing templates. Handlebars is the default.</td>
+</tr>
+<tr>
+<td style="text-align:right">ext</td>
+<td style="text-align:right">extension to be used for dest files.</td>
+</tr>
+</tbody>
+</table>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Links</h2>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;"><a href="https://www.autolink.com" style="color:#335c9c;">https://www.autolink.com</a></p>
 
 		<table border="0" cellspacing="0" cellpadding="0">
 			<tr>
@@ -114,7 +149,7 @@ console.log(foo(5));
         <td align="center">
 		<table border="0" cellspacing="0" cellpadding="0">
       <tr>
-          <td align="center" style="border-radius:5px;background-color:#3a86ff;width:80%;max-width:250px;"><a href="http://nodeca.github.io/pica/demo/" title="title text!" style="font-size:18px;font-weight:bold;text-decoration:none;border-radius:5px;padding:12px 18px;display:inline-block;color:#ffffff;border:1px solid #3a86ff;font-family:Georgia;">link with title</a></td></tr></table></td></tr></table><p style="font-size:12px;font-family:Georgia;color:#11226a;">Autoconverted link https://github.com/nodeca/pica (enable linkify to see)</p>
+          <td align="center" style="border-radius:5px;background-color:#3a86ff;width:80%;max-width:250px;"><a href="http://nodeca.github.io/pica/demo/" title="title text!" style="font-size:18px;font-weight:bold;text-decoration:none;border-radius:5px;padding:12px 18px;display:inline-block;color:#ffffff;border:1px solid #3a86ff;font-family:Georgia;">link with title</a></td></tr></table></td></tr></table><p style="font-size:12px;font-family:Georgia;color:#11226a;">Autoconverted link <a href="https://github.com/nodeca/pica" style="color:#335c9c;">https://github.com/nodeca/pica</a> (enable linkify to see)</p>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Images</h2>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;"><img src="https://octodex.github.com/images/minion.png" alt="Minion">
 <img src="https://octodex.github.com/images/stormtroopocat.jpg" alt="Stormtroopocat" title="The Stormtroopocat"></p>
@@ -125,7 +160,7 @@ console.log(foo(5));
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">The killer feature of <code style="font-family:monospace;background-color:#e8ecfb;">markdown-it</code> is very effective support of
 <a href="https://www.npmjs.org/browse/keyword/markdown-it-plugin" style="color:#335c9c;">syntax plugins</a>.</p>
 <h3 style="color:#11267;font-family:Georgia;font-size: 20px;"><a href="https://github.com/markdown-it/markdown-it-emoji" style="color:#335c9c;">Emojies</a></h3>
-<blockquote style="padding: 6px 14px 6px 12px;color:#e8ecfb;border:none;border-left:2px solid #335c4c;background-color:#e8ecfb;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">Classic markup: :wink: :cry: :laughing: :yum:</p>
+<blockquote style="padding: 6px 14px 6px 12px;background-color:#e8ecfb;border:none;border-left:2px solid #335c4c;background-color:#e8ecfb;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">Classic markup: :wink: :cry: :laughing: :yum:</p>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Shortcuts (emoticons): :-) :-( 8-) ;)</p>
 </blockquote>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">see <a href="https://github.com/markdown-it/markdown-it-emoji#change-output" style="color:#335c9c;">how to change output</a> with twemoji.</p>
@@ -165,7 +200,7 @@ Third paragraph of definition 2.
 ~ Definition 2b</p>
 <h3 style="color:#11267;font-family:Georgia;font-size: 20px;"><a href="https://github.com/markdown-it/markdown-it-abbr" style="color:#335c9c;">Abbreviations</a></h3>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">This is HTML abbreviation example.</p>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">It converts &quot;HTML&quot;, but keep intact partial entries like &quot;xxxHTMLyyy&quot; and so on.</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">It converts &ldquo;HTML&rdquo;, but keep intact partial entries like &ldquo;xxxHTMLyyy&rdquo; and so on.</p>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">*[HTML]: Hyper Text Markup Language</p>
 <h3 style="color:#11267;font-family:Georgia;font-size: 20px;"><a href="https://github.com/markdown-it/markdown-it-container" style="color:#335c9c;">Custom containers</a></h3>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">::: warning
