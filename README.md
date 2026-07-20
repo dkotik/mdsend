@@ -67,9 +67,10 @@ More usage examples are here:
 - [1-minimal.md](examples/1-minimal.md?plain=1)
 - [2-attachments.md](examples/2-attachments.md?plain=1)
 - [3-scheduling.md](examples/3-scheduling.md?plain=1)
-- [4-templating.md](examples/4-templating.md?plain=1)
-- [5-list.md](examples/5-list.md?plain=1)
-- [6-extending.md](examples/6-extending.md?plain=1)
+- [4-themes.md](examples/4-themes.md?plain=1)
+- [5-templates.md](examples/5-templates.md?plain=1)
+- [6-list.md](examples/6-list.md?plain=1)
+- [7-extending.md](examples/7-extending.md?plain=1)
 
 ## Installation
 
