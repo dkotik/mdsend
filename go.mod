@@ -4,6 +4,7 @@ go 1.26.5
 
 require (
 	cuelang.org/go v0.16.1
+	github.com/SparkPost/gosparkpost v0.2.0
 	github.com/ThreeDotsLabs/watermill v1.5.2
 	github.com/ThreeDotsLabs/watermill-sqlite/wmsqlitezombiezen v0.1.2
 	github.com/adrg/xdg v0.5.3

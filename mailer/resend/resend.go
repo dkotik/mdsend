@@ -28,7 +28,6 @@ type Configuration struct {
 	TestMode bool
 }
 
-// New creates a Mailgun sending agent.
 func New(config Configuration) (mdsend.Mailer, error) {
 	if config.Queue == nil {
 		return nil, errors.New("message queue is required for attachments: nil")

@@ -97,6 +97,7 @@ var application = &cli.Command{
 					Flags: []cli.Flag{
 						flagQueue,
 						flagFrom,
+						flagTo,
 						flagVerbose,
 					},
 					Action: cmdQueueAdd,
@@ -163,6 +164,7 @@ var application = &cli.Command{
 			Flags: []cli.Flag{
 				flagQueue,
 				flagFrom,
+				flagTo,
 				flagGraceTimeout,
 				flagDelay,
 				flagFluctuate,
