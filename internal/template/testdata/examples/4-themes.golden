@@ -1,0 +1,158 @@
+subject: example using themes
+seed_key: 3h7ajXxaKyF
+
+
+Styling Your Letters
+====================
+
+Markdown text can be stylized with `theme` frontmatter sectionand with templates.
+
+Templates are demonstrated in the next example. Default templatesrely on the same `theme` frontmatter values.
+
+
+Fonts
+-----
+
+Use only standard font names. Electronic mail does not display custom fonts well. Specify `font_size` in pixels only.
+
+
+Colors
+------
+
+
+- **text:** the text color in paragraphs.
+- **heading:** the text color of headings.
+- **link:** the text color of anchors.
+- **action:** the color of action button. A paragraph with one link, by itself, is rendered as an action button.
+- **blockquote:** the background color of a block quote, table alt row background, inline code element.
+- **border:** thematic break, borders of tables, code blocks, and blockquote margin.
+
+
+
+===========[HTML]=============
+
+<!doctype html><html lang="en" dir="auto">
+<head>
+  <title>example using themes</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">
+    body {
+      margin: 0;
+      padding: 0;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+
+    table, td {
+      border-collapse: collapse;
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+    }
+
+    img {
+      border: 0;
+      height: auto;
+      line-height: 100%;
+      outline: none;
+      text-decoration: none;
+      -ms-interpolation-mode: bicubic;
+    }
+
+    p {
+      display: block;
+      margin: 11px 0;
+    }
+
+    a { padding: 0; }
+
+    
+  </style>
+  
+  <style type="text/css">
+    @media only screen and (min-width:600px) {
+      .main {
+        margin-top: 24px !important;
+        width: 100% !important;
+        max-width: 100%;
+      }
+    }
+  </style>
+  <style media="screen and (min-width:600px)">
+    .moz-text-html .main {
+      margin-top: 24px !important;
+      width: 100% !important;
+      max-width: 100%;
+    }
+  </style>
+</head>
+
+<body style="word-spacing:normal;background-color:#e8ecfb;">
+  <div aria-roledescription="email" role="article" lang="en" dir="auto" style="word-spacing:normal;">
+    
+    <div style="margin:0px auto;max-width:600px;">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+        <tbody>
+          <tr>
+            <td style="font-size:0px;text-align:center;">
+              
+              <div class="main" style="font-size:0px;text-align:left;display:inline-block;vertical-align:top;width:100%;background-color:#fefeff;-webkit-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); -moz-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15);">
+                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                  <tbody>
+                    <tr>
+                      <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;background-color:#6784ff;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+                          <tbody>
+                            <tr>
+                              <td>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
+                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:orange;"><h1 style="color:#667799;font-family:'Courier New', verdana;font-size: 25px;">Styling Your Letters</h1>
+<p style="font-size:13px;font-family:'Courier New', verdana;color:#ffa500;">Markdown text can be stylized with <code style="font-family:monospace;background-color:#808080;">theme</code> frontmatter section
+and with templates.</p>
+<p style="font-size:13px;font-family:'Courier New', verdana;color:#ffa500;">Templates are demonstrated in the next example. Default templates
+rely on the same <code style="font-family:monospace;background-color:#808080;">theme</code> frontmatter values.</p>
+<h2 style="color:#667799;font-family:'Courier New', verdana;font-size: 23px;">Fonts</h2>
+<p style="font-size:13px;font-family:'Courier New', verdana;color:#ffa500;">Use only standard font names. Electronic mail does not display custom fonts well. Specify <code style="font-family:monospace;background-color:#808080;">font_size</code> in pixels only.</p>
+<h2 style="color:#667799;font-family:'Courier New', verdana;font-size: 23px;">Colors</h2>
+<ul>
+<li><strong>text:</strong> the text color in paragraphs.</li>
+<li><strong>heading:</strong> the text color of headings.</li>
+<li><strong>link:</strong> the text color of anchors.</li>
+<li><strong>action:</strong> the color of action button. A paragraph with one link, by itself, is rendered as an action button.</li>
+<li><strong>blockquote:</strong> the background color of a block quote, table alt row background, inline code element.</li>
+<li><strong>border:</strong> thematic break, borders of tables, code blocks, and blockquote margin.</li>
+</ul>
+</div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="font-size:0px;padding: 24px 26px 10px 26px;word-break:break-word;">
+              <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+                <tbody>
+                  <tr>
+                    <td style="color:#41629a;font-size: 11px;align: center"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+  </div>
+</body>
+</html>

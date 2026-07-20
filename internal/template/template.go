@@ -50,27 +50,6 @@ type Options struct {
 	Frontmatter         map[string]any
 }
 
-func (o Options) withDefaults() Options {
-	if o.IdentifierGenerator == nil {
-		o.IdentifierGenerator = mdsend.IdentifierGeneratorFunc(func() (string, error) {
-			return uuid.NewString(), nil
-		})
-	}
-	if o.ContentParser == nil {
-		o.ContentParser = markdown.NewParser(markdown.DefaultLightTheme)
-	}
-	if o.RendererForText == nil {
-		o.RendererForText = markdown.NewPlaintextRenderer()
-	}
-	if o.RendererForHTML == nil {
-		o.RendererForHTML = markdown.NewRendererHTML()
-	}
-	if o.Frontmatter == nil {
-		o.Frontmatter = make(map[string]any)
-	}
-	return o
-}
-
 // New creates a [Template]. The result is not safe for asynchronous rendering.
 func New(
 	l mdsend.Letter,
@@ -80,7 +59,31 @@ func New(
 	if l.Content == "" {
 		return nil, errors.New("empty letter content")
 	}
-	options = options.withDefaults()
+	if options.IdentifierGenerator == nil {
+		options.IdentifierGenerator = mdsend.IdentifierGeneratorFunc(func() (string, error) {
+			return uuid.NewString(), nil
+		})
+	}
+	if options.ContentParser == nil {
+		if themeStack, ok := l.Frontmatter["theme"].(map[string]any); ok {
+			theme, err := markdown.NewThemeFromMap(themeStack)
+			if err != nil {
+				return nil, err
+			}
+			options.ContentParser = markdown.NewParser(theme)
+		} else {
+			options.ContentParser = markdown.NewParser(markdown.DefaultLightTheme)
+		}
+	}
+	if options.RendererForText == nil {
+		options.RendererForText = markdown.NewPlaintextRenderer()
+	}
+	if options.RendererForHTML == nil {
+		options.RendererForHTML = markdown.NewRendererHTML()
+	}
+	if options.Frontmatter == nil {
+		options.Frontmatter = make(map[string]any)
+	}
 	internal.MapMergeLeft(options.Frontmatter, l.Frontmatter)
 	t := &tmpl{
 		LetterID: l.ID,

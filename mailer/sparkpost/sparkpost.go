@@ -85,7 +85,7 @@ func (s mailer) SendMail(ctx context.Context, m mdsend.Message) (_ string, err e
 	// headers["Idempotency-Key"] = m.SeedKey
 
 	tx := &sp.Transmission{
-		Recipients: []string{m.To.String()},
+		Recipients: []string{m.To.Address},
 		Content: MimeContent{
 			EmailRFC822: s.Buffer.String(),
 		},

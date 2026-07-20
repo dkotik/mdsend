@@ -63,8 +63,8 @@ func TestExamples(t *testing.T) {
 	if err != nil {
 		t.Fatal("unable to reach examples folder:", err)
 	}
-	if len(entries) != 6 {
-		t.Fatal("there should be 6 examples, instead:", len(entries))
+	if len(entries) != 7 {
+		t.Fatal("there should be 7 examples, instead:", len(entries))
 	}
 	fs := media.NewUnsafeUnconstrainedFileSystem()
 	for _, entry := range entries {
