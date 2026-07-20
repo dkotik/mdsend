@@ -6,7 +6,8 @@ import (
 	"testing"
 
 	"github.com/dkotik/mdsend/queue"
-	"github.com/dkotik/mdsend/queue/sqlite"
+	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
+	"zombiezen.com/go/sqlite"
 )
 
 func TestQueue(t *testing.T) {
@@ -32,11 +33,11 @@ func TestQueue(t *testing.T) {
 		t.Fatal("unable to queue letters to database:", err)
 	}
 
-	conn, err := newQueueConnection(database)
+	conn, err := sqlite.OpenConn(database)
 	if err != nil {
 		t.Fatal("cannot check database:", err)
 	}
-	q, err := sqlite.New(conn, "")
+	q, err := sqliteQ.New(conn, "")
 	if err != nil {
 		t.Fatal("cannot mount queue:", err)
 	}

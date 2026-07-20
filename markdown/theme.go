@@ -13,7 +13,7 @@ import (
 
 var (
 	reValidHexColor   = regexp.MustCompile(`^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$`)
-	reValidFontFamily = regexp.MustCompile(`^(?i)(?:[a-z0-9\- ]+|'[^']+'|"[^"]+")(?:,\s*(?:[a-z0-9\- ]+|'[^']+'|"[^"]+"))+$`)
+	reValidFontFamily = regexp.MustCompile(`^(?i)[a-z0-9\- ]{4,}$`)
 )
 
 type Palette struct {
@@ -40,6 +40,8 @@ func NewColor(s string) (string, error) {
 
 func NewColorFromAny(v any) (string, error) {
 	switch v := v.(type) {
+	case nil:
+		return "", nil
 	case string:
 		return NewColor(v)
 	default:
@@ -118,7 +120,7 @@ func NewThemeFromMap(m map[string]any) (t Theme, err error) {
 			if !ok {
 				return t, fmt.Errorf("invalid font_family: %v (%T)", v, v)
 			}
-			if !reValidFontFamily.MatchString(ff) {
+			if !IsValidFontFamily(ff) {
 				return t, fmt.Errorf("invalid font_family format: %s", ff)
 			}
 			t.FontFamily = strings.ReplaceAll(ff, "\"", "'")
@@ -132,11 +134,11 @@ func NewThemeFromMap(m map[string]any) (t Theme, err error) {
 			if err != nil {
 				return t, fmt.Errorf("invalid font size: %w", err)
 			}
-			if fsUint > 255 {
-				return t, fmt.Errorf("invalid font size: %d is too large (max 255)", fsUint)
+			if fsUint > 72 {
+				return t, fmt.Errorf("invalid font size: %d is too large (max 72)", fsUint)
 			}
-			if fsUint < 7 {
-				return t, fmt.Errorf("invalid font size: %d is too small (min 7)", fsUint)
+			if fsUint < 8 {
+				return t, fmt.Errorf("invalid font size: %d is too small (min 8)", fsUint)
 			}
 			t.FontSize = uint8(fsUint)
 		}
@@ -441,4 +443,29 @@ var validNamedColors = map[string]string{
 	"wheat":                "#f5deb3",
 	"whitesmoke":           "#f5f5f5",
 	"yellowgreen":          "#9acd32",
+}
+
+func IsValidFontFamily(ff string) bool {
+	for _, f := range strings.Split(ff, ",") {
+		f = strings.TrimSpace(f)
+		if f == "" {
+			return false
+		}
+		if f[0] == '\'' {
+			if len(f) < 2 || f[len(f)-1] != '\'' {
+				return false
+			}
+			f = f[1 : len(f)-1]
+		}
+		if f[0] == '"' {
+			if len(f) < 2 || f[len(f)-1] != '"' {
+				return false
+			}
+			f = f[1 : len(f)-1]
+		}
+		if !reValidFontFamily.MatchString(f) {
+			return false
+		}
+	}
+	return true
 }

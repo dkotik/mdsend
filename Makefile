@@ -3,12 +3,16 @@ export
 
 default:
 	@clear
-	@echo ":::::::::::::::::::::::::::::::::::::::::"
-	@go test ./...
+	@output=$$(go test ./...) || echo "$$output"
+	@#go test ./...
 	@#cd internal/template && go test ./...
 	@#cd queue && go test ./...
 	@#cd cmd/mdsend && go test ./...
-	@echo "::::::::::::::::::::::::::::::::::::"
+	@date +"[ %T ]"
+short:
+	@clear
+	@output=$$(go test -short ./...) || echo "$$output" | grep -Ev "^(ok|\\?)"
+	@date +"[ %T ]"
 live:
 	@clear
 	# @rm mailer/smtp/testdata/live_test.lock

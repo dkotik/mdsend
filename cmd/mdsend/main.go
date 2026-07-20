@@ -14,7 +14,6 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/urfave/cli/v3"
-	"zombiezen.com/go/sqlite"
 )
 
 var flagQueue = &cli.StringFlag{
@@ -61,23 +60,6 @@ var flagQueue = &cli.StringFlag{
 		// connectionDSN := "file:ephemeral?mode=memory&cache=shared"
 		return nil
 	},
-}
-
-func newQueueConnection(p string) (conn *sqlite.Conn, err error) {
-	// userDir, err := os.UserHomeDir()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// p = "file:" + filepath.Join(userDir, "Downloads", "mdsend.sqlite3?cache=shared&wal=on")
-	conn, err = sqlite.OpenConn(
-		p,
-		// flags ...sqlite.OpenFlags
-	)
-	if err != nil {
-		return nil, err
-	}
-	// conn.SetBlockOnBusy()
-	return conn, nil
 }
 
 var application = &cli.Command{
@@ -170,6 +152,7 @@ var application = &cli.Command{
 				flagFluctuate,
 				flagWorkerCount,
 				flagService,
+				flagDestroy,
 				flagVerbose,
 			},
 			Action: cmdSend,

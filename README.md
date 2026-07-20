@@ -94,9 +94,9 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 <details>
   <summary>Click here to see a list of planned features.</summary>
 
+- [ ] Beautify the default template. Add `dark.html` one.
 - [ ] attachments should be collected from templates as well
 - [ ] Validate function should detect language and complain that `language` field is not set, if the content is not English.
-- [ ] Beautify the default template. Add `dark.html` one.
 - [ ] service package with HTTP unsubscribe endpoint package
 - [ ] mdsend <file> should be equivalent to mdsend send <file>?
 - [ ] Queue clean up scanner - should be first added to sqlite Watermill driver.

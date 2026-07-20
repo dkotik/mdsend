@@ -18,6 +18,7 @@ import (
 	"github.com/dkotik/mdsend/queue"
 	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
 	"github.com/urfave/cli/v3"
+	"zombiezen.com/go/sqlite"
 )
 
 func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
@@ -54,7 +55,7 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 		}
 	}
 
-	conn, err := newQueueConnection(connectionDSN)
+	conn, err := sqlite.OpenConn(connectionDSN)
 	if err != nil {
 		return fmt.Errorf("database %q inaccessible: %w", connectionDSN, err)
 	}
@@ -195,9 +196,11 @@ func queueLetter(
 		}
 		if err = q.CreateMessage(ctx, message); err != nil {
 			if errors.Is(err, mdsend.ErrDuplicateMessage) {
+				subject, _ := letter.GetSubject()
 				logger.Warn(
 					"message has already been sent",
 					slog.String("letter_id", letter.ID),
+					slog.String("subject", subject),
 					slog.String("message_id", message.ID),
 					slog.String("seed_key", message.SeedKey),
 				)

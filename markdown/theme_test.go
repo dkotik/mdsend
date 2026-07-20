@@ -60,3 +60,25 @@ par2
 		t.Fatal(err)
 	}
 }
+
+func TestFontFamilyParsing(t *testing.T) {
+	tcs := []string{
+		`"Helvetica Neue", Arial, sans-serif`,
+		`"Times New Roman", Times, serif`,
+		`"Courier New", Courier, monospace`,
+		`"Segoe UI", Tahoma, Geneva, Verdana, sans-serif`,
+		`"Lucida Console", Monaco, monospace`,
+		`"Gill Sans", "Gill Sans MT", Calibri, sans-serif`,
+		`"Palatino Linotype", "Book Antiqua", Palatino, serif`,
+		`"Trebuchet MS", Helvetica, sans-serif`,
+		`"Brush Script MT", cursive`,
+		`"Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif`,
+	}
+	for i, tc := range tcs {
+		t.Run(fmt.Sprintf("%d", i+1), func(t *testing.T) {
+			if !IsValidFontFamily(tc) {
+				t.Fatalf("invalid font_family: %s", tc)
+			}
+		})
+	}
+}
