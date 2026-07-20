@@ -203,7 +203,7 @@ func TestQueue(q Queue) func(*testing.T) {
 			if err = d.AssertEqualityTo(messages[i]); err != nil {
 				t.Fatal("messages do not match:", err)
 			}
-			err := q.MarkMessagesAsScheduled(ctx, d.ID)
+			err := q.MarkMessagesAsScheduled(ctx, d.LetterID, d.ID)
 			if err != nil {
 				t.Fatalf("unable to complete message %d: %v", i+1, err)
 			}

@@ -52,8 +52,8 @@ Template execution context contains the following fields:
 
 ## Reify Templates
 
-Special `reify` function stores the output of a named `Golang` block
-or template. Calling `reify` again on the same template, returns
+Special `reify` function prints and stores the output of a named `Golang` block
+or template. Calling `reify` again on the same template, prints
 the initial output. Each recipient starts with an empty output cache.
 
 Here is an example of declaring a template that encodes recipient
@@ -66,3 +66,9 @@ address as a URL-safe field once to be used several times:
 
 URL: https://test.com/?unsubscribe={{ reify "token" }}
 ```
+
+Reified values are marked as safe HTML. This prevents Go templating
+engine from aggressively sanitizing their contents. For example, angle
+brackets around a template value or inside it become `&gt;` and `&lt;`
+to prevent cross-site scripting exploits. Put the angle brackets
+inside the reified template, and they will render correctly.

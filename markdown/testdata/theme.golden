@@ -1,0 +1,163 @@
+<h1 style="color:#5454;font-family:Georgia;font-size: 24px;">h1 Heading</h1>
+<h2 style="color:#5454;font-family:Georgia;font-size: 22px;">h2 Heading</h2>
+<h3 style="color:#5454;font-family:Georgia;font-size: 20px;">h3 Heading</h3>
+<h4 style="color:#5454;font-family:Georgia;font-size: 18px;">h4 Heading</h4>
+<h5 style="color:#5454;font-family:Georgia;font-size: 16px;">h5 Heading</h5>
+<h6 style="color:#5454;font-family:Georgia;font-size: 14px;">h6 Heading</h6>
+<h2 style="color:#5454;font-family:Georgia;font-size: 22px;">Horizontal Rules</h2>
+<hr style="padding:10px 25px 10px 25px;border:none;border-top:2px solid #5454;">
+<hr style="padding:10px 25px 10px 25px;border:none;border-top:2px solid #5454;">
+<hr style="padding:10px 25px 10px 25px;border:none;border-top:2px solid #5454;">
+<h2 style="color:#5454;font-family:Georgia;font-size: 22px;">Typographic replacements</h2>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Enable typographer option to see result.</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">(c) (C) (r) (R) (tm) (TM) +-</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">test.. test... test..... test?..... test!....</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">!!!!!! ???? ,,  -- ---</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">&quot;Smartypants, double quotes&quot; and 'single quotes'</p>
+<h2 style="color:#5454;font-family:Georgia;font-size: 22px;">Emphasis</h2>
+<p style="font-size:12px;font-family:Georgia;color:#5454;"><strong>This is bold text</strong></p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;"><strong>This is bold text</strong></p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;"><em>This is italic text</em></p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;"><em>This is italic text</em></p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">~~Strikethrough~~</p>
+<h2 style="color:#5454;font-family:Georgia;font-size: 22px;">Blockquotes</h2>
+<blockquote style="padding: 6px 14px 6px 12px;color:#5454;border:none;border-left:2px solid #5454;background-color:#5454;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#5454;">Blockquotes can also be nested...</p>
+<blockquote style="padding: 6px 14px 6px 12px;color:#5454;border:none;border-left:2px solid #5454;background-color:#5454;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#5454;">...by using additional greater-than signs right next to each other...</p>
+<blockquote style="padding: 6px 14px 6px 12px;color:#5454;border:none;border-left:2px solid #5454;background-color:#5454;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#5454;">...or with spaces between arrows.</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<h2 style="color:#5454;font-family:Georgia;font-size: 22px;">Lists</h2>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Unordered</p>
+<ul>
+<li>Create a list by starting a line with <code style="font-family:monospace;background-color:#5454;">+</code>, <code style="font-family:monospace;background-color:#5454;">-</code>, or <code style="font-family:monospace;background-color:#5454;">*</code></li>
+<li>Sub-lists are made by indenting 2 spaces:
+<ul>
+<li>Marker character change forces new list start:
+<ul>
+<li>Ac tristique libero volutpat at</li>
+</ul>
+<ul>
+<li>Facilisis in pretium nisl aliquet</li>
+</ul>
+<ul>
+<li>Nulla volutpat aliquam velit</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Very easy!</li>
+</ul>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Ordered</p>
+<ol>
+<li>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Lorem ipsum dolor sit amet</p>
+</li>
+<li>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Consectetur adipiscing elit</p>
+</li>
+<li>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Integer molestie lorem at massa</p>
+</li>
+<li>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">You can use sequential numbers...</p>
+</li>
+<li>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">...or keep all the numbers as <code style="font-family:monospace;background-color:#5454;">1.</code></p>
+</li>
+</ol>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Start numbering with offset:</p>
+<ol start="57">
+<li>foo</li>
+<li>bar</li>
+</ol>
+<h2 style="color:#5454;font-family:Georgia;font-size: 22px;">Code</h2>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Inline <code style="font-family:monospace;background-color:#5454;">code</code></p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Indented code</p>
+<pre><code>// Some comments
+line 1 of code
+line 2 of code
+line 3 of code
+</code></pre>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Block code &quot;fences&quot;</p>
+<pre><code>Sample text here...
+</code></pre>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Syntax highlighting</p>
+<pre><code class="language-js">var foo = function (bar) {
+  return bar++;
+};
+
+console.log(foo(5));
+</code></pre>
+<h2 style="color:#5454;font-family:Georgia;font-size: 22px;">Tables</h2>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">| Option | Description |
+| ------ | ----------- |
+| data   | path to data files to supply the data that will be passed into templates. |
+| engine | engine to be used for processing templates. Handlebars is the default. |
+| ext    | extension to be used for dest files. |</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Right aligned columns</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">| Option | Description |
+| ------:| -----------:|
+| data   | path to data files to supply the data that will be passed into templates. |
+| engine | engine to be used for processing templates. Handlebars is the default. |
+| ext    | extension to be used for dest files. |</p>
+<h2 style="color:#5454;font-family:Georgia;font-size: 22px;">Links</h2>
+<p style="font-size:12px;font-family:Georgia;color:#5454;"><a href="http://dev.nodeca.com" style="color:#5454;">link text</a></p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;"><a href="http://nodeca.github.io/pica/demo/" title="title text!" style="color:#5454;">link with title</a></p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Autoconverted link https://github.com/nodeca/pica (enable linkify to see)</p>
+<h2 style="color:#5454;font-family:Georgia;font-size: 22px;">Images</h2>
+<p style="font-size:12px;font-family:Georgia;color:#5454;"><img src="https://octodex.github.com/images/minion.png" alt="Minion">
+<img src="https://octodex.github.com/images/stormtroopocat.jpg" alt="Stormtroopocat" title="The Stormtroopocat"></p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Like links, Images also have a footnote style syntax</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;"><img src="https://octodex.github.com/images/dojocat.jpg" alt="Alt text" title="The Dojocat"></p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">With a reference later in the document defining the URL location:</p>
+<h2 style="color:#5454;font-family:Georgia;font-size: 22px;">Plugins</h2>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">The killer feature of <code style="font-family:monospace;background-color:#5454;">markdown-it</code> is very effective support of
+<a href="https://www.npmjs.org/browse/keyword/markdown-it-plugin" style="color:#5454;">syntax plugins</a>.</p>
+<h3 style="color:#5454;font-family:Georgia;font-size: 20px;"><a href="https://github.com/markdown-it/markdown-it-emoji" style="color:#5454;">Emojies</a></h3>
+<blockquote style="padding: 6px 14px 6px 12px;color:#5454;border:none;border-left:2px solid #5454;background-color:#5454;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#5454;">Classic markup: :wink: :cry: :laughing: :yum:</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Shortcuts (emoticons): :-) :-( 8-) ;)</p>
+</blockquote>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">see <a href="https://github.com/markdown-it/markdown-it-emoji#change-output" style="color:#5454;">how to change output</a> with twemoji.</p>
+<h3 style="color:#5454;font-family:Georgia;font-size: 20px;"><a href="https://github.com/markdown-it/markdown-it-sub" style="color:#5454;">Subscript</a> / <a href="https://github.com/markdown-it/markdown-it-sup" style="color:#5454;">Superscript</a></h3>
+<ul>
+<li>19^th^</li>
+<li>H~2~O</li>
+</ul>
+<h3 style="color:#5454;font-family:Georgia;font-size: 20px;"><a href="https://github.com/markdown-it/markdown-it-ins" style="color:#5454;">&lt;ins&gt;</a></h3>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">++Inserted text++</p>
+<h3 style="color:#5454;font-family:Georgia;font-size: 20px;"><a href="https://github.com/markdown-it/markdown-it-mark" style="color:#5454;">&lt;mark&gt;</a></h3>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">==Marked text==</p>
+<h3 style="color:#5454;font-family:Georgia;font-size: 20px;"><a href="https://github.com/markdown-it/markdown-it-footnote" style="color:#5454;">Footnotes</a></h3>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Footnote 1 link[^first].</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Footnote 2 link[^second].</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Inline footnote^[Text of inline footnote] definition.</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Duplicated footnote reference[^second].</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">[^first]: Footnote <strong>can have markup</strong></p>
+<pre><code>and multiple paragraphs.
+</code></pre>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">[^second]: Footnote text.</p>
+<h3 style="color:#5454;font-family:Georgia;font-size: 20px;"><a href="https://github.com/markdown-it/markdown-it-deflist" style="color:#5454;">Definition lists</a></h3>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Term 1</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">:   Definition 1
+with lazy continuation.</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Term 2 with <em>inline markup</em></p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">:   Definition 2</p>
+<pre><code>    { some code, part of Definition 2 }
+
+Third paragraph of definition 2.
+</code></pre>
+<p style="font-size:12px;font-family:Georgia;color:#5454;"><em>Compact style:</em></p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Term 1
+~ Definition 1</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">Term 2
+~ Definition 2a
+~ Definition 2b</p>
+<h3 style="color:#5454;font-family:Georgia;font-size: 20px;"><a href="https://github.com/markdown-it/markdown-it-abbr" style="color:#5454;">Abbreviations</a></h3>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">This is HTML abbreviation example.</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">It converts &quot;HTML&quot;, but keep intact partial entries like &quot;xxxHTMLyyy&quot; and so on.</p>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">*[HTML]: Hyper Text Markup Language</p>
+<h3 style="color:#5454;font-family:Georgia;font-size: 20px;"><a href="https://github.com/markdown-it/markdown-it-container" style="color:#5454;">Custom containers</a></h3>
+<p style="font-size:12px;font-family:Georgia;color:#5454;">::: warning
+<em>here be dragons</em>
+:::</p>

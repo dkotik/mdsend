@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"html/template"
 	"strings"
 )
 
@@ -11,7 +12,7 @@ import (
 // 	return t.HTML.Lookup(templateName) != nil
 // }
 
-func (t *tmpl) Reify(templateName string) (v string, err error) {
+func (t *tmpl) Reify(templateName string) (v template.HTML, err error) {
 	templateName = strings.TrimSpace(templateName)
 	if templateName == "" {
 		return "", errors.New("reify function requires a template name")
@@ -32,11 +33,11 @@ func (t *tmpl) Reify(templateName string) (v string, err error) {
 	if err = tmpl.Execute(b, t.context); err != nil {
 		return "", fmt.Errorf("unable to execute template %q: %w", templateName, err)
 	}
-	v = b.String()
+	v = template.HTML(b.String())
 	t.ReifiedCache[templateName] = v
 	return v, nil
 }
 
 func (t *tmpl) Reset() {
-	t.ReifiedCache = make(map[string]string)
+	t.ReifiedCache = make(map[string]template.HTML)
 }

@@ -232,7 +232,6 @@ func send(
 				subscriber,
 				"mdsendSent",
 				publisher,
-				// TODO: add retry
 				retry(mailer),
 				// message.HandlerFunc(func(msg *message.Message) ([]*message.Message, error) {
 				// 	panic("djkflsjd")

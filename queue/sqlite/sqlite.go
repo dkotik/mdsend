@@ -36,7 +36,7 @@ type sqliteQueue struct {
 	stmtLisMessagesForward       *sqlite.Stmt
 	stmtListMessagesBackwardHead *sqlite.Stmt
 	stmtListMessagesBackward     *sqlite.Stmt
-	stmtMarkMessagesAsQueued     *sqlite.Stmt
+	stmtMarkMessagesAsScheduled  *sqlite.Stmt
 	stmtMarkMessageAsSent        *sqlite.Stmt
 }
 
@@ -181,9 +181,7 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 	if q.stmtListMessagesBackward, err = conn.Prepare(`SELECT id, seed_key, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after, queued_at, sent_at FROM ` + messagesTable + ` WHERE letter_id=? AND id<? ORDER BY id DESC LIMIT ?`); err != nil {
 		return nil, fmt.Errorf("unable to prepare list messages statement: %w", err)
 	}
-	if q.stmtMarkMessagesAsQueued, err = conn.Prepare(`UPDATE ` + messagesTable + ` SET queued_at=? WHERE id IN (SELECT value FROM json_each(?))`); err != nil {
-		// TODO: is below suffix needed?
-		// AND queued_at IS NULL
+	if q.stmtMarkMessagesAsScheduled, err = conn.Prepare(`UPDATE ` + messagesTable + ` SET queued_at=? WHERE letter_id=? AND queued_at IS NULL AND id IN (SELECT value FROM json_each(?))`); err != nil {
 		return nil, fmt.Errorf("unable to prepare mark message as queued statement: %w", err)
 	}
 	if q.stmtMarkMessageAsSent, err = conn.Prepare(`UPDATE ` + messagesTable + ` SET sent_at=? WHERE id=? AND sent_at IS NULL`); err != nil {

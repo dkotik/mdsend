@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"iter"
-	"strings"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill/message"
@@ -86,42 +85,6 @@ func NewSender(s mdsend.Mailer) message.HandlerFunc {
 			return nil, fmt.Errorf("failed to marshal confirmation: %w", err)
 		}
 		return []*message.Message{message.NewMessage(uuid.NewString(), confirmationBytes)}, nil
-	}
-}
-
-// TODO: deprecate?
-func MountSenders(
-	r *message.Router,
-	pub message.Publisher,
-	sub message.Subscriber,
-	topicPrefix string,
-	senders ...mdsend.Mailer,
-) {
-	if r == nil {
-		panic("router is nil")
-	}
-	if sub == nil {
-		panic("subscriber is nil")
-	}
-	if pub == nil {
-		panic("publisher is nil")
-	}
-
-	topicPrefix = strings.TrimSpace(topicPrefix)
-	if topicPrefix == "" {
-		topicPrefix = "mdsend"
-	}
-	confirmationTopic := fmt.Sprintf("%s_confirmation", topicPrefix)
-	for i, s := range senders {
-		r.AddHandler(
-			fmt.Sprintf("%s_message_sender_%d", topicPrefix, i+1),
-			fmt.Sprintf("%s_outbox_%d", topicPrefix, i+1),
-			sub,
-			confirmationTopic,
-			pub,
-			// TODO: add retry
-			NewSender(s),
-		)
 	}
 }
 

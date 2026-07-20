@@ -11,7 +11,7 @@ bcc:
 language: en
 headers:
   List-ID: Some List <greatlist@test.com>
-  List-Unsubscribe: <mailto:unsub@yourdomain.com>, < {{- reify "unsubscribe_url" -}} >
+  List-Unsubscribe: <mailto:unsub@yourdomain.com>, {{ reify "unsubscribe_url" }}
   List-Unsubscribe-Post: token={{ reify "unsubscribe_token" }}
 ---
 
@@ -124,5 +124,27 @@ the body.
 {{- end -}}
 
 {{- define "unsubscribe_url" -}}
-  https://yourdomain.com/unsub?id={{ reify "unsubscribe_token" }}
+  <https://yourdomain.com/unsub?id={{ reify "unsubscribe_token" }}>
 {{- end -}}
+
+## Message Duplication
+
+Mdsend uses a seed template to protect you from accidentally sending
+the same message to the same recipient. The default seed template
+is `{{ .Frontmatter.subject }}||{{ .Content }}`. That is, a message
+with the same subject and content will have the same seed key.
+
+The queue will reject any message with a duplicate seed key for each
+recipient. Setting a seed template to a static value like `reminder`
+will block any message with the same seed until those
+messages expire by schedule:
+
+```yaml
+subject: this is a message to remind you to leave feedback
+seed: reminder
+schedule:
+  expires: 1mo
+```
+
+This is very handy if you do not want to pester subscribers with
+messages sourced from different letters for different reasons.

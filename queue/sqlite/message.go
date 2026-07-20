@@ -185,14 +185,14 @@ func (q sqliteQueue) MarkMessagesAsScheduled(ctx context.Context, letterID strin
 		return err
 	}
 	defer q.BindContext(ctx)()
-	// TODO: letterID should also be bound
-	if err = q.stmtMarkMessagesAsQueued.Reset(); err != nil {
+	if err = q.stmtMarkMessagesAsScheduled.Reset(); err != nil {
 		return err
 	}
-	q.stmtMarkMessagesAsQueued.BindText(1, encodeTime(time.Now()))
-	q.stmtMarkMessagesAsQueued.BindBytes(2, ids)
+	q.stmtMarkMessagesAsScheduled.BindText(1, encodeTime(time.Now()))
+	q.stmtMarkMessagesAsScheduled.BindText(2, letterID)
+	q.stmtMarkMessagesAsScheduled.BindBytes(3, ids)
 	for {
-		ok, err := q.stmtMarkMessagesAsQueued.Step()
+		ok, err := q.stmtMarkMessagesAsScheduled.Step()
 		if err != nil {
 			return err
 		}

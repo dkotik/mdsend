@@ -92,9 +92,8 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 <details>
   <summary>Click here to see a list of planned features.</summary>
 
+- [ ] themed markdown renderer
 - [ ] attachments should be collected from templates as well
-- [ ] body template should be HTML template? currently Markdown
-      content templates do not penetrate the outer HTML template
 - [ ] Validate function should detect language and complain that `language` field is not set, if the content is not English.
 - [ ] Beautify the default template. Add `dark.html` one.
 - [ ] service package with HTTP unsubscribe endpoint package

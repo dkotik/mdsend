@@ -40,7 +40,7 @@ func (d *addressValue) Set(s string) error {
 func (d *addressValue) Get() any { return mail.Address(*d) }
 
 func (d *addressValue) String() string {
-	return d.String()
+	return (*mail.Address)(d).String()
 }
 
 var (
