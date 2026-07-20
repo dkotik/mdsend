@@ -93,13 +93,16 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 			return fmt.Errorf("unable to connect to queue: %w", err)
 		}
 
-		m, err := environment.New(queue)
-		if err != nil {
-			return fmt.Errorf("unable to send mail: %w", err)
-		}
+		var m mdsend.Mailer
 		if destroy {
 			m = mailer.NewVoid()
+		} else {
+			m, err = environment.New(ctx, queue, logger)
+			if err != nil {
+				return fmt.Errorf("unable to send mail: %w", err)
+			}
 		}
+
 		for _, mw := range mailerMiddleware {
 			m = mw(m)
 		}

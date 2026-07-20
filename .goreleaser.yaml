@@ -52,7 +52,7 @@ nfpms:
       - deb
     vendor: "Dmitry Kotik"
     homepage: "https://github.com/dkotik/mdsend"
-    # maintainer: "Your Email <support@example.com>"
+    maintainer: "Dmitry Kotik <7bt7hnl6f@relay.firefox.com>"
     description: "Send markdown files as electronic mail. Maintain mailing lists as templated text files."
     license: "MIT"
 signs:

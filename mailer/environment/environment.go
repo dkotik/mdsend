@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sesv2"
@@ -18,7 +18,14 @@ import (
 	"github.com/dkotik/mdsend/queue"
 )
 
-func New(q queue.Queue, mailerNamePriority ...string) (mdsend.Mailer, error) {
+var ErrNoCredentials = errors.New("there are no environment credentials for any mail driver")
+
+func New(
+	ctx context.Context,
+	q queue.Queue,
+	logger *slog.Logger,
+	mailerNamePriority ...string,
+) (mdsend.Mailer, error) {
 	mailerNamePriority = append(
 		mailerNamePriority,
 		mailgun.MailerName,
@@ -53,15 +60,29 @@ func New(q queue.Queue, mailerNamePriority ...string) (mdsend.Mailer, error) {
 				})
 			}
 		case awsses.MailerName:
-			ctx, cancel := context.WithTimeout(context.Background(), time.Second*4)
-			defer cancel()
-			cfg, _ := config.LoadDefaultConfig(ctx)
-			if cfg.Credentials != nil {
+			cfg, err := config.LoadDefaultConfig(ctx)
+			if err != nil {
+				logger.Debug("failed to load AWS SES credentials from environment",
+					slog.String("mailer", mailerName),
+					slog.Any("error", err),
+				)
+				continue
+			}
+			// If config is empty, anonymous credentials will be used
+			// by default. Attempt to retrieve credentials to confirm
+			// that the config is valid.
+			_, err = cfg.Credentials.Retrieve(ctx)
+			if err == nil {
 				return awsses.New(q, sesv2.NewFromConfig(cfg))
 			}
+			logger.Debug("attempted to activate AWS SES credentials from environment, but failed to obtain them",
+				slog.String("mailer", mailerName),
+				slog.Any("error", err),
+			)
 		default:
 			return nil, fmt.Errorf("unsupporter mailer driver: <%s>", mailerName)
 		}
+		logger.Debug("valid mailer credentials for one driver, in order of priority, were not discovered in the environment, moving on to the next driver", slog.String("mailer", mailerName))
 	}
-	return nil, errors.New("there are no environment credentials for any mail driver")
+	return nil, ErrNoCredentials
 }
