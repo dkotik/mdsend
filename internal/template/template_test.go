@@ -1,8 +1,6 @@
 package template
 
 import (
-	"bytes"
-	"html/template"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,7 +9,6 @@ import (
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/address"
 	"github.com/dkotik/mdsend/internal/media"
-	"github.com/sebdah/goldie/v2"
 )
 
 func TestValidMessageFromTemplate(t *testing.T) {
@@ -55,25 +52,6 @@ func TestValidMessageFromTemplate(t *testing.T) {
 			t.Error("HTML content does not have the [html] tag")
 		}
 	})
-}
-
-func TestDefaultTemplateRendering(t *testing.T) {
-	defaultTemplate, err := defaultTemplates.ReadFile("html/default.html")
-	if err != nil {
-		t.Fatal(err)
-	}
-	tmpl, err := template.New("").Funcs(functions()).Parse(string(defaultTemplate))
-	if err != nil {
-		t.Fatal(err)
-	}
-	b := &bytes.Buffer{}
-	if err = tmpl.Execute(b, Context{
-		Content: template.HTML("[test content]"),
-	}); err != nil {
-		t.Fatal(err)
-	}
-
-	goldie.New(t).Assert(t, "default", b.Bytes())
 }
 
 func TestExamples(t *testing.T) {

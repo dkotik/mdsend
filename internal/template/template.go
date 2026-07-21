@@ -1,7 +1,6 @@
 package template
 
 import (
-	"embed"
 	"errors"
 	"fmt"
 	"html/template"
@@ -11,14 +10,12 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/internal"
+	"github.com/dkotik/mdsend/internal/html"
 	"github.com/dkotik/mdsend/markdown"
 	"github.com/google/uuid"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer"
 )
-
-//go:embed html/*
-var defaultTemplates embed.FS
 
 type Template interface {
 	RenderLetterForRecipient(map[string]any) (mdsend.Message, error)
@@ -115,21 +112,18 @@ func New(
 
 	templateFunctions := functions()
 	templateFunctions["reify"] = t.Reify
+	templateFunctions["execute"] = t.Execute
 	// templateFunctions["lookup"] = t.Lookup
 	t.HTML, err = template.New("").Funcs(templateFunctions).Parse(l.Content)
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse letter content as a template: %w", err)
 	}
 	if len(l.Templates) == 0 {
-		defaultTemplate, err := defaultTemplates.ReadFile("html/default.html")
-		if err != nil {
-			return nil, fmt.Errorf("unable to load default template: %w", err)
-		}
 		t.Text, err = t.HTML.Clone()
 		if err != nil {
 			return nil, fmt.Errorf("unable to clone letter content as a template: %w", err)
 		}
-		t.HTML, err = t.HTML.Parse(string(defaultTemplate))
+		t.HTML, err = t.HTML.Parse(string(html.GetDefaultTemplateHTML()))
 		if err != nil {
 			return nil, fmt.Errorf("unable to parse default template: %w", err)
 		}

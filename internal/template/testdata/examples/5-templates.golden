@@ -1,18 +1,8 @@
 subject: example message for Full Name
-seed_key: FP5ZHE9dZ3q
+seed_key: SryjWoCDpqG
 X-Template-Test: test
 
 Hello FirstName,
-
-Frontmatter title value is supported by default HTML templates,but it is not automatically included into the body of the alternativeplain text message. The same is true of any text present in theHTML template or inserted there by template execution.You may add those elements back by using `.IsPlainText` context value.
-
-
-This is Template-Specific Title to Display above Content (show in plain text only)
-============================================================================
-
-
-Subject: Example Message For Full Name
-=================================
 
 The Markdown content itself is a `Golang` text template.To wrap the output of a letter into an `HTML` template, specifythe list of files to load using the `template` field in thefrontmatter. The last template in the list becomes the roottemplate. Other templates can be called by their base filename:
 
@@ -35,6 +25,18 @@ Template execution context contains the following fields:
 - **Content:** rendered Markdown body.
 - **Schedule:** parsed scheduling directives.
 - **IsPlainText:** true value, when the rendered content isalternative plain text of the electronic mail message.
+
+
+HTML or PlainText
+-------
+
+Lets insert a centered large text title at the top of this letter:
+
+Title template is supported by all default *mdsend* templates,but the title text is not automatically included into the bodyof the alternative plain text message.
+
+The same is true of any text present in theHTML template or inserted there by template execution.You may add those elements back by using `.IsPlainText` context value.
+
+Example Message For Full Name
 
 
 Template Functions
@@ -129,7 +131,7 @@ Reified values are marked as safe HTML. This prevents Go templatingengine from a
           <tr>
             <td style="font-size:0px;text-align:center;">
               
-              <div class="main" style="font-size:0px;text-align:left;display:inline-block;vertical-align:top;width:100%;background-color:#fefeff;-webkit-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); -moz-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15);">
+              <div class="main" style="font-size:0px;text-align:left;display:inline-block;vertical-align:top;width:100%;background-color:#fefeff;">
                 <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                   <tbody>
                     <tr>
@@ -139,7 +141,9 @@ Reified values are marked as safe HTML. This prevents Go templatingengine from a
                             <tr>
                               <td>
                                   <h1 style="margin: 0; padding: 16px 12px 12px 12px; font-size: 28px; line-height: 34px; font-weight: bold;color:#e8ecfb;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;">
-                                    This is Template-Specific Title to Display above Content
+                                    
+  Example Message For Full Name
+
                                   </h1>
                               </td>
                             </tr>
@@ -150,12 +154,6 @@ Reified values are marked as safe HTML. This prevents Go templatingengine from a
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
                         <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">Hello FirstName,</p>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">Frontmatter title value is supported by default HTML templates,
-but it is not automatically included into the body of the alternative
-plain text message. The same is true of any text present in the
-HTML template or inserted there by template execution.
-You may add those elements back by using <code style="font-family:monospace;background-color:#e8ecfb;">.IsPlainText</code> context value.</p>
-<h1 style="color:#11267;font-family:Georgia;font-size: 24px;">Subject: Example Message For Full Name</h1>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">The Markdown content itself is a <code style="font-family:monospace;background-color:#e8ecfb;">Golang</code> text template.
 To wrap the output of a letter into an <code style="font-family:monospace;background-color:#e8ecfb;">HTML</code> template, specify
 the list of files to load using the <code style="font-family:monospace;background-color:#e8ecfb;">template</code> field in the
@@ -181,6 +179,14 @@ fromt the contact source.</li>
 <li><strong>IsPlainText:</strong> true value, when the rendered content is
 alternative plain text of the electronic mail message.</li>
 </ul>
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">HTML or PlainText</h2>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Let&rsquo;s insert a centered large text title at the top of this letter:</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Title template is supported by all default <em>mdsend</em> templates,
+but the title text is not automatically included into the body
+of the alternative plain text message.</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">The same is true of any text present in the
+HTML template or inserted there by template execution.
+You may add those elements back by using <code style="font-family:monospace;background-color:#e8ecfb;">.IsPlainText</code> context value.</p>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Template Functions</h2>
 <ul>
 <li><strong>skipMessageIfTrue:</strong> skip current recipient is the argument to this function call evaluates to an unempty value.</li>

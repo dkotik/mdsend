@@ -165,7 +165,9 @@ func getTemplates(frontmatter map[string]any, prefix string) (templates []string
 	case string:
 		t = strings.TrimSpace(t)
 		if len(t) > 0 {
-			t = filepath.Join(prefix, t)
+			if media.IsPathLocal(t) {
+				t = filepath.Join(prefix, t)
+			}
 			templates = append(templates, t)
 		}
 	case []any:
@@ -174,7 +176,9 @@ func getTemplates(frontmatter map[string]any, prefix string) (templates []string
 			case string:
 				s = strings.TrimSpace(s)
 				if len(s) > 0 {
-					s = filepath.Join(prefix, s)
+					if media.IsPathLocal(s) {
+						s = filepath.Join(prefix, s)
+					}
 					templates = append(templates, s)
 				}
 			default:

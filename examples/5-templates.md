@@ -1,6 +1,5 @@
 ---
 subject: example message for {{ .Recipient.name }}
-title: This is Template-Specific Title to Display above Content
 from: Test Author <joedoe@test.com>
 to:
   - name: Full Name
@@ -8,24 +7,13 @@ to:
     first_name: FirstName
 someVariable: test
 templates:
-  - ../internal/template/html/default.html
+  - ../internal/html/templates/default.html
+  - mdsend://default.html
 headers:
   X-Template-Test: "{{ .Frontmatter.someVariable }}"
 ---
 
 Hello {{ .Recipient.first_name }},
-
-Frontmatter title value is supported by default HTML templates,
-but it is not automatically included into the body of the alternative
-plain text message. The same is true of any text present in the
-HTML template or inserted there by template execution.
-You may add those elements back by using `.IsPlainText` context value.
-
-{{ if .IsPlainText }}
-# {{ .Frontmatter.title }} (show in plain text only)
-{{ end }}
-
-# Subject: {{ titlecase .Frontmatter.subject }}
 
 The Markdown content itself is a `Golang` text template.
 To wrap the output of a letter into an `HTML` template, specify
@@ -59,6 +47,26 @@ Template execution context contains the following fields:
 - **Schedule:** parsed scheduling directives.
 - **IsPlainText:** true value, when the rendered content is
   alternative plain text of the electronic mail message.
+
+## HTML or PlainText
+
+Let's insert a centered large text title at the top of this letter:
+
+{{ define "title" }}
+  {{ titlecase .Frontmatter.subject }}
+{{ end }}
+
+Title sub-template is supported by all default _mdsend_ templates,
+but the title text is not automatically included into the body
+of the alternative plain text message.
+
+The same is true of any text present in the
+HTML template or inserted there by template execution.
+You may add those elements back by using `.IsPlainText` context value.
+
+{{ if .IsPlainText }}
+  {{ template "title" . }}
+{{ end }}
 
 ## Template Functions
 

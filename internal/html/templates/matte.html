@@ -1,0 +1,159 @@
+<!doctype html>
+{{- $language := or .Frontmatter.language `en` -}}
+{{- $textDirection := or .Frontmatter.text_direction `auto` -}}
+{{- $backgroundColor := or .Frontmatter.theme_color.background `#e8ecfb` -}}
+{{- $contentColor := or .Frontmatter.theme.color.content `#fefeff` -}}
+{{- $headerColor := or .Frontmatter.theme.color.header `#6784ff` -}}
+{{- $headerTextColor := or .Frontmatter.theme.color.header_text `#e8ecfb` -}}
+{{- $footerColor := or .Frontmatter.theme.color.footer `#f0f1f5` -}}
+{{- $footerTextColor := or .Frontmatter.theme.color.footer_text `#41629a` -}}
+{{- $actionColor := or .Frontmatter.theme.color.action `#3a86ff` -}}
+{{- $textColor := or .Frontmatter.theme.color.text `#11226a` -}}
+{{- $font := safeCSS (or .Frontmatter.theme.font `Georgia, 'Times New Roman', Helvetica, serif`) -}}
+<html lang="{{ $language }}" dir="{{ $textDirection }}">
+<head>
+  <title>{{ .Frontmatter.subject }}</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">
+    body {
+      margin: 0;
+      padding: 0;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+
+    table, td {
+      border-collapse: collapse;
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+    }
+
+    img {
+      border: 0;
+      height: auto;
+      line-height: 100%;
+      outline: none;
+      text-decoration: none;
+      -ms-interpolation-mode: bicubic;
+    }
+
+    p {
+      display: block;
+      margin: 11px 0;
+    }
+
+    a { padding: 0; }
+
+    {{ block `style` . }}{{ end }}
+  </style>
+  <!--[if mso]>
+    <noscript>
+    <xml>
+    <o:OfficeDocumentSettings>
+      <o:AllowPNG/>
+      <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+    </noscript>
+    <![endif]-->
+  <style type="text/css">
+    @media only screen and (min-width:600px) {
+      .main {
+        margin-top: 24px !important;
+        width: 100% !important;
+        max-width: 100%;
+      }
+    }
+  </style>
+  <style media="screen and (min-width:600px)">
+    .moz-text-html .main {
+      margin-top: 24px !important;
+      width: 100% !important;
+      max-width: 100%;
+    }
+  </style>
+</head>
+
+<body style="word-spacing:normal;background-color:{{ $backgroundColor }};">
+  <div aria-roledescription="email" role="article" lang="{{ $language }}" dir="{{ $textDirection }}" style="word-spacing:normal;">
+    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="margin:0px auto;max-width:600px;">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+        <tbody>
+          <tr>
+            <td style="font-size:0px;text-align:center;">
+              <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
+              <div class="main" style="font-size:0px;text-align:left;display:inline-block;vertical-align:top;width:100%;background-color:{{ $contentColor }};">
+                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                  <tbody>
+                    {{- define "title" }}{{ end -}}
+                    {{ $title := execute "title" . }}
+                    {{- if $headerColor }}
+                    <tr>
+                      <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;background-color:{{ $headerColor }};">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+                          <tbody>
+                            <tr>
+                              <td>
+                                {{- with $title }}
+                                  <h1 style="margin: 0; padding: 16px 12px 12px 12px; font-size: 28px; line-height: 34px; font-weight: bold;color:{{ $headerTextColor }};font-family:{{ $font }};">
+                                    {{ . }}
+                                  </h1>
+                                {{- end }}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                    {{- end }}
+                    <tr>
+                      <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
+                        <div style="font-family:{{ $font }};font-size:20px;line-height:1.2;text-align:left;color:{{ $textColor }};">
+                          {{- .Content -}}
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!--[if mso | IE]></td></tr></table><![endif]-->
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="font-size:0px;padding: 24px 26px 10px 26px;word-break:break-word;">
+              <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+                <tbody>
+                  <tr>
+                    <td style="color:{{ $footerTextColor }};font-size: 11px;align: center">
+                      {{- block "footer" . -}}{{- end -}}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
+  </div>
+</body>
+</html>
+
+{{- define "actionButton" }}
+<table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+<td align="center" style="font-size:0px;padding:34px 22px;word-break:break-word;">
+  <table border="0" cellspacing="0" cellpadding="0">
+      <tr>
+          <td align="center" style="border-radius: 5px; background-color:{{ .BackgroundColor }};">
+              <a rel="noopener" target="_blank" rel="noopener" href="{{ .URL }}" style="font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: {{ .TextColor }}; font-weight: bold; text-decoration: none;border-radius: 5px; padding: 12px 18px; border: 1px solid {{ .BackgroundColor }}; display: inline-block;" title="{{ .Title }}">{{ .Label }} &rarr;</a>
+          </td>
+      </tr>
+  </table>
+</td>
+    </tr>
+</table>
+{{- end }}

@@ -1,9 +1,9 @@
 <!doctype html>
 {{- $language := or .Frontmatter.language `en` -}}
 {{- $textDirection := or .Frontmatter.text_direction `auto` -}}
-{{- $backgroundColor := or .Frontmatter.theme_color.background `#e8ecfb` -}}
+{{- $backgroundColor := or .Frontmatter.theme_color.background `#ffffff` -}}
 {{- $contentColor := or .Frontmatter.theme.color.content `#fefeff` -}}
-{{- $headerColor := or .Frontmatter.theme.color.header `#6784ff` -}}
+{{- $headerColor := or .Frontmatter.theme.color.header `#ffffff` -}}
 {{- $headerTextColor := or .Frontmatter.theme.color.header_text `#e8ecfb` -}}
 {{- $footerColor := or .Frontmatter.theme.color.footer `#f0f1f5` -}}
 {{- $footerTextColor := or .Frontmatter.theme.color.footer_text `#41629a` -}}
@@ -84,12 +84,11 @@
           <tr>
             <td style="font-size:0px;text-align:center;">
               <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
-              <div class="main" style="font-size:0px;text-align:left;display:inline-block;vertical-align:top;width:100%;background-color:{{ $contentColor }};
-                {{- block "shadow" . -}}
-                  -webkit-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); -moz-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15);
-                {{- end -}}">
+              <div class="main" style="font-size:0px;text-align:left;display:inline-block;vertical-align:top;width:100%;background-color:{{ $contentColor }};">
                 <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                   <tbody>
+                    {{- define "title" }}{{ end -}}
+                    {{ $title := execute "title" . }}
                     {{- if $headerColor }}
                     <tr>
                       <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;background-color:{{ $headerColor }};">
@@ -97,7 +96,7 @@
                           <tbody>
                             <tr>
                               <td>
-                                {{- with .Frontmatter.title }}
+                                {{- with $title }}
                                   <h1 style="margin: 0; padding: 16px 12px 12px 12px; font-size: 28px; line-height: 34px; font-weight: bold;color:{{ $headerTextColor }};font-family:{{ $font }};">
                                     {{ . }}
                                   </h1>
