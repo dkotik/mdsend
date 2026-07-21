@@ -1,84 +1,64 @@
 subject: example message for Full Name
-seed_key: FXERAjJaxF2
+seed_key: FP5ZHE9dZ3q
 X-Template-Test: test
 
-<!doctype html>
+Hello FirstName,
+
+Frontmatter title value is supported by default HTML templates,but it is not automatically included into the body of the alternativeplain text message. The same is true of any text present in theHTML template or inserted there by template execution.You may add those elements back by using `.IsPlainText` context value.
 
 
-table, td {
-  border-collapse: collapse;
-  mso-table-lspace: 0pt;
-  mso-table-rspace: 0pt;
-}
+This is Template-Specific Title to Display above Content (show in plain text only)
+============================================================================
 
-img {
-  border: 0;
-  height: auto;
-  line-height: 100%;
-  outline: none;
-  text-decoration: none;
-  -ms-interpolation-mode: bicubic;
-}
 
-p {
-  display: block;
-  margin: 11px 0;
-}
+Subject: Example Message For Full Name
+=================================
 
-a { padding: 0; }
+The Markdown content itself is a `Golang` text template.To wrap the output of a letter into an `HTML` template, specifythe list of files to load using the `template` field in thefrontmatter. The last template in the list becomes the roottemplate. Other templates can be called by their base filename:
 
 
 
 
-<div style="margin:0px auto;max-width:600px;">
-  <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
-    <tbody>
-      <tr>
-        <td style="font-size:0px;text-align:center;">
-          
-          <div class="main" style="font-size:0px;text-align:left;display:inline-block;vertical-align:top;width:100%;background-color:#fefeff;-webkit-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); -moz-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15);">
-            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
-              <tbody>
-                <tr>
-                  <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;background-color:#6784ff;">
-                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
-                      <tbody>
-                        <tr>
-                          <td>
-                              <h1 style="margin: 0; padding: 16px 12px 12px 12px; font-size: 28px; line-height: 34px; font-weight: bold;color:#e8ecfb;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;">
-                                This is Template-Specific Title to Display above Content
-                              </h1>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </td>
-                </tr>
-                <tr>
-                  <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                    <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"></div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          
-        </td>
-      </tr>
-      <tr>
-        <td align="center" style="font-size:0px;padding: 24px 26px 10px 26px;word-break:break-word;">
-          <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
-            <tbody>
-              <tr>
-                <td style="color:#41629a;font-size: 11px;align: center"></td>
-              </tr>
-            </tbody>
-          </table>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+Any sub-templates and blocks defined here, in the contentsof the letter are available in all other templates.
+
+The frontmatter subject and the header values are also treatedas text templates. If the header template is rendered empty,it will be ommitted from the sent message.
+
+
+Context
+-------
+
+Template execution context contains the following fields:
+
+
+- **Frontmatter:** the raw Markdown frontmatter as `map[string]any`.
+- **Recipient:** the raw message target as `map[string]any`. Itwill contain `name` and `email` fields and any other fieldsfromt the contact source.
+- **Content:** rendered Markdown body.
+- **Schedule:** parsed scheduling directives.
+- **IsPlainText:** true value, when the rendered content isalternative plain text of the electronic mail message.
+
+
+Template Functions
+--------
+
+
+- **skipMessageIfTrue:** skip current recipient is the argument to this function call evaluates to an unempty value.
+
+
+Reify Templates
+-----
+
+Special `reify` function prints and stores the output of a named `Golang` blockor template. Calling `reify` again on the same template, printsthe initial output. Each recipient starts with an empty output cache.
+
+Here is an example of declaring a template that encodes recipientaddress as a URL-safe field once to be used several times:
+
+
+
+
+URL: https://test.com/?unsubscribe=
+  to%40test.com
+
+
+Reified values are marked as safe HTML. This prevents Go templatingengine from aggressively sanitizing their contents. For example, anglebrackets around a template value or inside it become `&gt;` and `&lt;`to prevent cross-site scripting exploits. Put the angle bracketsinside the reified template, and they will render correctly.
 
 
 
@@ -169,88 +149,59 @@ a { padding: 0; }
                     </tr>
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">&lt;!doctype html&gt;<!-- raw HTML omitted --></p>
-<!-- raw HTML omitted -->
-<pre><code>table, td {
-  border-collapse: collapse;
-  mso-table-lspace: 0pt;
-  mso-table-rspace: 0pt;
-}
-
-img {
-  border: 0;
-  height: auto;
-  line-height: 100%;
-  outline: none;
-  text-decoration: none;
-  -ms-interpolation-mode: bicubic;
-}
-
-p {
-  display: block;
-  margin: 11px 0;
-}
-
-a { padding: 0; }
+                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">Hello FirstName,</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Frontmatter title value is supported by default HTML templates,
+but it is not automatically included into the body of the alternative
+plain text message. The same is true of any text present in the
+HTML template or inserted there by template execution.
+You may add those elements back by using <code style="font-family:monospace;background-color:#e8ecfb;">.IsPlainText</code> context value.</p>
+<h1 style="color:#11267;font-family:Georgia;font-size: 24px;">Subject: Example Message For Full Name</h1>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">The Markdown content itself is a <code style="font-family:monospace;background-color:#e8ecfb;">Golang</code> text template.
+To wrap the output of a letter into an <code style="font-family:monospace;background-color:#e8ecfb;">HTML</code> template, specify
+the list of files to load using the <code style="font-family:monospace;background-color:#e8ecfb;">template</code> field in the
+frontmatter. The last template in the list becomes the root
+template. Other templates can be called by their base file
+name:</p>
+<pre><code>
 </code></pre>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;"><!-- raw HTML omitted --></p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<pre><code>&lt;div style=&quot;margin:0px auto;max-width:600px;&quot;&gt;
-  &lt;table align=&quot;center&quot; border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; role=&quot;presentation&quot; style=&quot;width:100%;&quot;&gt;
-    &lt;tbody&gt;
-      &lt;tr&gt;
-        &lt;td style=&quot;font-size:0px;text-align:center;&quot;&gt;
-          
-          &lt;div class=&quot;main&quot; style=&quot;font-size:0px;text-align:left;display:inline-block;vertical-align:top;width:100%;background-color:#fefeff;-webkit-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); -moz-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15); box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15);&quot;&gt;
-            &lt;table border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; role=&quot;presentation&quot; style=&quot;vertical-align:top;&quot; width=&quot;100%&quot;&gt;
-              &lt;tbody&gt;
-                &lt;tr&gt;
-                  &lt;td align=&quot;center&quot; style=&quot;font-size:0px;padding:10px 25px;word-break:break-word;background-color:#6784ff;&quot;&gt;
-                    &lt;table border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; role=&quot;presentation&quot; style=&quot;border-collapse:collapse;border-spacing:0px;&quot;&gt;
-                      &lt;tbody&gt;
-                        &lt;tr&gt;
-                          &lt;td&gt;
-                              &lt;h1 style=&quot;margin: 0; padding: 16px 12px 12px 12px; font-size: 28px; line-height: 34px; font-weight: bold;color:#e8ecfb;font-family:Georgia, &amp;#39;Times New Roman&amp;#39;, Helvetica, serif;&quot;&gt;
-                                This is Template-Specific Title to Display above Content
-                              &lt;/h1&gt;
-                          &lt;/td&gt;
-                        &lt;/tr&gt;
-                      &lt;/tbody&gt;
-                    &lt;/table&gt;
-                  &lt;/td&gt;
-                &lt;/tr&gt;
-                &lt;tr&gt;
-                  &lt;td align=&quot;left&quot; style=&quot;font-size:0px;padding:14px 22px;word-break:break-word;&quot;&gt;
-                    &lt;div style=&quot;font-family:Georgia, &amp;#39;Times New Roman&amp;#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;&quot;&gt;&lt;/div&gt;
-                  &lt;/td&gt;
-                &lt;/tr&gt;
-              &lt;/tbody&gt;
-            &lt;/table&gt;
-          &lt;/div&gt;
-          
-        &lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-        &lt;td align=&quot;center&quot; style=&quot;font-size:0px;padding: 24px 26px 10px 26px;word-break:break-word;&quot;&gt;
-          &lt;table border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; role=&quot;presentation&quot; style=&quot;border-collapse:collapse;border-spacing:0px;&quot;&gt;
-            &lt;tbody&gt;
-              &lt;tr&gt;
-                &lt;td style=&quot;color:#41629a;font-size: 11px;align: center&quot;&gt;&lt;/td&gt;
-              &lt;/tr&gt;
-            &lt;/tbody&gt;
-          &lt;/table&gt;
-        &lt;/td&gt;
-      &lt;/tr&gt;
-    &lt;/tbody&gt;
-  &lt;/table&gt;
-&lt;/div&gt;
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Any sub-templates and blocks defined here, in the contents
+of the letter are available in all other templates.</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">The frontmatter subject and the header values are also treated
+as text templates. If the header template is rendered empty,
+it will be ommitted from the sent message.</p>
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Context</h2>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Template execution context contains the following fields:</p>
+<ul>
+<li><strong>Frontmatter:</strong> the raw Markdown frontmatter as <code style="font-family:monospace;background-color:#e8ecfb;">map[string]any</code>.</li>
+<li><strong>Recipient:</strong> the raw message target as <code style="font-family:monospace;background-color:#e8ecfb;">map[string]any</code>. It
+will contain <code style="font-family:monospace;background-color:#e8ecfb;">name</code> and <code style="font-family:monospace;background-color:#e8ecfb;">email</code> fields and any other fields
+fromt the contact source.</li>
+<li><strong>Content:</strong> rendered Markdown body.</li>
+<li><strong>Schedule:</strong> parsed scheduling directives.</li>
+<li><strong>IsPlainText:</strong> true value, when the rendered content is
+alternative plain text of the electronic mail message.</li>
+</ul>
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Template Functions</h2>
+<ul>
+<li><strong>skipMessageIfTrue:</strong> skip current recipient is the argument to this function call evaluates to an unempty value.</li>
+</ul>
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Reify Templates</h2>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Special <code style="font-family:monospace;background-color:#e8ecfb;">reify</code> function prints and stores the output of a named <code style="font-family:monospace;background-color:#e8ecfb;">Golang</code> block
+or template. Calling <code style="font-family:monospace;background-color:#e8ecfb;">reify</code> again on the same template, prints
+the initial output. Each recipient starts with an empty output cache.</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Here is an example of declaring a template that encodes recipient
+address as a URL-safe field once to be used several times:</p>
+<pre><code>
+
+URL: https://test.com/?unsubscribe=
+  to%40test.com
+
 </code></pre>
-<!-- raw HTML omitted -->
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Reified values are marked as safe HTML. This prevents Go templating
+engine from aggressively sanitizing their contents. For example, angle
+brackets around a template value or inside it become <code style="font-family:monospace;background-color:#e8ecfb;">&amp;gt;</code> and <code style="font-family:monospace;background-color:#e8ecfb;">&amp;lt;</code>
+to prevent cross-site scripting exploits. Put the angle brackets
+inside the reified template, and they will render correctly.</p>
 </div>
                       </td>
                     </tr>

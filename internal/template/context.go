@@ -11,4 +11,5 @@ type Context struct {
 	Recipient   map[string]any
 	Content     template.HTML
 	Schedule    mdsend.Schedule
+	IsPlainText bool
 }

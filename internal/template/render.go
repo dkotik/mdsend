@@ -73,22 +73,30 @@ func (t *tmpl) RenderLetterForRecipient(recipient map[string]any) (m mdsend.Mess
 		b.Reset()
 	}
 
-	if err = t.Text.Execute(b, t.context); err != nil {
-		return m, fmt.Errorf("unable to render text template: %w", err)
-	}
-	source := b.Bytes()
-	tree := t.ContentParser.Parse(text.NewReader(source))
-	b = buffers.Get().(*bytes.Buffer)
+	sourceBuffer := buffers.Get().(*bytes.Buffer)
 	defer func(b *bytes.Buffer) {
 		b.Reset()
 		buffers.Put(b)
-	}(b)
-
+	}(sourceBuffer)
+	t.context.IsPlainText = true
+	if err = t.Text.Execute(sourceBuffer, t.context); err != nil {
+		return m, fmt.Errorf("unable to render text template: %w", err)
+	}
+	source := sourceBuffer.Bytes()
+	tree := t.ContentParser.Parse(text.NewReader(source))
 	if err = t.RendererForText.Render(b, source, tree); err != nil {
 		return m, fmt.Errorf("unable to render text: %w", err)
 	}
 	m.Text = b.String()
 	b.Reset()
+	sourceBuffer.Reset()
+
+	t.context.IsPlainText = false
+	if err = t.Text.Execute(sourceBuffer, t.context); err != nil {
+		return m, fmt.Errorf("unable to render text template: %w", err)
+	}
+	source = sourceBuffer.Bytes()
+	tree = t.ContentParser.Parse(text.NewReader(source))
 	if err = t.RendererForHTML.Render(b, source, tree); err != nil {
 		return m, fmt.Errorf("unable to render HTML: %w", err)
 	}

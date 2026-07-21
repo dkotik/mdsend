@@ -47,6 +47,13 @@ func NewLetterTest(
 			if err != nil {
 				t.Fatal("unable to execute template:", err)
 			}
+			if strings.Index(message.Text, "<!doctype html>") != -1 {
+				t.Error("template plain text contains an HTML document:", p)
+			}
+			if strings.Index(message.HTML, "<!doctype html>") == -1 {
+				t.Error("template HTML output does not contain an HTML document:", p)
+			}
+
 			b := &bytes.Buffer{}
 			_, _ = io.WriteString(b, "subject: ")
 			_, _ = io.WriteString(b, message.Subject)
@@ -117,6 +124,10 @@ func NewTemplateTest(tmpl Template) func(*testing.T) {
 			// spew.Dump(tmpl)
 			// spew.Dump(message.From)
 			t.Fatal("template returned invalid message:", err)
+		}
+
+		if strings.Index(message.Text, "<!doctype html>") != -1 {
+			t.Error("template plain text contains an HTML document")
 		}
 	}
 }

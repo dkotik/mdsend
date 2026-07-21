@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/mail"
-	"path/filepath"
+	"path"
 	"strings"
 
 	"github.com/dkotik/mdsend"
@@ -134,21 +134,31 @@ func New(
 			return nil, fmt.Errorf("unable to parse default template: %w", err)
 		}
 	} else {
+		// clone, err := t.HTML.Clone() // for re-inserting
+		// if err != nil {
+		// 	return nil, fmt.Errorf("unable to clone letter content as a template: %w", err)
+		// }
 		var subTemplate mdsend.Attachment
 		for _, subTemplate = range l.Templates {
 			t.HTML, err = t.HTML.New(
-				filepath.Base(subTemplate.Name),
+				path.Base(subTemplate.Name),
 			).Parse(string(subTemplate.Content))
 			if err != nil {
 				return nil, fmt.Errorf("unable to parse template %q: %w", subTemplate.Name, err)
 			}
 		}
-		t.Text, err = t.HTML.Clone()
+		t.Text, err = t.HTML.Lookup("").Clone()
 		if err != nil {
 			return nil, fmt.Errorf("unable to clone letter content as a template: %w", err)
 		}
 		// the latest template becomes the root template
-		t.HTML, err = t.HTML.New("").Parse(string(subTemplate.Content))
+		t.HTML = WithNewRootTemplate(t.HTML, t.HTML.Lookup(path.Base(subTemplate.Name)))
+		// reinsert the clone back into text template
+		// t.Text, err = t.Text.AddParseTree("", clone.Tree)
+		// t.Text, err = t.Text.New("").Parse(l.Content)
+		// if err != nil {
+		// 	return nil, fmt.Errorf("unable to reinsert clone into text template: %w", err)
+		// }
 	}
 
 	subject, err := l.GetSubject()

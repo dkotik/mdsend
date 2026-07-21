@@ -15,17 +15,23 @@ import (
 )
 
 func TestValidMessageFromTemplate(t *testing.T) {
+	frontmatter := map[string]any{
+		address.FieldFrom: map[string]any{
+			address.FieldName:  "TestName",
+			address.FieldEmail: "from2from@test.com",
+		},
+		mdsend.FieldNameSubject: "test letter subject for {{ .Recipient.Name }}",
+	}
 	tmpl, err := New(
 		mdsend.Letter{
-			ID: "valid message test",
-			Frontmatter: map[string]any{
-				address.FieldFrom: map[string]any{
-					address.FieldName:  "Test Name From",
-					address.FieldEmail: "from2from@test.com",
-				},
-				mdsend.FieldNameSubject: "test letter subject for {{ .Recipient.Name }}",
-			},
-			Content: "test letter for {{ .Recipient.Name }}",
+			ID:          "valid message test",
+			Frontmatter: frontmatter,
+			Content: `test letter for {{ .Recipient.name }}
+				{{- if .IsPlainText -}}
+					[plain text]
+				{{- else -}}
+					[html]
+				{{- end -}}`,
 		},
 		Options{},
 	)
@@ -36,6 +42,19 @@ func TestValidMessageFromTemplate(t *testing.T) {
 		t.Fatal("nil template returned")
 	}
 	t.Run("interface conformity", NewTemplateTest(tmpl))
+	t.Run("IsPlainText value", func(t *testing.T) {
+		message, err := tmpl.RenderLetterForRecipient(frontmatter[`from`].(map[string]any))
+		if err != nil {
+			t.Fatal("unable to render letter:", err)
+		}
+		if strings.Index(message.Text, "[plain text]") == -1 {
+			t.Error("unexpected text content:", message.Text)
+		}
+		if strings.Index(message.HTML, "[html]") == -1 {
+			// t.Fatal("unexpected html content:", message.HTML)
+			t.Error("HTML content does not have the [html] tag")
+		}
+	})
 }
 
 func TestDefaultTemplateRendering(t *testing.T) {

@@ -15,7 +15,17 @@ headers:
 
 Hello {{ .Recipient.first_name }},
 
-# {{ titlecase .Frontmatter.subject }}
+Frontmatter title value is supported by default HTML templates,
+but it is not automatically included into the body of the alternative
+plain text message. The same is true of any text present in the
+HTML template or inserted there by template execution.
+You may add those elements back by using `.IsPlainText` context value.
+
+{{ if .IsPlainText }}
+# {{ .Frontmatter.title }} (show in plain text only)
+{{ end }}
+
+# Subject: {{ titlecase .Frontmatter.subject }}
 
 The Markdown content itself is a `Golang` text template.
 To wrap the output of a letter into an `HTML` template, specify
@@ -25,7 +35,9 @@ template. Other templates can be called by their base file
 name:
 
 ```
+{{ if and "render only if true" false }}
 {{ template "default.html" . }}
+{{ end }}
 ```
 
 Any sub-templates and blocks defined here, in the contents
@@ -45,6 +57,8 @@ Template execution context contains the following fields:
   fromt the contact source.
 - **Content:** rendered Markdown body.
 - **Schedule:** parsed scheduling directives.
+- **IsPlainText:** true value, when the rendered content is
+  alternative plain text of the electronic mail message.
 
 ## Template Functions
 
