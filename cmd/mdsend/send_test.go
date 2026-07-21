@@ -36,7 +36,6 @@ func TestSend(t *testing.T) {
 	ctx := t.Context()
 	if err := application.Run(ctx, []string{
 		"mdsend",
-		"send",
 		"--destroy",
 		"--queue", database,
 		"../../examples/1-minimal.md",

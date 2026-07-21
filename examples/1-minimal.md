@@ -19,39 +19,36 @@ export SMTP_HOST=...
 export SMTP_PORT=...
 export SMTP_USERNAME=...
 export SMTP_PASSWORD=...
-mdsend send 1-minimal.md
+mdsend 1-minimal.md
 ```
 
 ## Separate Queuing
 
-Send command will continued to deliver any 
-queued messages, which can be added to the
-queue with a separate command.
+The `continue` command will resume delivery of any 
+remaining queued messages. Messages can added to the
+queue with a separate command:
 
 ```sh
+# add first letter
 mdsend queue add 1-minimal.md
+# add second letter
 mdsend queue add 2-attachments.md
-mdsend send
+# send everything that is in the queue and stop when done
+mdsend continue
+# send everything that is in the queue and wait for more messages forever
+mdsend continue --forever
 ```
 
 ## Command Line Flags
 
-- mdsend queue
-    - `--queue`: change database where the messages are stored.
-    - `--from`: override the author of the messages. 
-    - `--to`: add another recipient to each queued letter. Repeat the flag
-      as many times as needed.
-    - `--cc`: equivalent to `--to` flag. Kept for historic reasons.
-    - `--bcc`: equivalent to `--to` flag. Kept for historic reasons.
-- mdsend send
-    - `--queue`: change database where the messages are stored.
-    - `--from`: override the author of the messages. 
-    - `--service`: keep the process perpetually alive. If more
-      letters are added to the queue at any time, they will be sent.
-    - If the send command is called targetting one or more letters,
-      all those letters will be queued before the sending operations
-      begin. All the flags of the `mdsend queue` command come into
-      effect while queuing.
+- `--queue`: change database where the messages are stored.
+- `--from`: override the author of the messages. 
+- `--to`: add another recipient to each queued letter. Repeat the flag
+  as many times as needed.
+- `--cc`: equivalent to `--to` flag. Kept for historic reasons.
+- `--bcc`: equivalent to `--to` flag. Kept for historic reasons.
+- `--forever`: keep the process perpetually alive. If more
+  letters are added to the queue at any time, they will be sent.
 
 # Sample Content
 

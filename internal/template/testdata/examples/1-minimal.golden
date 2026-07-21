@@ -1,5 +1,5 @@
 subject: minimal example message
-seed_key: FbyyYosETuU
+seed_key: LMUt8fFojXb
 
 
 Introduction
@@ -18,41 +18,35 @@ export SMTP_HOST=...
 export SMTP_PORT=...
 export SMTP_USERNAME=...
 export SMTP_PASSWORD=...
-mdsend send 1-minimal.md
+mdsend 1-minimal.md
 
 
 Separate Queuing
 --------
 
-Send command will continued to deliver anyqueued messages, which can be added to thequeue with a separate command.
+The `continue` command will resume delivery of anyremaining queued messages. Messages can added to thequeue with a separate command:
 
 
+# add first letter
 mdsend queue add 1-minimal.md
+# add second letter
 mdsend queue add 2-attachments.md
-mdsend send
+# send everything that is in the queue and stop when done
+mdsend continue
+# send everything that is in the queue and wait for more messages forever
+mdsend continue --forever
 
 
 Command Line Flags
 ------------
 
 
-- mdsend queue
-
 - `--queue`: change database where the messages are stored.
 - `--from`: override the author of the messages.
 - `--to`: add another recipient to each queued letter. Repeat the flagas many times as needed.
 - `--cc`: equivalent to `--to` flag. Kept for historic reasons.
 - `--bcc`: equivalent to `--to` flag. Kept for historic reasons.
-
-
-- mdsend send
-
-- `--queue`: change database where the messages are stored.
-- `--from`: override the author of the messages.
-- `--service`: keep the process perpetually alive. If moreletters are added to the queue at any time, they will be sent.
-- If the send command is called targetting one or more letters,all those letters will be queued before the sending operationsbegin. All the flags of the `mdsend queue` command come intoeffect while queuing.
-
-
+- `--forever`: keep the process perpetually alive. If moreletters are added to the queue at any time, they will be sent.
 
 
 Sample Content
@@ -128,7 +122,7 @@ Suspendisse iaculis tortor at massa congue condimentum. Ut interdumleo vel digni
   </style>
 </head>
 
-<body style="word-spacing:normal;background-color:#e8ecfb;">
+<body style="word-spacing:normal;background-color:#ffffff;">
   <div aria-roledescription="email" role="article" lang="en" dir="auto" style="word-spacing:normal;">
     
     <div style="margin:0px auto;max-width:600px;">
@@ -141,7 +135,7 @@ Suspendisse iaculis tortor at massa congue condimentum. Ut interdumleo vel digni
                 <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                   <tbody>
                     <tr>
-                      <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;background-color:#6784ff;">
+                      <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;background-color:#ffffff;">
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
                           <tbody>
                             <tr>
@@ -166,19 +160,22 @@ provided as environment variables.</p>
 export SMTP_PORT=...
 export SMTP_USERNAME=...
 export SMTP_PASSWORD=...
-mdsend send 1-minimal.md
+mdsend 1-minimal.md
 </code></pre>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Separate Queuing</h2>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">Send command will continued to deliver any
-queued messages, which can be added to the
-queue with a separate command.</p>
-<pre><code class="language-sh">mdsend queue add 1-minimal.md
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">The <code style="font-family:monospace;background-color:#e8ecfb;">continue</code> command will resume delivery of any
+remaining queued messages. Messages can added to the
+queue with a separate command:</p>
+<pre><code class="language-sh"># add first letter
+mdsend queue add 1-minimal.md
+# add second letter
 mdsend queue add 2-attachments.md
-mdsend send
+# send everything that is in the queue and stop when done
+mdsend continue
+# send everything that is in the queue and wait for more messages forever
+mdsend continue --forever
 </code></pre>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Command Line Flags</h2>
-<ul>
-<li>mdsend queue
 <ul>
 <li><code style="font-family:monospace;background-color:#e8ecfb;">--queue</code>: change database where the messages are stored.</li>
 <li><code style="font-family:monospace;background-color:#e8ecfb;">--from</code>: override the author of the messages.</li>
@@ -186,20 +183,8 @@ mdsend send
 as many times as needed.</li>
 <li><code style="font-family:monospace;background-color:#e8ecfb;">--cc</code>: equivalent to <code style="font-family:monospace;background-color:#e8ecfb;">--to</code> flag. Kept for historic reasons.</li>
 <li><code style="font-family:monospace;background-color:#e8ecfb;">--bcc</code>: equivalent to <code style="font-family:monospace;background-color:#e8ecfb;">--to</code> flag. Kept for historic reasons.</li>
-</ul>
-</li>
-<li>mdsend send
-<ul>
-<li><code style="font-family:monospace;background-color:#e8ecfb;">--queue</code>: change database where the messages are stored.</li>
-<li><code style="font-family:monospace;background-color:#e8ecfb;">--from</code>: override the author of the messages.</li>
-<li><code style="font-family:monospace;background-color:#e8ecfb;">--service</code>: keep the process perpetually alive. If more
+<li><code style="font-family:monospace;background-color:#e8ecfb;">--forever</code>: keep the process perpetually alive. If more
 letters are added to the queue at any time, they will be sent.</li>
-<li>If the send command is called targetting one or more letters,
-all those letters will be queued before the sending operations
-begin. All the flags of the <code style="font-family:monospace;background-color:#e8ecfb;">mdsend queue</code> command come into
-effect while queuing.</li>
-</ul>
-</li>
 </ul>
 <h1 style="color:#11267;font-family:Georgia;font-size: 24px;">Sample Content</h1>
 <blockquote style="padding: 6px 14px 6px 12px;background-color:#e8ecfb;border:none;border-left:2px solid #335c4c;background-color:#e8ecfb;font-family:Georgia;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">A Markdown file requires valid &lsquo;from&rsquo;, &rsquo;to&rsquo;, and &lsquo;subject&rsquo; fields

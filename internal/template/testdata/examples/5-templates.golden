@@ -1,5 +1,5 @@
 subject: example message for Full Name
-seed_key: SryjWoCDpqG
+seed_key: AYZZMHRRYh7
 X-Template-Test: test
 
 Hello FirstName,
@@ -32,7 +32,7 @@ HTML or PlainText
 
 Lets insert a centered large text title at the top of this letter:
 
-Title template is supported by all default *mdsend* templates,but the title text is not automatically included into the bodyof the alternative plain text message.
+Title sub-template is supported by all default *mdsend* templates,but the title text is not automatically included into the bodyof the alternative plain text message.
 
 The same is true of any text present in theHTML template or inserted there by template execution.You may add those elements back by using `.IsPlainText` context value.
 
@@ -122,7 +122,7 @@ Reified values are marked as safe HTML. This prevents Go templatingengine from a
   </style>
 </head>
 
-<body style="word-spacing:normal;background-color:#e8ecfb;">
+<body style="word-spacing:normal;background-color:#ffffff;">
   <div aria-roledescription="email" role="article" lang="en" dir="auto" style="word-spacing:normal;">
     
     <div style="margin:0px auto;max-width:600px;">
@@ -135,7 +135,7 @@ Reified values are marked as safe HTML. This prevents Go templatingengine from a
                 <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                   <tbody>
                     <tr>
-                      <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;background-color:#6784ff;">
+                      <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;background-color:#ffffff;">
                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
                           <tbody>
                             <tr>
@@ -181,7 +181,7 @@ alternative plain text of the electronic mail message.</li>
 </ul>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">HTML or PlainText</h2>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Let&rsquo;s insert a centered large text title at the top of this letter:</p>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">Title template is supported by all default <em>mdsend</em> templates,
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Title sub-template is supported by all default <em>mdsend</em> templates,
 but the title text is not automatically included into the body
 of the alternative plain text message.</p>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">The same is true of any text present in the

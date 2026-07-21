@@ -23,10 +23,10 @@ import (
 )
 
 var (
-	flagService = &cli.BoolFlag{
-		Name:    `service`,
-		Aliases: []string{"s"},
-		Usage:   `Keep the process running and serving mail perpetually.`,
+	flagForever = &cli.BoolFlag{
+		Name: `forever`,
+
+		Usage: `Keep the process running and serving mail perpetually.`,
 	}
 
 	flagWorkerCount = &cli.IntFlag{
@@ -143,7 +143,7 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 			Logger:              wmLogger,
 		},
 	}
-	if !c.Bool(flagService.Name) {
+	if !c.Bool(flagForever.Name) {
 		// interrupt send command once everything appears to have
 		// been sent
 		options.Tracker = newInterruptingProgressTracker(

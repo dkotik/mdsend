@@ -67,20 +67,31 @@ var application = &cli.Command{
 	Usage:     `Send markdown files as electronic mail. Maintain mailing lists as templated text files.`,
 	Copyright: "Copyright 2022 Dmitry Kotik",
 	Version:   version(),
+	Flags: []cli.Flag{
+		flagQueue,
+		flagFrom,
+		flagTo,
+		flagGraceTimeout,
+		flagDelay,
+		flagFluctuate,
+		flagWorkerCount,
+		flagForever,
+		flagDestroy,
+		flagVerbose,
+	},
 	Commands: []*cli.Command{
 		{
-			Name:    `queue`,
-			Usage:   `Manages the queue of markdown documents to send.`,
-			Aliases: []string{`q`},
+			Name:  `queue`,
+			Usage: `Manages the queue of markdown documents to send.`,
 			Commands: []*cli.Command{
 				{
 					Name:  `add`,
 					Usage: `Adds a letter to the queue.`,
 					Flags: []cli.Flag{
-						flagQueue,
-						flagFrom,
-						flagTo,
-						flagVerbose,
+						// flagQueue,
+						// flagFrom,
+						// flagTo,
+						// flagVerbose,
 					},
 					Action: cmdQueueAdd,
 				},
@@ -88,8 +99,8 @@ var application = &cli.Command{
 					Name:  `remove`,
 					Usage: `Removes a letter from the queue.`,
 					Flags: []cli.Flag{
-						flagQueue,
-						flagVerbose,
+						// flagQueue,
+						// flagVerbose,
 					},
 					Action: func(ctx context.Context, c *cli.Command) error {
 						return errors.New(`not implemented, yet`)
@@ -99,7 +110,7 @@ var application = &cli.Command{
 					Name:  `view`,
 					Usage: `Views the queue of markdown documents to send.`,
 					Flags: []cli.Flag{
-						flagQueue,
+						// flagQueue,
 					},
 					Action: func(ctx context.Context, c *cli.Command) error {
 						return errors.New(`not implemented, yet`)
@@ -109,7 +120,7 @@ var application = &cli.Command{
 					Name:  `path`,
 					Usage: `Prints the path to the current queue.`,
 					Flags: []cli.Flag{
-						flagQueue,
+						// flagQueue,
 					},
 					Action: func(ctx context.Context, c *cli.Command) error {
 						fmt.Println(c.String(flagQueue.Name))
@@ -120,7 +131,7 @@ var application = &cli.Command{
 					Name:  `clear`,
 					Usage: `Removes all queued messages from the current queue.`,
 					Flags: []cli.Flag{
-						flagQueue,
+						// flagQueue,
 					},
 					Action: func(ctx context.Context, c *cli.Command) error {
 						p := c.String(flagQueue.Name)
@@ -140,32 +151,22 @@ var application = &cli.Command{
 			},
 		},
 		{
-			Name:    `send`,
-			Usage:   `Sends markdown documents as templated emails.`,
-			Aliases: []string{`s`},
+			Name:  `validate`,
+			Usage: `Validates the markdown document for correctness and readiness to be sent.`,
 			Flags: []cli.Flag{
-				flagQueue,
-				flagFrom,
-				flagTo,
-				flagGraceTimeout,
-				flagDelay,
-				flagFluctuate,
-				flagWorkerCount,
-				flagService,
-				flagDestroy,
-				flagVerbose,
-			},
-			Action: cmdSend,
-		},
-		{
-			Name:    `validate`,
-			Usage:   `Validates the markdown document for correctness and readiness to be sent.`,
-			Aliases: []string{`t`},
-			Flags: []cli.Flag{
-				flagQueue,
-				flagVerbose,
+				// flagQueue,
+				// flagVerbose,
 			},
 			Action: cmdValidate,
+		},
+		{
+			Name:  `continue`,
+			Usage: `Resume message delivery.`,
+			Flags: []cli.Flag{
+				// flagQueue,
+				// flagVerbose,
+			},
+			Action: cmdSend,
 		},
 	},
 	ExitErrHandler: func(
@@ -177,6 +178,12 @@ var application = &cli.Command{
 			err.Error(),
 		)
 	},
+	Action: cli.ActionFunc(func(ctx context.Context, c *cli.Command) error {
+		if c.Args().Len() == 0 && !c.IsSet(flagForever.Name) {
+			return cli.ShowRootCommandHelp(c) // nothing is happening
+		}
+		return cmdSend(ctx, c)
+	}),
 }
 
 func main() {
