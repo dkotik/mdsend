@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/btcsuite/btcd/btcutil/base58"
 	"github.com/dkotik/mdsend/queue"
+	"github.com/mr-tron/base58"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
@@ -20,8 +20,8 @@ func functions() template.FuncMap {
 		},
 		"base64":    base64.RawStdEncoding.EncodeToString,
 		"base64URL": base64.RawURLEncoding.EncodeToString,
-		"urlQuery":  url.QueryEscape,
-		"urlPath":   url.PathEscape,
+		"url_query": url.QueryEscape,
+		"url_path":  url.PathEscape,
 		"base58": func(in string) string {
 			return string(base58.Encode([]byte(in)))
 		},
@@ -36,6 +36,12 @@ func functions() template.FuncMap {
 		// },
 		"safeCSS": func(s string) template.CSS {
 			return template.CSS(s)
+		},
+		"safeURL": func(s string) template.URL {
+			return template.URL(s)
+		},
+		"safeHTML": func(s string) template.HTML {
+			return template.HTML(s)
 		},
 		"titlecase": func(in string) string {
 			caser := cases.Title(language.English)

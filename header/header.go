@@ -22,7 +22,7 @@ const (
 	To                      = "To"
 	Subject                 = "Subject"
 	Date                    = "Date"
-	ListID                  = "List-ID"
+	ListID                  = "List-Id"
 	ListOwner               = "List-Owner"
 	ListPost                = "List-Post"
 	ListHelp                = "List-Help"
@@ -73,7 +73,7 @@ var reValidListID = regexp.MustCompile(`(\w+\s+)*\<[^\<\>]+\>$`)
 
 func ValidateListID(value string) (err error) {
 	if !reValidListID.MatchString(value) {
-		return fmt.Errorf("invalid List-ID header format: %s", value)
+		return fmt.Errorf("invalid List-Id header format: %s", value)
 	}
 	return nil
 }

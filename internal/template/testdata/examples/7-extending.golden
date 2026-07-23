@@ -1,8 +1,8 @@
 subject: extend one letter from letter
-seed_key: ioagC8b5Bkq
+seed_key: RpKRfbTXyhg
 List-Id: Some List <greatlist@test.com>
-List-Unsubscribe: <mailto:unsub@yourdomain.com>, <https://yourdomain.com/unsub?id=MLFhcxXQr1kWB3z3sCTTnUCVT3TzmoMg3BUfGTBM5>
-List-Unsubscribe-Post: token=MLFhcxXQr1kWB3z3sCTTnUCVT3TzmoMg3BUfGTBM5
+List-Unsubscribe: <mailto:unsub@yourdomain.com>, <https://yourdomain.com/unsubscribe/MLFhcxXQr1kWB3z3sCTTnUCVT3TzmoMg3BUfGTBM5>
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
 
 
 Load Recipient Lists
@@ -89,7 +89,9 @@ Footer
 
 You may unsubscribe here.
 
-The CAN-SPAM act became law on Jan. 1, 2004. It says there manythings you must do as a commercial email-er. Highlights arebasically dont be deceptive, and that you **MUST** include aphysical mailing address as well as a working unsubscribe link inthe body.## Message Duplication
+The [CAN-SPAM][CAN-SPAM] act became law on Jan. 1, 2004. It says there manythings you must do as a commercial email-er. Highlights arebasically dont be deceptive, and that you **MUST** include aphysical mailing address as well as a working unsubscribe link inthe body.
+
+[CAN-SPAM]: https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business## Message Duplication
 
 Mdsend uses a seed template to protect you from accidentally sendingthe same message to the same recipient. The default seed templateis `extend one letter from letter||`. That is, a messagewith the same subject and content will have the same seed key.
 
@@ -286,11 +288,12 @@ database or encrypted location, to groom or combine and pre-process the
 contact list.</p>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Footer</h2>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">You may unsubscribe <!-- raw HTML omitted -->here<!-- raw HTML omitted -->.</p>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">The CAN-SPAM act became law on Jan. 1, 2004. It says there many
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">The [CAN-SPAM][CAN-SPAM] act became law on Jan. 1, 2004. It says there many
 things you must do as a commercial email-er. Highlights are
 basically don&rsquo;t be deceptive, and that you <strong>MUST</strong> include a
 physical mailing address as well as a working unsubscribe link in
-the body.## Message Duplication</p>
+the body.</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">[CAN-SPAM]: <a href="https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business##" style="color:#335c9c;">https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business##</a> Message Duplication</p>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Mdsend uses a seed template to protect you from accidentally sending
 the same message to the same recipient. The default seed template
 is <code style="font-family:monospace;background-color:#e8ecfb;">extend one letter from letter||</code>. That is, a message

@@ -105,6 +105,11 @@ var maxHeaderBase64Len = base64.StdEncoding.DecodedLen(
 // TODO: remove <n int> from WriteHeader signature
 func WriteHeader(w io.Writer, name, value string) (n int, err error) {
 	if !doesValueRequireEncoding(value) {
+		// if name == "List-Unsubscribe" {
+		// 	n, err = fmt.Fprintf(w, "%s: %s\r\n", name, value)
+		// 	_, _ = fmt.Println("List-Unsubscribe:", value)
+		// 	return n, err
+		// }
 		// Important: long lines will be wrapped, which can
 		// break URLs because plain multi-line header decoder
 		// will take `\r\n ` as a word break.

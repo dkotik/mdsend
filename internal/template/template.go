@@ -29,7 +29,7 @@ type tmpl struct {
 	Subject             *template.Template
 	Text                *template.Template
 	HTML                *template.Template
-	ReifiedCache        map[string]template.HTML
+	ReifiedCache        map[string]string
 	ContentParser       parser.Parser
 	RendererForText     renderer.Renderer
 	RendererForHTML     renderer.Renderer

@@ -83,7 +83,7 @@ address as a URL-safe field once to be used several times:
 
 ```
 {{ define "token" }}
-  {{ urlQuery .Recipient.email }}
+  {{ url_query .Recipient.email }}
 {{ end }}
 
 URL: https://test.com/?unsubscribe={{ reify "token" }}

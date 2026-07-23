@@ -10,9 +10,11 @@ bcc:
   - ../address/testdata/recipients.toml
 language: en
 headers:
-  List-ID: Some List <greatlist@test.com>
-  List-Unsubscribe: <mailto:unsub@yourdomain.com>, {{ reify "unsubscribe_url" }}
-  List-Unsubscribe-Post: token={{ reify "unsubscribe_token" }}
+  List-Id: Some List <greatlist@test.com>
+  # extra work with the angle braces to prevent Go template from sanitizing
+  # the URL and destroying the base58 token with path segment lowercase conversion
+  List-Unsubscribe: <mailto:unsub@yourdomain.com>, {{ safeHTML (print "<https://yourdomain.com/unsubscribe/" (base58 (print .Recipient.email "?list=testList")) ">") }}
+  List-Unsubscribe-Post: List-Unsubscribe=One-Click
 ---
 
 # Load Recipient Lists
@@ -111,20 +113,18 @@ contact list.
 ## Footer
 
 You may unsubscribe <a title="unsubscribe from the mailing list"
-href="{{ reify "unsubscribe_url" }}">here</a>.
+href="{{ safeURL (reify "unsubscribe_url") }}">here</a>.
 
-The CAN-SPAM act became law on Jan. 1, 2004. It says there many
+The [CAN-SPAM][CAN-SPAM] act became law on Jan. 1, 2004. It says there many
 things you must do as a commercial email-er. Highlights are
 basically don't be deceptive, and that you **MUST** include a
 physical mailing address as well as a working unsubscribe link in
 the body.
 
-{{- define "unsubscribe_token" -}}
-  {{ base58 (print .Recipient.email "?list=testList") }}
-{{- end -}}
+[CAN-SPAM]: https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business
 
 {{- define "unsubscribe_url" -}}
-  <https://yourdomain.com/unsub?id={{ reify "unsubscribe_token" }}>
+  https://yourdomain.com/unsubscribe/{{ base58 (print .Recipient.email "?list=testList") }}
 {{- end -}}
 
 ## Message Duplication

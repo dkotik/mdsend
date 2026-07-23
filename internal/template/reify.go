@@ -32,7 +32,7 @@ func (t *tmpl) Execute(templateName string, data any) (v template.HTML, err erro
 	return template.HTML(b.String()), nil
 }
 
-func (t *tmpl) Reify(templateName string) (v template.HTML, err error) {
+func (t *tmpl) Reify(templateName string) (v string, err error) {
 	templateName = strings.TrimSpace(templateName)
 	if templateName == "" {
 		return "", errors.New("reify function requires a template name")
@@ -41,14 +41,15 @@ func (t *tmpl) Reify(templateName string) (v template.HTML, err error) {
 	if ok {
 		return v, nil
 	}
-	v, err = t.Execute(templateName, t.context)
+	raw, err := t.Execute(templateName, t.context)
 	if err != nil {
 		return "", fmt.Errorf("unable to execute template %q: %w", templateName, err)
 	}
+	v = string(raw)
 	t.ReifiedCache[templateName] = v
 	return v, nil
 }
 
 func (t *tmpl) Reset() {
-	t.ReifiedCache = make(map[string]template.HTML)
+	t.ReifiedCache = make(map[string]string)
 }
