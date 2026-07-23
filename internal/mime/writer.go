@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"math/rand/v2"
+	"net/mail"
 	"time"
 
 	"github.com/dkotik/mdsend"
@@ -78,8 +79,25 @@ func (w Writer) Write(
 		return err
 	}
 	for _, header := range m.Headers {
-		if _, err = WriteHeader(out, header.Name, header.Value); err != nil {
-			return err
+		switch header.Name {
+		case "From", "To", "Subject", "Bcc", "Cc":
+			return fmt.Errorf("header %q is not allowed, because should be set in frontmatter root", header.Name)
+		case "Delivered-To", "Reply-To", "Sender", "Resent-Bcc", "Resent-Cc", "Resent-From", "Resent-Reply-To", "Resent-To", "Resent-Sender":
+			addresses, err := mail.ParseAddressList(header.Value)
+			if err != nil {
+				return fmt.Errorf("unable to parse header <%s: %s> as an address list: %w", header.Name, header.Value, err)
+			}
+			copies := make([]mail.Address, len(addresses))
+			for i, addr := range addresses {
+				copies[i] = *addr
+			}
+			if err = WriteAddressHeader(out, header.Name, copies...); err != nil {
+				return err
+			}
+		default:
+			if _, err = WriteHeader(out, header.Name, header.Value); err != nil {
+				return err
+			}
 		}
 	}
 	if _, err = io.WriteString(out, header.MIMEVersion+": 1.0"+CRNL); err != nil {
