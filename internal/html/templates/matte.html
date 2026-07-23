@@ -9,7 +9,7 @@
 {{- $footerTextColor := or .Frontmatter.theme.color.footer_text `#41629a` -}}
 {{- $actionColor := or .Frontmatter.theme.color.action `#3a86ff` -}}
 {{- $textColor := or .Frontmatter.theme.color.text `#11226a` -}}
-{{- $font := safeCSS (or .Frontmatter.theme.font `Georgia, 'Times New Roman', Helvetica, serif`) -}}
+{{- $font := safeCSS (or .Frontmatter.theme.font_family `Georgia, 'Times New Roman', Helvetica, serif`) -}}
 <html lang="{{ $language }}" dir="{{ $textDirection }}">
 <head>
   <title>{{ .Frontmatter.subject }}</title>

@@ -151,8 +151,8 @@ Suspendisse iaculis tortor at massa congue condimentum. Ut interdumleo vel digni
                         <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><h1 style="color:#11267;font-family:Georgia;font-size: 24px;">Introduction</h1>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">This is the simplest letter that can be sent. It has one recipient.</p>
 <ul>
-<li><em>Letter</em>: this file.</li>
-<li><em>Message</em>: a rendered copy of this file for each recipient.</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><em>Letter</em>: this file.</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><em>Message</em>: a rendered copy of this file for each recipient.</li>
 </ul>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Sending requires a set of mailing service credentials
 provided as environment variables.</p>
@@ -177,13 +177,13 @@ mdsend continue --forever
 </code></pre>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Command Line Flags</h2>
 <ul>
-<li><code style="font-family:monospace;background-color:#e8ecfb;">--queue</code>: change database where the messages are stored.</li>
-<li><code style="font-family:monospace;background-color:#e8ecfb;">--from</code>: override the author of the messages.</li>
-<li><code style="font-family:monospace;background-color:#e8ecfb;">--to</code>: add another recipient to each queued letter. Repeat the flag
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">--queue</code>: change database where the messages are stored.</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">--from</code>: override the author of the messages.</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">--to</code>: add another recipient to each queued letter. Repeat the flag
 as many times as needed.</li>
-<li><code style="font-family:monospace;background-color:#e8ecfb;">--cc</code>: equivalent to <code style="font-family:monospace;background-color:#e8ecfb;">--to</code> flag. Kept for historic reasons.</li>
-<li><code style="font-family:monospace;background-color:#e8ecfb;">--bcc</code>: equivalent to <code style="font-family:monospace;background-color:#e8ecfb;">--to</code> flag. Kept for historic reasons.</li>
-<li><code style="font-family:monospace;background-color:#e8ecfb;">--forever</code>: keep the process perpetually alive. If more
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">--cc</code>: equivalent to <code style="font-family:monospace;background-color:#e8ecfb;">--to</code> flag. Kept for historic reasons.</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">--bcc</code>: equivalent to <code style="font-family:monospace;background-color:#e8ecfb;">--to</code> flag. Kept for historic reasons.</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">--forever</code>: keep the process perpetually alive. If more
 letters are added to the queue at any time, they will be sent.</li>
 </ul>
 <h1 style="color:#11267;font-family:Georgia;font-size: 24px;">Sample Content</h1>

@@ -113,7 +113,7 @@ Colors
                     </tr>
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
-                        <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:orange;"><h1 style="color:#667799;font-family:'Courier New', verdana;font-size: 25px;">Styling Your Letters</h1>
+                        <div style="font-family:&#39;Courier New&#39;, verdana;font-size:20px;line-height:1.2;text-align:left;color:orange;"><h1 style="color:#667799;font-family:'Courier New', verdana;font-size: 25px;">Styling Your Letters</h1>
 <p style="font-size:13px;font-family:'Courier New', verdana;color:#ffa500;">Markdown text can be stylized with <code style="font-family:monospace;background-color:#808080;">theme</code> frontmatter section
 and with templates.</p>
 <p style="font-size:13px;font-family:'Courier New', verdana;color:#ffa500;">Templates are demonstrated in the next example. Default templates
@@ -122,12 +122,12 @@ rely on the same <code style="font-family:monospace;background-color:#808080;">t
 <p style="font-size:13px;font-family:'Courier New', verdana;color:#ffa500;">Use only standard font names. Electronic mail does not display custom fonts well. Specify <code style="font-family:monospace;background-color:#808080;">font_size</code> in pixels only.</p>
 <h2 style="color:#667799;font-family:'Courier New', verdana;font-size: 23px;">Colors</h2>
 <ul>
-<li><strong>text:</strong> the text color in paragraphs.</li>
-<li><strong>heading:</strong> the text color of headings.</li>
-<li><strong>link:</strong> the text color of anchors.</li>
-<li><strong>action:</strong> the color of action button. A paragraph with one link, by itself, is rendered as an action button.</li>
-<li><strong>blockquote:</strong> the background color of a block quote, table alt row background, inline code element.</li>
-<li><strong>border:</strong> thematic break, borders of tables, code blocks, and blockquote margin.</li>
+<li style="font-size:13px;font-family:'Courier New', verdana;color:#ffa500;"><strong>text:</strong> the text color in paragraphs.</li>
+<li style="font-size:13px;font-family:'Courier New', verdana;color:#ffa500;"><strong>heading:</strong> the text color of headings.</li>
+<li style="font-size:13px;font-family:'Courier New', verdana;color:#ffa500;"><strong>link:</strong> the text color of anchors.</li>
+<li style="font-size:13px;font-family:'Courier New', verdana;color:#ffa500;"><strong>action:</strong> the color of action button. A paragraph with one link, by itself, is rendered as an action button.</li>
+<li style="font-size:13px;font-family:'Courier New', verdana;color:#ffa500;"><strong>blockquote:</strong> the background color of a block quote, table alt row background, inline code element.</li>
+<li style="font-size:13px;font-family:'Courier New', verdana;color:#ffa500;"><strong>border:</strong> thematic break, borders of tables, code blocks, and blockquote margin.</li>
 </ul>
 </div>
                       </td>

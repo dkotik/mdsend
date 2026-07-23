@@ -30,46 +30,46 @@
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Lists</h2>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Unordered</p>
 <ul>
-<li>Create a list by starting a line with <code style="font-family:monospace;background-color:#e8ecfb;">+</code>, <code style="font-family:monospace;background-color:#e8ecfb;">-</code>, or <code style="font-family:monospace;background-color:#e8ecfb;">*</code></li>
-<li>Sub-lists are made by indenting 2 spaces:
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">Create a list by starting a line with <code style="font-family:monospace;background-color:#e8ecfb;">+</code>, <code style="font-family:monospace;background-color:#e8ecfb;">-</code>, or <code style="font-family:monospace;background-color:#e8ecfb;">*</code></li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">Sub-lists are made by indenting 2 spaces:
 <ul>
-<li>Marker character change forces new list start:
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">Marker character change forces new list start:
 <ul>
-<li>Ac tristique libero volutpat at</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">Ac tristique libero volutpat at</li>
 </ul>
 <ul>
-<li>Facilisis in pretium nisl aliquet</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">Facilisis in pretium nisl aliquet</li>
 </ul>
 <ul>
-<li>Nulla volutpat aliquam velit</li>
-</ul>
-</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">Nulla volutpat aliquam velit</li>
 </ul>
 </li>
-<li>Very easy!</li>
+</ul>
+</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">Very easy!</li>
 </ul>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Ordered</p>
 <ol>
-<li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Lorem ipsum dolor sit amet</p>
 </li>
-<li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Consectetur adipiscing elit</p>
 </li>
-<li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Integer molestie lorem at massa</p>
 </li>
-<li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">You can use sequential numbers&hellip;</p>
 </li>
-<li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">&hellip;or keep all the numbers as <code style="font-family:monospace;background-color:#e8ecfb;">1.</code></p>
 </li>
 </ol>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Start numbering with offset:</p>
 <ol start="57">
-<li>foo</li>
-<li>bar</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">foo</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">bar</li>
 </ol>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Code</h2>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Inline <code style="font-family:monospace;background-color:#e8ecfb;">code</code></p>
@@ -166,8 +166,8 @@ console.log(foo(5));
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">see <a href="https://github.com/markdown-it/markdown-it-emoji#change-output" style="color:#335c9c;">how to change output</a> with twemoji.</p>
 <h3 style="color:#11267;font-family:Georgia;font-size: 20px;"><a href="https://github.com/markdown-it/markdown-it-sub" style="color:#335c9c;">Subscript</a> / <a href="https://github.com/markdown-it/markdown-it-sup" style="color:#335c9c;">Superscript</a></h3>
 <ul>
-<li>19^th^</li>
-<li>H~2~O</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">19^th^</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;">H~2~O</li>
 </ul>
 <h3 style="color:#11267;font-family:Georgia;font-size: 20px;"><a href="https://github.com/markdown-it/markdown-it-ins" style="color:#335c9c;">&lt;ins&gt;</a></h3>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">++Inserted text++</p>

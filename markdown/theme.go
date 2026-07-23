@@ -231,6 +231,7 @@ func (t Theme) Transform(node *ast.Document, reader text.Reader, pc parser.Conte
 		case ast.KindImage:
 		case ast.KindList:
 		case ast.KindListItem:
+			fallthrough
 		case ast.KindParagraph:
 			style := ""
 			if t.FontSize != 0 {

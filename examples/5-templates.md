@@ -94,3 +94,12 @@ engine from aggressively sanitizing their contents. For example, angle
 brackets around a template value or inside it become `&gt;` and `&lt;`
 to prevent cross-site scripting exploits. Put the angle brackets
 inside the reified template, and they will render correctly.
+
+## Comments
+
+HTML comments are removed from both plain text and HTML output.
+
+```html
+<!-- HTML Comments are not printed. -->
+Comment line above will not be visible.
+```

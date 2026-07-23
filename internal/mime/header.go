@@ -15,7 +15,7 @@ import (
 )
 
 // taken from mime package of the standard library
-func needsEncoding(s string) bool {
+func doesValueRequireEncoding(s string) bool {
 	for _, b := range s {
 		if (b < ' ' || b > '~') && b != '\t' {
 			return true
@@ -94,12 +94,36 @@ close:
 	return n, nil
 }
 
-var maxBase64Len = base64.StdEncoding.DecodedLen(WordLengthLimit)
+// Mime package BEncoder refers to RFC 2047, section 2 to set
+// maximum word length to 75 characters. from which the length
+// of the prefix and suffix are subtracted to get the limit.
+// Plus one for the leading space.
+var maxHeaderBase64Len = base64.StdEncoding.DecodedLen(
+	75 - len(BEncodingPrefix) - len(BEncodingSuffix),
+)
 
 // TODO: remove <n int> from WriteHeader signature
 func WriteHeader(w io.Writer, name, value string) (n int, err error) {
-	if !needsEncoding(value) {
-		return writeSimpleHeader(w, name, value)
+	if !doesValueRequireEncoding(value) {
+		// Important: long lines will be wrapped, which can
+		// break URLs because plain multi-line header decoder
+		// will take `\r\n ` as a word break.
+		//
+		// [doesValueRequireEncoding] returns true for line breaks,
+		// but it will not see those in long values, because the header
+		// is not yet wrapped. Therefore, encoding must be coerced
+		// on long values.
+		//
+		// The standard library `mime/encodedword.go` file includes the following
+		// comment: "White-space and newline  characters separating two
+		// encoded-words must be deleted." This means that line splits
+		// will heal when decoding the header, preserving URLs and long values.
+		//
+		// There is a test condition that uses standard library word decoder
+		// to ensure that decoded header matches the expected value.
+		if len(name)+2+len(value) < LineLengthLimit {
+			return writeSimpleHeader(w, name, value)
+		}
 	}
 
 	i, err := w.Write([]byte(name))
@@ -120,15 +144,19 @@ func WriteHeader(w io.Writer, name, value string) (n int, err error) {
 	}
 
 	w64 := base64.NewEncoder(base64.StdEncoding, w)
-	var currentLen, last, runeLen int
-	currentLen = len(name) - 2 // subtract the length of the header name and separator
+	var (
+		currentLen = n - i // len(": ") + space
+		// currentLen = n
+		runeLen int
+		last    int
+	)
 
 	for i = 0; i < len(value); i += runeLen {
 		// Multi-byte characters must not be split across encoded-words.
 		// See RFC 2047, section 5.3.
 		_, runeLen = utf8.DecodeRuneInString(value[i:])
 
-		if currentLen+runeLen <= maxBase64Len {
+		if currentLen+runeLen <= maxHeaderBase64Len {
 			currentLen += runeLen
 		} else {
 			io.WriteString(w64, value[last:i])
@@ -143,8 +171,8 @@ func WriteHeader(w io.Writer, name, value string) (n int, err error) {
 			// if i != 12 {
 			// 	return n, io.ErrShortWrite
 			// }
-			last = i
 			currentLen = runeLen
+			last = i
 		}
 	}
 	io.WriteString(w64, value[last:])

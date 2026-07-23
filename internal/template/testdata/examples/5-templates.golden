@@ -1,5 +1,5 @@
 subject: example message for Full Name
-seed_key: AYZZMHRRYh7
+seed_key: K5hmivKnbcd
 X-Template-Test: test
 
 Hello FirstName,
@@ -61,6 +61,16 @@ URL: https://test.com/?unsubscribe=
 
 
 Reified values are marked as safe HTML. This prevents Go templatingengine from aggressively sanitizing their contents. For example, anglebrackets around a template value or inside it become `&gt;` and `&lt;`to prevent cross-site scripting exploits. Put the angle bracketsinside the reified template, and they will render correctly.
+
+
+Comments
+--------
+
+HTML comments are removed from both plain text and HTML output.
+
+
+
+Comment line above will not be visible.
 
 
 
@@ -140,7 +150,7 @@ Reified values are marked as safe HTML. This prevents Go templatingengine from a
                           <tbody>
                             <tr>
                               <td>
-                                  <h1 style="margin: 0; padding: 16px 12px 12px 12px; font-size: 28px; line-height: 34px; font-weight: bold;color:#e8ecfb;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;">
+                                  <h1 style="margin: 0; padding: 16px 12px 12px 12px; font-size: 28px; line-height: 34px; font-weight: bold;color:#333365;font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;">
                                     
   Example Message For Full Name
 
@@ -170,13 +180,13 @@ it will be ommitted from the sent message.</p>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Context</h2>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Template execution context contains the following fields:</p>
 <ul>
-<li><strong>Frontmatter:</strong> the raw Markdown frontmatter as <code style="font-family:monospace;background-color:#e8ecfb;">map[string]any</code>.</li>
-<li><strong>Recipient:</strong> the raw message target as <code style="font-family:monospace;background-color:#e8ecfb;">map[string]any</code>. It
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>Frontmatter:</strong> the raw Markdown frontmatter as <code style="font-family:monospace;background-color:#e8ecfb;">map[string]any</code>.</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>Recipient:</strong> the raw message target as <code style="font-family:monospace;background-color:#e8ecfb;">map[string]any</code>. It
 will contain <code style="font-family:monospace;background-color:#e8ecfb;">name</code> and <code style="font-family:monospace;background-color:#e8ecfb;">email</code> fields and any other fields
 fromt the contact source.</li>
-<li><strong>Content:</strong> rendered Markdown body.</li>
-<li><strong>Schedule:</strong> parsed scheduling directives.</li>
-<li><strong>IsPlainText:</strong> true value, when the rendered content is
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>Content:</strong> rendered Markdown body.</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>Schedule:</strong> parsed scheduling directives.</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>IsPlainText:</strong> true value, when the rendered content is
 alternative plain text of the electronic mail message.</li>
 </ul>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">HTML or PlainText</h2>
@@ -189,7 +199,7 @@ HTML template or inserted there by template execution.
 You may add those elements back by using <code style="font-family:monospace;background-color:#e8ecfb;">.IsPlainText</code> context value.</p>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Template Functions</h2>
 <ul>
-<li><strong>skipMessageIfTrue:</strong> skip current recipient is the argument to this function call evaluates to an unempty value.</li>
+<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>skipMessageIfTrue:</strong> skip current recipient is the argument to this function call evaluates to an unempty value.</li>
 </ul>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Reify Templates</h2>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Special <code style="font-family:monospace;background-color:#e8ecfb;">reify</code> function prints and stores the output of a named <code style="font-family:monospace;background-color:#e8ecfb;">Golang</code> block
@@ -208,6 +218,11 @@ engine from aggressively sanitizing their contents. For example, angle
 brackets around a template value or inside it become <code style="font-family:monospace;background-color:#e8ecfb;">&amp;gt;</code> and <code style="font-family:monospace;background-color:#e8ecfb;">&amp;lt;</code>
 to prevent cross-site scripting exploits. Put the angle brackets
 inside the reified template, and they will render correctly.</p>
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Comments</h2>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">HTML comments are removed from both plain text and HTML output.</p>
+<pre><code class="language-html">
+Comment line above will not be visible.
+</code></pre>
 </div>
                       </td>
                     </tr>

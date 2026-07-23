@@ -56,13 +56,6 @@ const (
 	// Therefore, the maximum length must be reduced by the length of the parameter name.
 	BoundaryLengthLimit = 70 - len(`boundary`) + 2
 
-	// Mime package BEncoder refers to RFC 2047, section 2 to set
-	// maximum word length to 75 characters. from which the length
-	// of the prefix and suffix are subtracted to get the limit.
-	// One less is to prevent line wrapping in the middle of a multi-byte
-	// UTF character rune.
-	WordLengthLimit = LineLengthLimit - 1 - len("=?UTF-8?b?") - len("?=")
-
 	BEncodingPrefix = "=?UTF-8?b?"
 	BEncodingSuffix = "?="
 	CRNL            = "\r\n"

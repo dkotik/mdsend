@@ -11,6 +11,12 @@ import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
+type ValidationResult struct {
+	Subject  *i18n.LocalizeConfig
+	Errors   []*i18n.LocalizeConfig
+	Warnings []i18n.LocalizeConfig
+}
+
 func (l Letter) Validate() (err error) {
 	// if l.ID == "" {
 	// 	return errors.New("letter has no ID")

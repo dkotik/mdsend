@@ -13,10 +13,8 @@ Send markdown files as electronic mail. Maintain mailing lists as templated text
     - [x] **SMTP** (SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD)
     - [x] **Mailgun** (MG_API_KEY, MG_API_DOMAIN) or SMTP relay
     - [x] **Resend** via SMTP relay or (RESEND_API_KEY) 
-    - [x] **Amazon SES** (requires AWS configuration present)
-      - The author decoupled himself from AWS years ago and requests
-        help testing this implementation.
-    - [ ] SparkPost (soon)
+    - [x] **Amazon SES** (requires AWS configuration present, beta)
+    - [x] SparkPost (alpha)
     - [ ] Loops
   - Supports additional mailing services by SMTP relay:
     - [x] SMTP2GO
@@ -94,15 +92,14 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 <details>
   <summary>Click here to see a list of planned features.</summary>
 
-- [ ] Beautify the default template. Add `dark.html` one.
-- [ ] attachments should be collected from templates as well
 - [ ] Validate function should detect language and complain that `language` field is not set, if the content is not English.
 - [ ] service package with HTTP unsubscribe endpoint package
-- [ ] mdsend <file> should be equivalent to mdsend send <file>?
+- [ ] attachments should be collected from templates as well
 - [ ] Queue clean up scanner - should be first added to sqlite Watermill driver.
 - [ ] Sending message with scheduling delay (instead of only queuing) should prompt a confirmation.
 - [ ] list out templating functions in the example, including the default ones
 - [ ] Write a better Goldmark 2.0 renderer that recognizes single-line youtube and image paragraphs, centers them.
+- [ ] Beautify the default template. Add `dark.html` one.
 - [ ] Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
 - [ ] https://github.com/charmbracelet/glamour
 - [ ] Run some tests with <https://www.suped.com/tools/email-tester>
