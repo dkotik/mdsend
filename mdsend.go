@@ -227,7 +227,7 @@ func (loader loader) LoadLetter(ctx context.Context, p string) (Letter, iter.Seq
 			for source, err := range letter.EachAttachmentSource() {
 				if err != nil {
 					yield(Attachment{}, fmt.Errorf("unable to decode attachment source %q: %w", source.Location, err))
-					break
+					return
 				}
 				attachment, err := loader.LoadAttachment(
 					ctx,
@@ -236,11 +236,11 @@ func (loader loader) LoadLetter(ctx context.Context, p string) (Letter, iter.Seq
 				)
 				if err != nil {
 					yield(Attachment{}, fmt.Errorf("unable to load attachment %q: %w", source.Location, err))
-					break
+					return
 				}
 				attachment.LetterID = letter.ID
 				if !yield(attachment, nil) {
-					break
+					return
 				}
 			}
 		}, nil

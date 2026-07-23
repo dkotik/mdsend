@@ -152,6 +152,9 @@ func queueLetter(
 	}
 	rootDirectory := filepath.Dir(letterPath)
 	for attachment, err := range attachments {
+		if err != nil {
+			return queued, err
+		}
 		if err = q.CreateAttachment(ctx, attachment); err != nil {
 			return queued, err
 		}

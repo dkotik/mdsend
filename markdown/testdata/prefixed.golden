@@ -1,6 +1,10 @@
 ![sm](relativePathPrefix/perfect "sm")
 
+![withReference][withReference]
+
 ## Subtitle
+
+[withReference]: relativePathPrefix/www.google.com/logo.jpg
 
 # Title [](relativePathPrefix/inTitle.jpg "In Title")
 

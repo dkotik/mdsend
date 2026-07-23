@@ -54,45 +54,65 @@ func CollectLinks(source []byte) (result []Link) {
 		ast.Walker(func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 			if entering {
 				switch n := n.(type) {
-				case *ast.Link:
-					if n.Reference != nil {
-						return ast.WalkContinue, nil
-					}
-					// index := n.Pos() + 3
-					// if n.FirstChild() != nil {
-					// 	index += len(n.FirstChild().(*ast.Text).Value(source))
-					// }
-					result = append(result, Link{
-						Name:        string(n.Title),
+				// case *ast.Link:
+				// 	if n.Reference != nil {
+				// 		return ast.WalkContinue, nil
+				// 	}
+				// 	// index := n.Pos() + 3
+				// 	// if n.FirstChild() != nil {
+				// 	// 	index += len(n.FirstChild().(*ast.Text).Value(source))
+				// 	// }
+				// 	result = append(result, Link{
+				// 		Name:        string(n.Title),
+				// 		Destination: string(n.Destination),
+				// 		// Position:    index,
+				// 	})
+				// 	// if n.NextSibling() != nil {
+				// 	// 	result[len(result)-1].Position = n.NextSibling().Pos() + 1
+				// 	// }
+				case *ast.Image:
+					link := Link{
+						Name:        string(bytes.TrimSpace(n.Title)),
 						Destination: string(n.Destination),
 						// Position:    index,
-					})
-					// if n.NextSibling() != nil {
-					// 	result[len(result)-1].Position = n.NextSibling().Pos() + 1
-					// }
-				case *ast.Image:
-					if n.Reference != nil {
-						return ast.WalkContinue, nil
 					}
+					// if n.Reference != nil {
+					// 	link := Link{
+					// 		Name:        string(bytes.TrimSpace(n.Reference.Value)),
+					// 		Destination: string(n.Destination),
+					// 		// Position:    index,
+					// 	}
+					// 	if link.Name == "" {
+					// 		link.Name = string(bytes.TrimSpace(n.Title))
+					// 	}
+					// 	result = append(result, link)
+					// 	return ast.WalkContinue, nil
+					// }
 					// index := n.Pos() + 4
 					// if n.FirstChild() != nil {
 					// 	index += len(n.FirstChild().(*ast.Text).Value(source))
 					// }
-					result = append(result, Link{
-						Name:        string(n.Title),
-						Destination: string(n.Destination),
-						// Position:    index,
-					})
-				case *ast.LinkReferenceDefinition:
-					// index := n.Pos() + 3
-					// if n.FirstChild() != nil {
-					// 	index += len(n.FirstChild().(*ast.Text).Value(source))
-					// }
-					result = append(result, Link{
-						Name:        string(n.Title),
-						Destination: string(n.Destination),
-						// Position:    n.Pos() + 3 + len(n.Label),
-					})
+
+					if link.Name == "" {
+						link.Name = string(bytes.TrimSpace(n.Title))
+					}
+					if link.Name == "" {
+						text, ok := n.FirstChild().(*ast.Text)
+						if ok {
+							link.Name = string(bytes.TrimSpace(text.Value(source)))
+						}
+					}
+					result = append(result, link)
+					// case *ast.LinkReferenceDefinition:
+					// 	// index := n.Pos() + 3
+					// 	// if n.FirstChild() != nil {
+					// 	// 	index += len(n.FirstChild().(*ast.Text).Value(source))
+					// 	// }
+					// 	result = append(result, Link{
+					// 		Name:        string(n.Title),
+					// 		Destination: string(n.Destination),
+					// 		// Position:    n.Pos() + 3 + len(n.Label),
+					// 	})
 				}
 			}
 			return ast.WalkContinue, nil

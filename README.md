@@ -92,6 +92,7 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 <details>
   <summary>Click here to see a list of planned features.</summary>
 
+- [ ] Detect images with link references - needs testing.
 - [ ] Validate function should detect language and complain that `language` field is not set, if the content is not English.
 - [ ] service package with HTTP unsubscribe endpoint package
 - [ ] attachments should be collected from templates as well

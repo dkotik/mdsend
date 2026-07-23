@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"iter"
 
@@ -37,7 +38,7 @@ func (q sqliteQueue) CreateAttachment(
 			case lib.SQLITE_OK:
 				return nil
 			case lib.SQLITE_CONSTRAINT_UNIQUE:
-				return mdsend.ErrDuplicateAttachment
+				return fmt.Errorf("error putting %q (#%s) into queue: %w", a.Name, a.Hash, mdsend.ErrDuplicateAttachment)
 			default:
 				return err
 			}
