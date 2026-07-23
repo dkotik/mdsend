@@ -7,6 +7,7 @@ import (
 	"net/mail"
 	"path"
 	"strings"
+	ttemplate "text/template"
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/internal"
@@ -26,7 +27,7 @@ type tmpl struct {
 	SeedKey             string
 	From                mail.Address
 	Headers             []headerTemplate
-	Subject             *template.Template
+	Subject             *ttemplate.Template
 	Text                *template.Template
 	HTML                *template.Template
 	ReifiedCache        map[string]string
@@ -155,11 +156,15 @@ func New(
 		// }
 	}
 
+	baseHeaderTemplate, err := newBaseHeaderTemplate(l, templateFunctions)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create base header template: %w", err)
+	}
 	subject, err := l.GetSubject()
 	if err != nil {
 		return nil, err
 	}
-	clone, err := t.Text.Clone()
+	clone, err := baseHeaderTemplate.Clone()
 	if err != nil {
 		return nil, fmt.Errorf("unable to clone content template: %w", err)
 	}
@@ -167,24 +172,6 @@ func New(
 	if err != nil {
 		return nil, fmt.Errorf("invalid subject template: %w", err)
 	}
-	headers, err := l.GetHeaders()
-	if err != nil {
-		return nil, err
-	}
-	t.Headers = make([]headerTemplate, len(headers))
-	for i, header := range headers {
-		clone, err = t.Text.Clone()
-		if err != nil {
-			return nil, fmt.Errorf("unable to clone content template: %w", err)
-		}
-		value, err := clone.New("").Parse(header.Value)
-		if err != nil {
-			return nil, fmt.Errorf("unable to parse header %q as template: %w", header.Name, err)
-		}
-		t.Headers[i] = headerTemplate{
-			Name:     header.Name,
-			Template: value,
-		}
-	}
-	return t, nil
+	t.Headers, err = newHeaderTemplateSet(l, baseHeaderTemplate)
+	return t, err
 }

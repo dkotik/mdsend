@@ -118,9 +118,9 @@ when linked like so:
 <a href="../internal/media/testdata/cat.jpg" title="Cat Photo by Cindy vanHeerden" style="color:#335c9c;">cat</a>.</p>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Creative Commons Credits</h2>
 <ul>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>cat.jpg:</strong> Cindy vanHeerden.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>panda.jpg:</strong> Snow Chang.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>camillion.jpg:</strong> Regan Dsouza.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>cat.jpg:</strong> Cindy vanHeerden.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>panda.jpg:</strong> Snow Chang.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>camillion.jpg:</strong> Regan Dsouza.</li>
 </ul>
 </div>
                       </td>

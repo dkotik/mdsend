@@ -11,9 +11,7 @@ bcc:
 language: en
 headers:
   List-Id: Some List <greatlist@test.com>
-  # extra work with the angle braces to prevent Go template from sanitizing
-  # the URL and destroying the base58 token with path segment lowercase conversion
-  List-Unsubscribe: <mailto:unsub@yourdomain.com>, {{ safeHTML (print "<https://yourdomain.com/unsubscribe/" (base58 (print .Recipient.email "?list=testList")) ">") }}
+  List-Unsubscribe: <mailto:unsub@yourdomain.com>, <https://yourdomain.com/unsubscribe/{{ base58 (print .Recipient.email "?list=testList") }}>
   List-Unsubscribe-Post: List-Unsubscribe=One-Click
 ---
 

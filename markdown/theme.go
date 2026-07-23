@@ -231,7 +231,17 @@ func (t Theme) Transform(node *ast.Document, reader text.Reader, pc parser.Conte
 		case ast.KindImage:
 		case ast.KindList:
 		case ast.KindListItem:
-			fallthrough
+			style := ""
+			if t.FontSize != 0 {
+				style += fmt.Sprintf("font-size:%dpx;padding:4px 6px 4px 0;", t.FontSize)
+			}
+			if t.FontFamily != "" {
+				style += "font-family:" + t.FontFamily + ";"
+			}
+			if t.Color.Text != "" {
+				style += "color:" + t.Color.Text + ";"
+			}
+			ApplyStyle(node, style)
 		case ast.KindParagraph:
 			style := ""
 			if t.FontSize != 0 {

@@ -122,24 +122,24 @@ schedule:
                         <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><h1 style="color:#11267;font-family:Georgia;font-size: 24px;">Schedule Messages for Later Delivery</h1>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Queued messages can be delayed by providing <code style="font-family:monospace;background-color:#e8ecfb;">schedule</code> frontmatter instructions:</p>
 <ul>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>after:</strong> time until the message can be sent.
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>after:</strong> time until the message can be sent.
 Must be in ISO format <code style="font-family:monospace;background-color:#e8ecfb;">YYYY-MM-DD hh:mm</code>.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>delay:</strong> time duration added to <code style="font-family:monospace;background-color:#e8ecfb;">after</code> or current time.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>step:</strong> time duration added for each recipient.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>fluctuate:</strong> normalized random time duration added for each
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>delay:</strong> time duration added to <code style="font-family:monospace;background-color:#e8ecfb;">after</code> or current time.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>step:</strong> time duration added for each recipient.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>fluctuate:</strong> normalized random time duration added for each
 mailing step, including the first message.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>expire:</strong> time duration, after all the messages have been sent,
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>expire:</strong> time duration, after all the messages have been sent,
 to keep the letter and message records in the database before they
 are deleted.</li>
 </ul>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Time Duration Units</h2>
 <ul>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">m</code>: Minute.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">h</code>: Hour.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">d</code>: Day.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">w</code>: Week.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">mo</code>: Month, that is 31 days.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">y</code>: Year, that is 365 days.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">m</code>: Minute.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">h</code>: Hour.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">d</code>: Day.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">w</code>: Week.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">mo</code>: Month, that is 31 days.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><code style="font-family:monospace;background-color:#e8ecfb;">y</code>: Year, that is 365 days.</li>
 </ul>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Units can be combined together. For example, to delay the message
 by eight weeks, four days, and seven hours, add to the front matter:</p>

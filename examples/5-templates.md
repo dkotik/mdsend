@@ -15,8 +15,8 @@ headers:
 
 Hello {{ .Recipient.first_name }},
 
-The Markdown content itself is a `Golang` text template.
-To wrap the output of a letter into an `HTML` template, specify
+The Markdown content itself is a `Golang` HTML template.
+To wrap the output of a letter, specify
 the list of files to load using the `template` field in the
 frontmatter. The last template in the list becomes the root
 template. Other templates can be called by their base file
@@ -31,8 +31,7 @@ name:
 Any sub-templates and blocks defined here, in the contents
 of the letter are available in all other templates.
 
-The frontmatter subject and the header values are also treated
-as text templates. If the header template is rendered empty,
+The frontmatter subject and the header values are `Golang` text templates, not HTML. If the header template is rendered empty,
 it will be ommitted from the sent message.
 
 ## Context

@@ -233,8 +233,8 @@ carbon copy recipients. The field exists for historic reasons. Those
 recipients will not be displayed in sent messages by design for
 the following reasons:</p>
 <ul>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;">To prevent accidental exposure of private contact information.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;">To prevent possible message duplication in mailer APIs due to
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;">To prevent accidental exposure of private contact information.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;">To prevent possible message duplication in mailer APIs due to
 implementation ambiguity in handling carbon copy recipients.</li>
 </ul>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Load Recipient List From an Executable</h2>
@@ -250,11 +250,11 @@ This protects <code style="font-family:monospace;background-color:#e8ecfb;">mdse
 and binary files, and precludes ambiguity in choosing between JSON and
 Cuelang, CSV and other formats.</p>
 <ul>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><em>JSON:</em> Content-Type: application/json</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><em>Cue:</em> Content-Type: application/cue</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><em>YAML:</em> Content-Type: application/yaml</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><em>TOML:</em> Content-Type: application/toml</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><em>CSV:</em> Content-Type: text/csv</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><em>JSON:</em> Content-Type: application/json</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><em>Cue:</em> Content-Type: application/cue</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><em>YAML:</em> Content-Type: application/yaml</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><em>TOML:</em> Content-Type: application/toml</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><em>CSV:</em> Content-Type: text/csv</li>
 </ul>
 <pre><code class="language-sh">#!/bin/sh
 

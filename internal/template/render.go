@@ -55,7 +55,10 @@ func (t *tmpl) RenderLetterForRecipient(recipient map[string]any) (m mdsend.Mess
 		// TODO: use rendering error for all errors in this func
 		return m, fmt.Errorf("unable to render subject: %w", err)
 	}
-	m.Subject = b.String()
+	m.Subject = strings.TrimSpace(b.String())
+	if m.Subject == "" {
+		return m, fmt.Errorf("subject template returned an empty string: %w", mdsend.ErrNoSubject)
+	}
 	t.context.Frontmatter[mdsend.FieldNameSubject] = m.Subject
 	b.Reset()
 

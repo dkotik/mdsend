@@ -1,17 +1,17 @@
 subject: example message for Full Name
-seed_key: MZz1SPAj4p8
+seed_key: hX8tzP1eeUf
 X-Template-Test: test
 
 Hello FirstName,
 
-The Markdown content itself is a `Golang` text template.To wrap the output of a letter into an `HTML` template, specifythe list of files to load using the `template` field in thefrontmatter. The last template in the list becomes the roottemplate. Other templates can be called by their base filename:
+The Markdown content itself is a `Golang` HTML template.To wrap the output of a letter, specifythe list of files to load using the `template` field in thefrontmatter. The last template in the list becomes the roottemplate. Other templates can be called by their base filename:
 
 
 
 
 Any sub-templates and blocks defined here, in the contentsof the letter are available in all other templates.
 
-The frontmatter subject and the header values are also treatedas text templates. If the header template is rendered empty,it will be ommitted from the sent message.
+The frontmatter subject and the header values are `Golang` text templates, not HTML. If the header template is rendered empty,it will be ommitted from the sent message.
 
 
 Context
@@ -164,8 +164,8 @@ Comment line above will not be visible.
                     <tr>
                       <td align="left" style="font-size:0px;padding:14px 22px;word-break:break-word;">
                         <div style="font-family:Georgia, &#39;Times New Roman&#39;, Helvetica, serif;font-size:20px;line-height:1.2;text-align:left;color:#11226a;"><p style="font-size:12px;font-family:Georgia;color:#11226a;">Hello FirstName,</p>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">The Markdown content itself is a <code style="font-family:monospace;background-color:#e8ecfb;">Golang</code> text template.
-To wrap the output of a letter into an <code style="font-family:monospace;background-color:#e8ecfb;">HTML</code> template, specify
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">The Markdown content itself is a <code style="font-family:monospace;background-color:#e8ecfb;">Golang</code> HTML template.
+To wrap the output of a letter, specify
 the list of files to load using the <code style="font-family:monospace;background-color:#e8ecfb;">template</code> field in the
 frontmatter. The last template in the list becomes the root
 template. Other templates can be called by their base file
@@ -174,19 +174,18 @@ name:</p>
 </code></pre>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Any sub-templates and blocks defined here, in the contents
 of the letter are available in all other templates.</p>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">The frontmatter subject and the header values are also treated
-as text templates. If the header template is rendered empty,
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">The frontmatter subject and the header values are <code style="font-family:monospace;background-color:#e8ecfb;">Golang</code> text templates, not HTML. If the header template is rendered empty,
 it will be ommitted from the sent message.</p>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Context</h2>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Template execution context contains the following fields:</p>
 <ul>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>Frontmatter:</strong> the raw Markdown frontmatter as <code style="font-family:monospace;background-color:#e8ecfb;">map[string]any</code>.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>Recipient:</strong> the raw message target as <code style="font-family:monospace;background-color:#e8ecfb;">map[string]any</code>. It
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>Frontmatter:</strong> the raw Markdown frontmatter as <code style="font-family:monospace;background-color:#e8ecfb;">map[string]any</code>.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>Recipient:</strong> the raw message target as <code style="font-family:monospace;background-color:#e8ecfb;">map[string]any</code>. It
 will contain <code style="font-family:monospace;background-color:#e8ecfb;">name</code> and <code style="font-family:monospace;background-color:#e8ecfb;">email</code> fields and any other fields
 fromt the contact source.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>Content:</strong> rendered Markdown body.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>Schedule:</strong> parsed scheduling directives.</li>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>IsPlainText:</strong> true value, when the rendered content is
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>Content:</strong> rendered Markdown body.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>Schedule:</strong> parsed scheduling directives.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>IsPlainText:</strong> true value, when the rendered content is
 alternative plain text of the electronic mail message.</li>
 </ul>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">HTML or PlainText</h2>
@@ -199,7 +198,7 @@ HTML template or inserted there by template execution.
 You may add those elements back by using <code style="font-family:monospace;background-color:#e8ecfb;">.IsPlainText</code> context value.</p>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Template Functions</h2>
 <ul>
-<li style="font-size:12px;font-family:Georgia;color:#11226a;"><strong>skipMessageIfTrue:</strong> skip current recipient is the argument to this function call evaluates to an unempty value.</li>
+<li style="font-size:12px;padding:4px 6px 4px 0;font-family:Georgia;color:#11226a;"><strong>skipMessageIfTrue:</strong> skip current recipient is the argument to this function call evaluates to an unempty value.</li>
 </ul>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Reify Templates</h2>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Special <code style="font-family:monospace;background-color:#e8ecfb;">reify</code> function prints and stores the output of a named <code style="font-family:monospace;background-color:#e8ecfb;">Golang</code> block
