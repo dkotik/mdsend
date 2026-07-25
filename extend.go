@@ -97,28 +97,28 @@ func extend(
 
 		file, err := fs.Open(p)
 		if err != nil {
-			return letter, err
+			return letter, NewFileReadError(p, err)
 		}
 		data, err := io.ReadAll(file)
 		if err != nil {
-			return letter, errors.Join(err, file.Close())
+			return letter, NewFileReadError(p, errors.Join(err, file.Close()))
 		}
 		if err = file.Close(); err != nil {
-			return letter, err
+			return letter, NewFileReadError(p, err)
 		}
 
 		switch ext := strings.ToLower(path.Ext(p)); ext {
 		case ".json":
 			var frontmatter map[string]any
 			if err := json.Unmarshal(data, &frontmatter); err != nil {
-				return letter, err
+				return letter, NewFileReadError(p, err)
 			}
 			if frontmatter == nil {
 				continue
 			}
 			if rootDirectory != "" && rootDirectory != "." {
 				if err = injectPathPrefix(frontmatter, rootDirectory); err != nil {
-					return letter, err
+					return letter, NewFileReadError(p, err)
 				}
 			}
 			internal.MapMergeLeft(frontmatter, letter.Frontmatter)
@@ -127,14 +127,14 @@ func extend(
 		case ".yaml", ".yml":
 			var frontmatter map[string]any
 			if err := yaml.Unmarshal(data, &frontmatter); err != nil {
-				return letter, err
+				return letter, NewFileReadError(p, err)
 			}
 			if frontmatter == nil {
 				continue
 			}
 			if rootDirectory != "" && rootDirectory != "." {
 				if err = injectPathPrefix(frontmatter, rootDirectory); err != nil {
-					return letter, err
+					return letter, NewFileReadError(p, err)
 				}
 			}
 			internal.MapMergeLeft(frontmatter, letter.Frontmatter)
@@ -143,14 +143,14 @@ func extend(
 		case ".toml":
 			var frontmatter map[string]any
 			if err := toml.Unmarshal(data, &frontmatter); err != nil {
-				return letter, err
+				return letter, NewFileReadError(p, err)
 			}
 			if frontmatter == nil {
 				continue
 			}
 			if rootDirectory != "" && rootDirectory != "." {
 				if err = injectPathPrefix(frontmatter, rootDirectory); err != nil {
-					return letter, err
+					return letter, NewFileReadError(p, err)
 				}
 			}
 			internal.MapMergeLeft(frontmatter, letter.Frontmatter)
@@ -159,14 +159,14 @@ func extend(
 		case ".cue":
 			var frontmatter map[string]any
 			if err := cuecontext.New().CompileBytes(data).Decode(&frontmatter); err != nil {
-				return letter, err
+				return letter, NewFileReadError(p, err)
 			}
 			if frontmatter == nil {
 				continue
 			}
 			if rootDirectory != "" && rootDirectory != "." {
 				if err = injectPathPrefix(frontmatter, rootDirectory); err != nil {
-					return letter, err
+					return letter, NewFileReadError(p, err)
 				}
 			}
 			internal.MapMergeLeft(frontmatter, letter.Frontmatter)
@@ -180,20 +180,20 @@ func extend(
 
 		subLetter, err := newLetter(data)
 		if err != nil {
-			return letter, err
+			return letter, NewFileReadError(p, err)
 		}
 		subLetter, err = extend(ctx, subLetter, path.Dir(p), fs)
 		if err != nil {
-			return letter, err
+			return letter, NewFileReadError(p, err)
 		}
 
 		if rootDirectory != "" && rootDirectory != "." {
 			b := &bytes.Buffer{}
 			if err = markdown.CopyWithRelativePathPrefix(b, []byte(subLetter.Content), rootDirectory); err != nil {
-				return letter, err
+				return letter, NewFileReadError(p, err)
 			}
 			if err = injectPathPrefix(subLetter.Frontmatter, rootDirectory); err != nil {
-				return letter, err
+				return letter, NewFileReadError(p, err)
 			}
 		}
 

@@ -15,6 +15,30 @@ import (
 	"github.com/oklog/ulid/v2"
 )
 
+type FileReadError struct {
+	Path  string
+	Cause error
+}
+
+func (err FileReadError) Error() string {
+	return fmt.Sprintf(
+		"file <%s> cannot be read: %v",
+		err.Path,
+		err.Cause,
+	)
+}
+
+func (err FileReadError) Unwrap() error {
+	return err.Cause
+}
+
+func NewFileReadError(p string, cause error) error {
+	return FileReadError{
+		Path:  p,
+		Cause: cause,
+	}
+}
+
 type IdentifierGenerator interface {
 	GenerateID() (string, error)
 }
@@ -90,19 +114,19 @@ func (loader loader) loadLetterFromFile(
 ) (letter Letter, err error) {
 	file, err := loader.FileSystem.Open(p)
 	if err != nil {
-		return letter, err
+		return letter, NewFileReadError(p, err)
 	}
 	data, err := io.ReadAll(file)
 	if err != nil {
-		return letter, errors.Join(err, file.Close())
+		return letter, NewFileReadError(p, errors.Join(err, file.Close()))
 	}
 	if err = file.Close(); err != nil {
-		return letter, err
+		return letter, NewFileReadError(p, err)
 	}
 
 	letter, err = newLetter(data)
 	if err != nil {
-		return letter, err
+		return letter, NewFileReadError(p, err)
 	}
 	if letter.ID == "" {
 		id, err := loader.LetterIdentifierGenerator.GenerateID()
@@ -150,14 +174,14 @@ func (loader loader) loadLetterFromFile(
 				})
 				continue
 			}
-			return letter, err
+			return letter, NewFileReadError(t, err)
 		}
 		data, err := io.ReadAll(file)
 		if err != nil {
-			return letter, errors.Join(err, file.Close())
+			return letter, NewFileReadError(t, errors.Join(err, file.Close()))
 		}
 		if err = file.Close(); err != nil {
-			return letter, err
+			return letter, NewFileReadError(t, err)
 		}
 		letter.Templates = append(letter.Templates, Attachment{
 			Name:        t,
@@ -181,12 +205,12 @@ func (loader loader) LoadAttachment(
 
 	file, err := loader.FileSystem.Open(source.Location)
 	if err != nil {
-		return a, err
+		return a, NewFileReadError(source.Location, err)
 	}
 	defer func() { err = errors.Join(err, file.Close()) }()
 	b, err := io.ReadAll(file)
 	if err != nil {
-		return a, err
+		return a, NewFileReadError(source.Location, err)
 	}
 	a, err = NewAttachment(b, constraints)
 	if err != nil {
@@ -200,7 +224,7 @@ func (loader loader) LoadLetter(ctx context.Context, p string) (Letter, iter.Seq
 	rootDirectory := path.Dir(p)
 	letter, err := loader.loadLetterFromFile(ctx, p, rootDirectory)
 	if err != nil {
-		return letter, nil, fmt.Errorf("unable to load file %q: %w", p, err)
+		return letter, nil, err
 	}
 	// language, err := letter.GetLanguage()
 	// if err != nil {
@@ -235,7 +259,7 @@ func (loader loader) LoadLetter(ctx context.Context, p string) (Letter, iter.Seq
 					constraints,
 				)
 				if err != nil {
-					yield(Attachment{}, fmt.Errorf("unable to load attachment %q: %w", source.Location, err))
+					yield(Attachment{}, NewFileReadError(source.Location, err))
 					return
 				}
 				attachment.LetterID = letter.ID

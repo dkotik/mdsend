@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"html/template"
 	"testing"
+
+	"github.com/dkotik/mdsend/internal/locale"
+	"golang.org/x/text/language"
 )
 
 func TestDefaultTemplateRendering(t *testing.T) {
@@ -19,6 +22,13 @@ func TestDefaultTemplateRendering(t *testing.T) {
 			},
 			"execute": func(templateName string, data any) template.HTML {
 				return template.HTML("[execute:" + templateName + "]")
+			},
+			"isRTL": func(s string) (bool, error) {
+				tag, err := language.Parse(s)
+				if err != nil {
+					return false, err
+				}
+				return locale.IsLanguageRightToLeft(tag), nil
 			},
 		},
 	).Parse(defaultTemplate)

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dkotik/mdsend/internal/locale"
 	"github.com/dkotik/mdsend/queue"
 	"github.com/mr-tron/base58"
 	"golang.org/x/text/cases"
@@ -46,6 +47,13 @@ func functions() template.FuncMap {
 		"titlecase": func(in string) string {
 			caser := cases.Title(language.English)
 			return caser.String(strings.ToLower(in))
+		},
+		"isRTL": func(s string) (bool, error) {
+			tag, err := language.Parse(s)
+			if err != nil {
+				return false, err
+			}
+			return locale.IsLanguageRightToLeft(tag), nil
 		},
 		"skipMessageIfTrue": func(condition any) (any, error) {
 			switch v := condition.(type) {

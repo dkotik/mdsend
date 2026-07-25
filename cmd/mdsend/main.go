@@ -13,6 +13,7 @@ import (
 	"syscall"
 
 	"github.com/adrg/xdg"
+	"github.com/dkotik/mdsend"
 	"github.com/urfave/cli/v3"
 )
 
@@ -45,7 +46,7 @@ var flagQueue = &cli.StringFlag{
 			// } else {
 			// 	return err
 			// }
-			return fmt.Errorf("unable to access database directory %q: %w", dir, err)
+			return mdsend.NewFileReadError(p, err)
 		}
 		paramValues := strings.Split(params, "&")
 		if !slices.Contains(paramValues, `cache=shared`) {

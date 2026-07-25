@@ -1,6 +1,7 @@
 <!doctype html>
 {{- $language := or .Frontmatter.language `en` -}}
 {{- $textDirection := or .Frontmatter.text_direction `auto` -}}
+{{- if (isRTL $language) -}}{{ $textDirection = or .Frontmatter.text_direction "rtl" }}{{- end -}}
 {{- $backgroundColor := or .Frontmatter.theme_color.background `#ffffff` -}}
 {{- $contentColor := or .Frontmatter.theme.color.content `#fefeff` -}}
 {{- $headerColor := or .Frontmatter.theme.color.header `#ffffff` -}}

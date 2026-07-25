@@ -235,6 +235,7 @@ func (l Letter) GetHeaders() (headers []header.Header, err error) {
 func (l Letter) GetLanguage() (lang language.Tag, err error) {
 	switch languageTag := l.Frontmatter[FieldNameLanguage].(type) {
 	case nil:
+		return lang, nil
 	case string:
 		// languageTag = strings.TrimSpace(languageTag)
 		lang, err = language.Parse(languageTag)
@@ -245,7 +246,6 @@ func (l Letter) GetLanguage() (lang language.Tag, err error) {
 	default:
 		return lang, fmt.Errorf("invalid language type: %T", languageTag)
 	}
-	return lang, nil
 }
 
 func (l Letter) GetMediaConstraints() (m media.Constraints, err error) {

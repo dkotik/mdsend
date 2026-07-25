@@ -233,7 +233,7 @@ func (t Theme) Transform(node *ast.Document, reader text.Reader, pc parser.Conte
 		case ast.KindListItem:
 			style := ""
 			if t.FontSize != 0 {
-				style += fmt.Sprintf("font-size:%dpx;padding:4px 6px 4px 0;", t.FontSize)
+				style += fmt.Sprintf("font-size:%dpx;padding:6px 8px 6px 2px;", t.FontSize)
 			}
 			if t.FontFamily != "" {
 				style += "font-family:" + t.FontFamily + ";"
@@ -255,9 +255,11 @@ func (t Theme) Transform(node *ast.Document, reader text.Reader, pc parser.Conte
 			}
 			ApplyStyle(node, style)
 		case ast.KindThematicBreak:
-			style := "padding:10px 25px 10px 25px;"
+			style := "margin:10px 25px 10px 25px;"
 			if t.Color.Border != "" {
 				style += "border:none;border-top:2px solid " + t.Color.Border + ";"
+			} else {
+				style += "border:none;border-top:2px solid #565656;"
 			}
 			ApplyStyle(node, style)
 		case KindActionButton:
