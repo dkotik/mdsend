@@ -76,7 +76,8 @@ func New(
 			return fmt.Errorf("unable to setup database publisher: %w", err)
 		}
 		subscriber, err := wmsqlitezombiezen.NewSubscriber(connectionDSN, wmsqlitezombiezen.SubscriberOptions{
-			PollInterval:     time.Millisecond * 30,
+			BatchSize:        1,
+			PollInterval:     time.Millisecond * 300,
 			InitializeSchema: true,
 			Logger:           router.Logger(),
 		})
