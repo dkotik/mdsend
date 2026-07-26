@@ -72,9 +72,9 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 			c.Value(flagFrom.Name).(mail.Address),
 		))
 	}
-	if c.Bool(flagVerbose.Name) {
-		mailerMiddleware = append(mailerMiddleware, mailer.NewLogger(logger))
-	}
+	// if c.Bool(flagVerbose.Name) {
+	mailerMiddleware = append(mailerMiddleware, mailer.NewLogger(logger))
+	// }
 	// mailer, err := newSemaphoreMailer(
 	// 	c.Int(flagWorkerCount.Name),
 	// 	mailerMiddleware...,
