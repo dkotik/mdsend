@@ -8,16 +8,6 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func newProgressTracker(
-	logger *slog.Logger,
-) queue.ProgressTracker {
-	return queue.ProgressTrackerFunc(
-		func(ctx context.Context, p queue.Progress) {
-			logger.Info("progress", slog.Any("report", p))
-		},
-	)
-}
-
 func newInterruptingProgressTracker(
 	ctx context.Context,
 	eg *errgroup.Group,
@@ -55,6 +45,7 @@ func newInterruptingProgressTracker(
 			if p.Average > 0 { // at least some new deliveries were made
 				logger.Info("deliveries made", slog.Any("report", p))
 			}
+			// logger.Warn("no new deliveries made", slog.Any("report", p))
 			select {
 			case <-ctx.Done():
 				return

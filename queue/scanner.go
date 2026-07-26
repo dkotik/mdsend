@@ -209,6 +209,12 @@ func (s continuousScanner) Scan(
 						return err
 					}
 					foundUnsentInLetter += foundUnsentInBatch
+					s.Logger.DebugContext(
+						ctx,
+						"scheduled messages for delivery:",
+						slog.String("letter_id", letter.ID),
+						slog.Int("count", len(messages)),
+					)
 				}
 				if !ok {
 					break

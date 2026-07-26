@@ -41,6 +41,9 @@ func New(
 	if options.Tracker == nil {
 		options.Tracker = queue.ProgressTrackerFunc(
 			func(ctx context.Context, p queue.Progress) {
+				if p.Average == 0 {
+					return // no messages were sent in this cycle
+				}
 				options.Logger.Info(
 					"messages sent",
 					slog.String("count", fmt.Sprintf("%d/%d", p.Sent, p.Total)),
@@ -139,7 +142,7 @@ func New(
 				// BeginWithOlderLetters: true,
 				// Frequency: time.Millisecond * 30,
 				Frequency:        time.Second * 2,
-				MessageBatchSize: 10,
+				MessageBatchSize: 100,
 				Logger:           logger,
 			},
 		)
