@@ -80,18 +80,27 @@ func TestContinuousScanner(t *testing.T) {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 		eg, ctx := errgroup.WithContext(ctx)
-		found := 0
-		queue.NewContinuousScanner(ctx, eg, q, queue.SchedulerFunc(func(ctx context.Context, l mdsend.Letter, m []mdsend.Message) error {
-			found++
-			return nil
+		known := make(map[string]struct{})
+		queue.NewContinuousScanner(ctx, eg, q, queue.SchedulerFunc(func(ctx context.Context, l mdsend.Letter, messages []mdsend.Message) error {
+			ok := false
+			markAsScheduled := make([]string, len(messages))
+			for i, message := range messages {
+				if _, ok = known[message.ID]; ok {
+					t.Fatal("a message duplicate was scheduled:", message.ID)
+				}
+				known[message.ID] = struct{}{}
+				markAsScheduled[i] = message.ID
+			}
+			return q.MarkMessagesAsScheduled(ctx, l.ID, markAsScheduled...)
 		}), queue.ContinuousScannerOptions{
 			Frequency: time.Millisecond * 30,
 			// BeginWithOlderLetters: true,
 		})
 
 		<-time.After(time.Minute * 2)
-		if found < 2000 {
-			t.Fatal("did not find enough records:", found)
+		scheduledMessagesCount := len(known)
+		if scheduledMessagesCount != 2000 {
+			t.Fatal("unexpected number of messages scheduled:", scheduledMessagesCount, "vs", 2000)
 		}
 
 		cancel()

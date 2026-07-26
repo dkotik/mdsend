@@ -177,7 +177,6 @@ func (s continuousScanner) Scan(
 			}
 
 			mc.ParentID = letter.ID
-			messages = messages[:0]
 			mc.Cursor.ItemID = ""
 			foundUnsentInLetter = 0
 
@@ -188,6 +187,7 @@ func (s continuousScanner) Scan(
 				case <-pulse:
 				}
 
+				messages = messages[:0]
 				messagePull, messageStop := iter.Pull2[mdsend.Message, error](s.Queue.ListMessages(ctx, mc))
 				for range messageBatchSize {
 					message, err, ok = messagePull()
@@ -203,7 +203,6 @@ func (s continuousScanner) Scan(
 					}
 				}
 				messageStop()
-				// fmt.Println("---------- found messages:", messages, mc)
 
 				if foundUnsentInBatch = len(messages); foundUnsentInBatch > 0 {
 					if err = s.Scheduler.ScheduleForDelivery(ctx, letter, messages); err != nil {
