@@ -73,7 +73,7 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 		))
 	}
 	// if c.Bool(flagVerbose.Name) {
-	mailerMiddleware = append(mailerMiddleware, mailer.NewLogger(logger))
+	mailerMiddleware = append(mailerMiddleware, mailer.NewLogger(logger, slog.LevelInfo))
 	// }
 	// mailer, err := newSemaphoreMailer(
 	// 	c.Int(flagWorkerCount.Name),
@@ -149,7 +149,6 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 		options.Tracker = newInterruptingProgressTracker(
 			ctx,
 			wg,
-			(time.Second*2)+delay,
 			logger,
 		)
 	}

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log/slog"
-	"time"
 
 	"github.com/dkotik/mdsend/queue"
 	"golang.org/x/sync/errgroup"
@@ -22,7 +21,6 @@ func newProgressTracker(
 func newInterruptingProgressTracker(
 	ctx context.Context,
 	eg *errgroup.Group,
-	frequency time.Duration,
 	logger *slog.Logger,
 ) queue.ProgressTracker {
 	if eg == nil {
@@ -31,32 +29,32 @@ func newInterruptingProgressTracker(
 	if logger == nil {
 		panic("nil logger")
 	}
-	closer := make(chan queue.Progress, 100)
+	closer := make(chan queue.Progress, 1)
 	eg.Go(func() error {
 		var p queue.Progress
-		ticker := time.NewTicker(frequency)
 		passed := 0
 		for {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
 			case p = <-closer:
-				passed = 0
-			case <-ticker.C:
-				if p.Sent < p.Total {
-					continue
-				}
-				passed++
-				if passed > 7 {
-					logger.Info("progress tracker detected that everything had been sent, closing the program...")
-					return context.Canceled
+				if p.Average == 0 && p.Sent == p.Total {
+					passed++
+					if passed > 2 {
+						logger.Info("progress tracker detected that everything had been sent, closing the program...")
+						return context.Canceled
+					}
+				} else {
+					passed = 0
 				}
 			}
 		}
 	})
 	return queue.ProgressTrackerFunc(
 		func(ctx context.Context, p queue.Progress) {
-			logger.Info("deliveries made", slog.Any("report", p))
+			if p.Average > 0 { // at least some new deliveries were made
+				logger.Info("deliveries made", slog.Any("report", p))
+			}
 			select {
 			case <-ctx.Done():
 				return

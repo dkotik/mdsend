@@ -105,15 +105,14 @@ func NewProgressTracker(
 
 func (p *progressTracker) announceProgress(ctx context.Context) {
 	fresh := int64(len(p.sentMessages))
-	if fresh == p.lastReportCount {
-		return // there is no new progress to report
-	}
 	t := time.Now()
 	delta := t.Sub(p.lastReportTime)
 	report := Progress{
-		Sent:    fresh,
-		Total:   int64(len(p.pendingMessages)) + fresh,
-		Average: delta / time.Duration(fresh-p.lastReportCount),
+		Sent:  fresh,
+		Total: int64(len(p.pendingMessages)) + fresh,
+	}
+	if fresh > p.lastReportCount {
+		report.Average = delta / time.Duration(fresh-p.lastReportCount)
 	}
 	p.lastReportTime = t
 	p.lastReportCount = fresh
@@ -210,18 +209,18 @@ func (p *progressTracker) ListLetters(
 				p.lastReportCount = 0
 				// fmt.Println("========== clear ============")
 			}
-			defer func() {
-				// take a pause to allow
-				// pending messages to be scheduled and confirmed before the next full scan
-				// fmt.Println("========== pause ============")
-				for range max(4, p.fullScanCount) {
-					select {
-					case <-ctx.Done():
-						return
-					case <-time.After(time.Second * 5):
-					}
-				}
-			}()
+			// defer func() {
+			// 	// take a pause to allow
+			// 	// pending messages to be scheduled and confirmed before the next full scan
+			// 	// fmt.Println("========== pause ============")
+			// 	for range max(4, p.fullScanCount) {
+			// 		select {
+			// 		case <-ctx.Done():
+			// 			return
+			// 		case <-time.After(time.Second * 5):
+			// 		}
+			// 	}
+			// }()
 		}
 		p.announceProgress(ctx)
 		p.mu.Unlock()

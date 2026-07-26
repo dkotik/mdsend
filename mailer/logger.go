@@ -24,10 +24,11 @@ func ApplyPrivacyMaskToEmailAddress(email string) string {
 
 type logger struct {
 	mdsend.Mailer
-	Logger *slog.Logger
+	Logger       *slog.Logger
+	SuccessLevel slog.Level
 }
 
-func NewLogger(l *slog.Logger) func(mdsend.Mailer) mdsend.Mailer {
+func NewLogger(l *slog.Logger, successLevel slog.Level) func(mdsend.Mailer) mdsend.Mailer {
 	if l == nil {
 		l = slog.Default()
 	}
@@ -35,7 +36,11 @@ func NewLogger(l *slog.Logger) func(mdsend.Mailer) mdsend.Mailer {
 		if s == nil {
 			panic("sender is nil")
 		}
-		return logger{Mailer: s, Logger: l}
+		return logger{
+			Mailer:       s,
+			Logger:       l,
+			SuccessLevel: successLevel,
+		}
 	}
 }
 
@@ -43,8 +48,9 @@ func (l logger) SendMail(ctx context.Context, msg mdsend.Message) (id string, er
 	id, err = l.Mailer.SendMail(ctx, msg)
 	address := ApplyPrivacyMaskToEmailAddress(msg.To.Address)
 	if err == nil {
-		l.Logger.DebugContext(
+		l.Logger.Log(
 			ctx,
+			l.SuccessLevel,
 			"sent: "+msg.Subject,
 			slog.String("id", msg.ID),
 			slog.String("letter_id", msg.LetterID),

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/dkotik/mdsend"
 )
@@ -33,7 +34,11 @@ func TestSend(t *testing.T) {
 			t.Fatal("failed to clean up database file:", err)
 		}
 	})
-	ctx := t.Context()
+	ctx, cancel := context.WithTimeout(
+		t.Context(),
+		time.Second*20,
+	)
+	defer cancel()
 	if err := application.Run(ctx, []string{
 		"mdsend",
 		"--destroy",

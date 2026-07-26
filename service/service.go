@@ -137,7 +137,7 @@ func New(
 			queue.NewRoundRobinScheduler(schedulers...),
 			queue.ContinuousScannerOptions{
 				// BeginWithOlderLetters: true,
-				// Frequency:        time.Millisecond * 30,
+				// Frequency: time.Millisecond * 30,
 				Frequency:        time.Second * 2,
 				MessageBatchSize: 10,
 				Logger:           logger,
