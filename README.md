@@ -82,7 +82,7 @@ More usage examples are here:
 - Windows Binary: [latest release](releases)
 - Build from source:
   ```sh
-  go install github.com/dkotik/mdsend@latest
+  go install github.com/dkotik/mdsend/cmd/mdsend@latest
   ```
 
 ## Development
@@ -90,14 +90,15 @@ More usage examples are here:
 Mdsend is under active development. Version 1.0.0 is expected by the end of 2026.
 
 <details>
-  <summary>**This** is a list of planned features. ↩</summary>
+  <summary><strong>This</strong> is the list of planned features. ↩</summary>
 
-- [ ] service package with HTTP unsubscribe endpoint package
 - [ ] attachments should be collected from templates as well
+- [ ] service package with HTTP unsubscribe endpoint package
 - [ ] Queue clean up scanner - should be first added to sqlite Watermill driver.
 - [ ] Sending message with scheduling delay (instead of only queuing) should prompt a confirmation.
 - [ ] list out templating functions in the example, including the default ones
 - [ ] Write a better Goldmark 2.0 renderer that recognizes single-line youtube and image paragraphs, centers them.
+- [ ] Lots of disk usage: each message is pre-rendered plaintext + html and all of that gets duplicated into watermill - i can probably pull out of the main table, but felt like extra read calls; if i add caching can trim that down
 - [ ] Beautify the default template. Add `dark.html` one.
 - [ ] Event invitations markup: https://developers.google.com/gmail/markup/reference/event-reservation#basic_event_reminder_without_a_ticket
 - [ ] https://github.com/charmbracelet/glamour

@@ -1,7 +1,7 @@
 subject: typical mailing list message
-seed_key: RPrUfyjy4sj
+seed_key: afCLueQskfa
 List-Id: Some List <greatlist@test.com>
-List-Unsubscribe: <mailto:unsub@yourdomain.com?subject=Unsubscribe>, <https://yourdomain.com/unsubscribe/orMDSH9upTqMfMZfPwwAuCReRxaZiQqvDy>
+List-Unsubscribe: <mailto:unsub@yourdomain.com?subject=Unsubscribe>, <https://yourdomain.com/unsubscribe?address=VsdHH9hPNo9Dtkc&list=testList>
 List-Unsubscribe-Post: List-Unsubscribe=One-Click
 
 
@@ -89,9 +89,11 @@ Footer
 
 You may unsubscribe here.
 
-The [CAN-SPAM][CAN-SPAM] act became law on Jan. 1, 2004. It says there manythings you must do as a commercial email-er. Highlights arebasically dont be deceptive, and that you **MUST** include aphysical mailing address as well as a working unsubscribe link inthe body.
+The 🔗 CAN-SPAM<https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business> act became law on Jan. 1, 2004. It says there manythings you must do as a commercial email-er. Highlights arebasically dont be deceptive, and that you **MUST** include aphysical mailing address as well as a working unsubscribe link inthe body.
 
-[CAN-SPAM]: https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business## Message Duplication
+
+Message Duplication
+-------
 
 Mdsend uses a seed template to protect you from accidentally sendingthe same message to the same recipient. The default seed templateis `typical mailing list message||`. That is, a messagewith the same subject and content will have the same seed key.
 
@@ -104,6 +106,13 @@ schedule:
   expires: 1mo
 
 This is very handy if you do not want to pester subscribers withmessages sourced from different letters for different reasons.
+
+
+Export Tips
+------
+
+
+- Never put tokens into URL path segments. Mail processors sanitize URLs before calling them and many of them change path segments to lowercase, which destroys the token payload.
 
 
 
@@ -272,12 +281,12 @@ database or encrypted location, to groom or combine and pre-process the
 contact list.</p>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Footer</h2>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">You may unsubscribe <!-- raw HTML omitted -->here<!-- raw HTML omitted -->.</p>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">The [CAN-SPAM][CAN-SPAM] act became law on Jan. 1, 2004. It says there many
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">The <a href="https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business" style="color:#335c9c;">CAN-SPAM</a> act became law on Jan. 1, 2004. It says there many
 things you must do as a commercial email-er. Highlights are
 basically don&rsquo;t be deceptive, and that you <strong>MUST</strong> include a
 physical mailing address as well as a working unsubscribe link in
 the body.</p>
-<p style="font-size:12px;font-family:Georgia;color:#11226a;">[CAN-SPAM]: <a href="https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business##" style="color:#335c9c;">https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business##</a> Message Duplication</p>
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Message Duplication</h2>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Mdsend uses a seed template to protect you from accidentally sending
 the same message to the same recipient. The default seed template
 is <code style="font-family:monospace;background-color:#e8ecfb;">typical mailing list message||</code>. That is, a message
@@ -293,6 +302,10 @@ schedule:
 </code></pre>
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">This is very handy if you do not want to pester subscribers with
 messages sourced from different letters for different reasons.</p>
+<h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Export Tips</h2>
+<ul>
+<li style="font-size:12px;padding:6px 8px 6px 2px;font-family:Georgia;color:#11226a;">Never put tokens into URL path segments. Mail processors sanitize URLs before calling them and many of them change path segments to lowercase, which destroys the token payload.</li>
+</ul>
 </div>
                       </td>
                     </tr>

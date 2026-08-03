@@ -11,7 +11,7 @@ bcc:
 language: en
 headers:
   List-Id: Some List <greatlist@test.com>
-  List-Unsubscribe: <mailto:unsub@yourdomain.com?subject=Unsubscribe>, <https://yourdomain.com/unsubscribe/{{ base58 (print .Recipient.email "?list=testList") }}>
+  List-Unsubscribe: <mailto:unsub@yourdomain.com?subject=Unsubscribe>, <https://yourdomain.com/unsubscribe?address={{ base58 .Recipient.email }}&list=testList>
   List-Unsubscribe-Post: List-Unsubscribe=One-Click
 ---
 
@@ -111,7 +111,7 @@ contact list.
 ## Footer
 
 You may unsubscribe <a title="unsubscribe from the mailing list"
-href="{{ safeURL (reify "unsubscribe_url") }}">here</a>.
+href="https://yourdomain.com/unsubscribe?address={{ base58 .Recipient.email }}&list=testList">here</a>.
 
 The [CAN-SPAM][CAN-SPAM] act became law on Jan. 1, 2004. It says there many
 things you must do as a commercial email-er. Highlights are
@@ -120,10 +120,6 @@ physical mailing address as well as a working unsubscribe link in
 the body.
 
 [CAN-SPAM]: https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business
-
-{{- define "unsubscribe_url" -}}
-  https://yourdomain.com/unsubscribe/{{ base58 (print .Recipient.email "?list=testList") }}
-{{- end -}}
 
 ## Message Duplication
 
@@ -146,3 +142,7 @@ schedule:
 
 This is very handy if you do not want to pester subscribers with
 messages sourced from different letters for different reasons.
+
+## Export Tips
+
+- Never put tokens into URL path segments. Mail processors sanitize URLs before calling them and many of them change path segments to lowercase, which destroys the token payload.

@@ -76,9 +76,9 @@ func NewContinuousScanner(
 		Scheduler: s,
 		Logger:    options.Logger,
 	}
-	pulse := time.NewTicker(options.Frequency).C
+	pulse := time.NewTicker(options.Frequency)
 	wg.Go(func() error {
-		return cs.Scan(ctx, letterCursor, messageCursor, pulse)
+		return cs.Scan(ctx, letterCursor, messageCursor, pulse.C)
 	})
 }
 
@@ -115,12 +115,6 @@ func (s continuousScanner) Scan(
 	ok := false
 
 	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-pulse:
-		}
-
 		letters = letters[:0]
 		letterPull, letterStop := iter.Pull2[mdsend.Letter, error](s.Queue.ListLetters(ctx, lc))
 		for range letterBatchSize {
@@ -227,6 +221,12 @@ func (s continuousScanner) Scan(
 					return err
 				}
 			}
+		}
+
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-pulse:
 		}
 	}
 }

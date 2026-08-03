@@ -18,6 +18,7 @@ import (
 )
 
 type Options struct {
+	ScannerOptions queue.ContinuousScannerOptions
 	Tracker   queue.ProgressTracker
 	Retry     middleware.Retry
 	Marshaler queue.Marshaler
@@ -37,6 +38,9 @@ func New(
 	}
 	if options.Logger == nil {
 		options.Logger = slog.Default()
+	}
+	if options.ScannerOptions.Logger == nil {
+		options.ScannerOptions.Logger = options.Logger
 	}
 	if options.Tracker == nil {
 		options.Tracker = queue.ProgressTrackerFunc(
@@ -138,13 +142,7 @@ func New(
 			group,
 			progressTracker,
 			queue.NewRoundRobinScheduler(schedulers...),
-			queue.ContinuousScannerOptions{
-				// BeginWithOlderLetters: true,
-				// Frequency: time.Millisecond * 30,
-				Frequency:        time.Second * 2,
-				MessageBatchSize: 100,
-				Logger:           logger,
-			},
+			options.ScannerOptions,
 		)
 
 		confirmationConn, err := sqlite.OpenConn(connectionDSN)

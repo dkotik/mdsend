@@ -15,6 +15,7 @@ import (
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/mailer"
 	"github.com/dkotik/mdsend/mailer/environment"
+	"github.com/dkotik/mdsend/queue"
 	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
 	"github.com/dkotik/mdsend/service"
 	"github.com/urfave/cli/v3"
@@ -61,10 +62,11 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 	logger := getLogger(c)
 
 	delay := c.Duration(flagDelay.Name)
+	fluctuate := c.Duration(flagFluctuate.Name) + time.Millisecond*100
 	mailerMiddleware := []func(mdsend.Mailer) mdsend.Mailer{
 		mailer.NewDelay(
 			delay+time.Millisecond*50,
-			c.Duration(flagFluctuate.Name)+time.Millisecond*20,
+			fluctuate,
 		),
 	}
 	if c.IsSet(flagFrom.Name) {
@@ -130,6 +132,13 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 	}()
 
 	options := service.Options{
+		ScannerOptions: queue.ContinuousScannerOptions{
+			// BeginWithOlderLetters: true,
+			// Frequency: time.Millisecond * 30,
+			Frequency:        (time.Second * 2) + delay + (fluctuate * 2),
+			MessageBatchSize: 100,
+			Logger:           logger,
+		},
 		Retry: middleware.Retry{
 			InitialInterval: time.Second * 3,
 			MaxInterval:     time.Minute * 10,
