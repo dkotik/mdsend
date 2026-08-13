@@ -11,7 +11,7 @@ import (
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/address"
 	"github.com/dkotik/mdsend/internal/locale"
-	"github.com/dkotik/mdsend/internal/media"
+	"github.com/dkotik/mdsend/media"
 	"golang.org/x/text/language"
 )
 

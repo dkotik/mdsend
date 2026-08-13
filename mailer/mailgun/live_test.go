@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/dkotik/mdsend"
-	"github.com/dkotik/mdsend/internal/media"
+	"github.com/dkotik/mdsend/media"
 )
 
 func TestLiveSend(t *testing.T) {

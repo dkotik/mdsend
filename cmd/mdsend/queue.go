@@ -13,8 +13,8 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/address"
-	"github.com/dkotik/mdsend/internal/media"
 	"github.com/dkotik/mdsend/internal/template"
+	"github.com/dkotik/mdsend/media"
 	"github.com/dkotik/mdsend/queue"
 	sqliteQ "github.com/dkotik/mdsend/queue/sqlite"
 	"github.com/urfave/cli/v3"

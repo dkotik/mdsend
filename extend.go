@@ -14,8 +14,8 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"github.com/dkotik/mdsend/address"
 	"github.com/dkotik/mdsend/internal"
-	"github.com/dkotik/mdsend/internal/media"
 	"github.com/dkotik/mdsend/markdown"
+	"github.com/dkotik/mdsend/media"
 	"github.com/pelletier/go-toml/v2"
 	"gopkg.in/yaml.v3"
 )

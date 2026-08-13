@@ -8,7 +8,7 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/header"
-	"github.com/dkotik/mdsend/internal/media"
+	"github.com/dkotik/mdsend/media"
 	"github.com/sebdah/goldie/v2"
 )
 

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/dkotik/mdsend/internal/media"
+	"github.com/dkotik/mdsend/media"
 	"github.com/sebdah/goldie/v2"
 	"gopkg.in/yaml.v3"
 )

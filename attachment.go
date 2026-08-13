@@ -12,7 +12,7 @@ import (
 
 	"github.com/btcsuite/btcd/btcutil/base58"
 	"github.com/cespare/xxhash/v2"
-	"github.com/dkotik/mdsend/internal/media"
+	"github.com/dkotik/mdsend/media"
 )
 
 var _ slog.LogValuer = (*Attachment)(nil)

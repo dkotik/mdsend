@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"github.com/dkotik/mdsend/header"
-	"github.com/dkotik/mdsend/internal/media"
+	"github.com/dkotik/mdsend/media"
 )
 
 func TestValidBoundaryGeneration(t *testing.T) {

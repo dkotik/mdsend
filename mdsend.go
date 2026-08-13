@@ -9,8 +9,8 @@ import (
 	"iter"
 	"path"
 
-	"github.com/dkotik/mdsend/internal/media"
 	"github.com/dkotik/mdsend/markdown"
+	"github.com/dkotik/mdsend/media"
 	"github.com/oklog/ulid/v2"
 )
 

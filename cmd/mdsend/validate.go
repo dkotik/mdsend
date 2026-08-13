@@ -7,8 +7,8 @@ import (
 	"iter"
 
 	"github.com/dkotik/mdsend"
-	"github.com/dkotik/mdsend/internal/media"
 	"github.com/dkotik/mdsend/internal/template"
+	"github.com/dkotik/mdsend/media"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/urfave/cli/v3"
 	"golang.org/x/text/language"

@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/dkotik/mdsend"
-	"github.com/dkotik/mdsend/internal/media"
+	"github.com/dkotik/mdsend/media"
 )
 
 const testLetterID = "test-letter-id"
