@@ -8,7 +8,7 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/header"
-	"github.com/dkotik/mdsend/media"
+	"github.com/dkotik/mdsend/internal"
 	"github.com/sebdah/goldie/v2"
 )
 
@@ -140,19 +140,19 @@ func TestMixedMessageEncoding(t *testing.T) {
 			Name:        "cat.jpg",
 			Hash:        "string",
 			ContentType: ContentTypeImageJPEG,
-			Content:     media.Cat,
+			Content:     internal.Cat,
 		},
 		mdsend.Attachment{
 			Name:        "panda.jpg",
 			Hash:        "string1",
 			ContentType: ContentTypeImageJPEG,
-			Content:     media.Panda,
+			Content:     internal.Panda,
 		},
 		mdsend.Attachment{
 			Name:        "chamillion.jpg",
 			Hash:        "string2",
 			ContentType: ContentTypeImageJPEG,
-			Content:     media.Chamillion,
+			Content:     internal.Chamillion,
 		},
 	), entropy).Write(t.Context(), b, mdsend.Message{
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},
@@ -222,19 +222,19 @@ func TestRelatedMessageEncoding(t *testing.T) {
 			Name:        "cat.jpg",
 			Hash:        "string",
 			ContentType: ContentTypeImageJPEG,
-			Content:     media.Cat,
+			Content:     internal.Cat,
 		},
 		mdsend.Attachment{
 			Name:        "panda.jpg",
 			Hash:        "string1",
 			ContentType: ContentTypeImageJPEG,
-			Content:     media.Panda,
+			Content:     internal.Panda,
 		},
 		mdsend.Attachment{
 			Name:        "chamillion.jpg",
 			Hash:        "string2",
 			ContentType: ContentTypeImageJPEG,
-			Content:     media.Chamillion,
+			Content:     internal.Chamillion,
 		},
 	), entropy).Write(t.Context(), b, mdsend.Message{
 		From:    mail.Address{Name: "Sender", Address: "sender@example.com"},

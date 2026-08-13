@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"github.com/dkotik/mdsend/header"
-	"github.com/dkotik/mdsend/media"
+	"github.com/dkotik/mdsend/internal"
 )
 
 func TestValidBoundaryGeneration(t *testing.T) {
@@ -120,7 +120,7 @@ func TestFileEncoding(t *testing.T) {
 	b := &bytes.Buffer{}
 	e := NewEncoderBase64(b)
 	var err error
-	if _, err = io.Copy(e, bytes.NewReader(media.Cat)); err != nil {
+	if _, err = io.Copy(e, bytes.NewReader(internal.Cat)); err != nil {
 		t.Fatal(err)
 	}
 	if err = e.Close(); err != nil {

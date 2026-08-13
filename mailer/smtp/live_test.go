@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/dkotik/mdsend"
+	"github.com/dkotik/mdsend/internal"
 	"github.com/dkotik/mdsend/media"
 )
 
@@ -31,13 +32,13 @@ func TestSend(t *testing.T) {
 		Quality: 20,
 	}
 
-	cat, err := mdsend.NewAttachment(media.Cat, constraints)
+	cat, err := mdsend.NewAttachment(internal.Cat, constraints)
 	cat.Name = "cat.jpg"
 	cat.LetterID = testLetterID
 	if err = config.Queue.CreateAttachment(ctx, cat); err != nil {
 		t.Fatal(err)
 	}
-	chamillion, err := mdsend.NewAttachment(media.Chamillion, constraints)
+	chamillion, err := mdsend.NewAttachment(internal.Chamillion, constraints)
 	chamillion.Name = "chamillion.jpg"
 	chamillion.LetterID = testLetterID
 	if err = config.Queue.CreateAttachment(ctx, chamillion); err != nil {
