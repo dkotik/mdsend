@@ -1,6 +1,8 @@
 package template
 
 import (
+	"bytes"
+	"html/template"
 	"os"
 	"path/filepath"
 	"strings"
@@ -8,8 +10,44 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/address"
+	"github.com/dkotik/mdsend/internal/locale"
 	"github.com/dkotik/mdsend/internal/media"
+	"golang.org/x/text/language"
 )
+
+func TestDefaultTemplateRendering(t *testing.T) {
+	defaultTemplate := string(getDefaultTemplateHTML())
+	if defaultTemplate == "" {
+		t.Fatal("default template is empty")
+	}
+
+	tmpl, err := template.New("").Funcs(
+		map[string]any{
+			"safeCSS": func(css string) template.CSS {
+				return template.CSS(css)
+			},
+			"execute": func(templateName string, data any) template.HTML {
+				return template.HTML("[execute:" + templateName + "]")
+			},
+			"isRTL": func(s string) (bool, error) {
+				tag, err := language.Parse(s)
+				if err != nil {
+					return false, err
+				}
+				return locale.IsLanguageRightToLeft(tag), nil
+			},
+		},
+	).Parse(defaultTemplate)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := &bytes.Buffer{}
+	if err = tmpl.Execute(b, nil); err != nil {
+		t.Fatal(err)
+	}
+
+	// goldie.New(t).Assert(t, "default", b.Bytes())
+}
 
 func TestValidMessageFromTemplate(t *testing.T) {
 	frontmatter := map[string]any{
@@ -70,6 +108,9 @@ func TestExamples(t *testing.T) {
 		if strings.ToLower(ext) != ".md" {
 			continue // skip files that are not Markdown
 		}
-		t.Run(name, NewLetterTest(fs, filepath.Join(examplePath, name)))
+		t.Run(name, NewLetterTest(
+			NewFileSystemWithEmbeddedTemplates(fs),
+			filepath.Join(examplePath, name)),
+		)
 	}
 }

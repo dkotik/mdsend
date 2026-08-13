@@ -28,7 +28,10 @@ func cmdQueueAdd(ctx context.Context, c *cli.Command) (err error) {
 	fs := media.NewUnsafeUnconstrainedFileSystem()
 	fs = media.NewCyclicalImportPreventingFileSystem(fs)
 	p := c.Args().First()
-	loader, err := mdsend.New(fs, mdsend.Defaults{})
+	loader, err := mdsend.New(
+		template.NewFileSystemWithEmbeddedTemplates(fs),
+		mdsend.Defaults{},
+	)
 	if err != nil {
 		return err
 	}

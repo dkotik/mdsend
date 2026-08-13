@@ -7,7 +7,7 @@ to:
     first_name: FirstName
 someVariable: test
 templates:
-  - ../internal/html/templates/default.html
+  - ../internal/template/html/default.html
   - mdsend://default.html
 headers:
   X-Template-Test: "{{ .Frontmatter.someVariable }}"

@@ -9,7 +9,6 @@ import (
 	"iter"
 	"path"
 
-	"github.com/dkotik/mdsend/internal/html"
 	"github.com/dkotik/mdsend/internal/media"
 	"github.com/dkotik/mdsend/markdown"
 	"github.com/oklog/ulid/v2"
@@ -162,18 +161,6 @@ func (loader loader) loadLetterFromFile(
 		// }
 		file, err := loader.FileSystem.Open(t)
 		if err != nil {
-			if errors.Is(err, fs.ErrNotExist) {
-				data, ok := html.LoadEmbeddedTemplate(t)
-				if !ok {
-					return letter, fmt.Errorf("template does not exist: %s", t)
-				}
-				letter.Templates = append(letter.Templates, Attachment{
-					Name:        t,
-					Content:     data,
-					ContentType: media.ContentTypeTextHTML,
-				})
-				continue
-			}
 			return letter, NewFileReadError(t, err)
 		}
 		data, err := io.ReadAll(file)

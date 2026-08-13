@@ -16,6 +16,7 @@ Send markdown files as electronic mail. Maintain mailing lists as templated text
     - [x] **Amazon SES** (requires AWS configuration present, beta)
     - [x] SparkPost (alpha)
     - [ ] Loops
+    - [ ] Cloudflare send
   - Supports additional mailing services by SMTP relay:
     - [x] SMTP2GO
     - [x] Brevo

@@ -11,7 +11,6 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/internal"
-	"github.com/dkotik/mdsend/internal/html"
 	"github.com/dkotik/mdsend/markdown"
 	"github.com/google/uuid"
 	"github.com/yuin/goldmark/parser"
@@ -124,7 +123,7 @@ func New(
 		if err != nil {
 			return nil, fmt.Errorf("unable to clone letter content as a template: %w", err)
 		}
-		t.HTML, err = t.HTML.Parse(string(html.GetDefaultTemplateHTML()))
+		t.HTML, err = t.HTML.Parse(string(getDefaultTemplateHTML()))
 		if err != nil {
 			return nil, fmt.Errorf("unable to parse default template: %w", err)
 		}

@@ -19,7 +19,7 @@ live:
 	# @rm mailer/mailgun/testdata/live_test.lock
 	@cd mailer && go test ./... -v -count=1
 build:
-	goreleaser release --snapshot --rm-dist
+	goreleaser release --snapshot --clean
 update:
 	@echo Updating project test data golden files...
 	@cd internal/template && go test . -update && \

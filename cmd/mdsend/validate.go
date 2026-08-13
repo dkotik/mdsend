@@ -8,6 +8,7 @@ import (
 
 	"github.com/dkotik/mdsend"
 	"github.com/dkotik/mdsend/internal/media"
+	"github.com/dkotik/mdsend/internal/template"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/urfave/cli/v3"
 	"golang.org/x/text/language"
@@ -23,7 +24,10 @@ func cmdValidate(ctx context.Context, c *cli.Command) error {
 	}
 	fs := media.NewUnsafeUnconstrainedFileSystem()
 	fs = media.NewCyclicalImportPreventingFileSystem(fs)
-	loader, err := mdsend.New(fs, mdsend.Defaults{})
+	loader, err := mdsend.New(
+		template.NewFileSystemWithEmbeddedTemplates(fs),
+		mdsend.Defaults{},
+	)
 	if err != nil {
 		return err
 	}
