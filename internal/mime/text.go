@@ -109,9 +109,9 @@ func (w Writer) writeAlternativeWithAttachments(out io.Writer, text, html, bound
 		if err = attachment.WriteInlineHeader(out); err != nil {
 			return err
 		}
-		data, ok := w.cachedAttachmentContents[attachment.ContentID]
+		data, ok := w.cachedAttachmentContents[attachment.Hash]
 		if !ok {
-			return fmt.Errorf("attachment content not found: %s", attachment.ContentID)
+			return fmt.Errorf("attachment content not found: %s", attachment.Hash)
 		}
 		if _, err = io.Copy(out, bytes.NewReader(data)); err != nil {
 			return err

@@ -68,23 +68,6 @@ func newLetter(b []byte) (letter Letter, err error) {
 	if err != nil {
 		return letter, err
 	}
-	if links := markdown.CollectLinks(body); len(links) > 0 {
-		maps := make([]any, len(links))
-		for i, link := range links {
-			maps[i] = map[string]any{
-				"name":     link.Name,
-				"location": link.Destination,
-			}
-		}
-		switch attachments := frontmatter[FieldNameAttachments].(type) {
-		case nil:
-			frontmatter[FieldNameAttachments] = maps
-		case []any:
-			frontmatter[FieldNameAttachments] = append(attachments, maps...)
-		default:
-			frontmatter[FieldNameAttachments] = append([]any{attachments}, maps...)
-		}
-	}
 
 	return Letter{
 		Frontmatter: frontmatter,

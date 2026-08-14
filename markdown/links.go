@@ -44,7 +44,8 @@ type Link struct {
 	// Position    int
 }
 
-func CollectLinks(source []byte) (result []Link) {
+// TODO: deprecate and remove - all inlining algorythm
+func collectLinks(source []byte) (result []Link) {
 	pc := parser.NewContext()
 	ast.Walk(
 		attachmentsSniffer.Parse(

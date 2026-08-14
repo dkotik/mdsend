@@ -47,7 +47,7 @@ func inlineTemplateAttachments(
 				if token.Data == "img" {
 					content = append(content, []byte("<img ")...)
 					attachment := AttachmentSource{}
-					for i, attr := range token.Attr {
+					for _, attr := range token.Attr {
 						switch attr.Key {
 						case "alt":
 							if attachment.Name == "" {
@@ -55,12 +55,17 @@ func inlineTemplateAttachments(
 							}
 						case "title":
 							attachment.Name = attr.Val
-						case "src":
-							attachment.Location = attr.Val
-							token.Attr[i].Val, err = replacer(attachment)
-							if err != nil {
-								return source, err
-							}
+						}
+					}
+
+					for i, attr := range token.Attr {
+						if attr.Key != "src" {
+							continue
+						}
+						attachment.Location = attr.Val
+						token.Attr[i].Val, err = replacer(attachment)
+						if err != nil {
+							return source, err
 						}
 					}
 

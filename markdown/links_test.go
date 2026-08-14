@@ -48,7 +48,7 @@ In List:
 [refLink]:greatRefLink
 
 `
-	result := CollectLinks([]byte(source))
+	result := collectLinks([]byte(source))
 	require := []Link{
 		{Name: "sm", Destination: "perfect"},
 		{Name: "In Title", Destination: "inTitle.jpg"},

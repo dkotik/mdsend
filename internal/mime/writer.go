@@ -55,6 +55,7 @@ func (w Writer) Write(
 			}
 			attachments = append(attachments, cachedAttachment{
 				Name:        attachment.Name,
+				Hash:        attachment.Hash,
 				ContentID:   attachment.ContentID,
 				ContentType: attachment.ContentType,
 			})
@@ -64,7 +65,7 @@ func (w Writer) Write(
 			if _, err = io.Copy(encoder, bytes.NewReader(attachment.Content)); err != nil {
 				return err
 			}
-			w.cachedAttachmentContents[attachment.ContentID] = b.Bytes()
+			w.cachedAttachmentContents[attachment.Hash] = b.Bytes()
 		}
 		w.cachedAttachments[m.LetterID] = attachments
 	}
@@ -125,9 +126,9 @@ func (w Writer) Write(
 			if err = attachment.WriteHeader(out); err != nil {
 				return err
 			}
-			data, ok := w.cachedAttachmentContents[attachment.ContentID]
+			data, ok := w.cachedAttachmentContents[attachment.Hash]
 			if !ok {
-				return fmt.Errorf("attachment content not found: %s", attachment.ContentID)
+				return fmt.Errorf("attachment content not found: %s", attachment.Hash)
 			}
 			if _, err = io.Copy(out, bytes.NewReader(data)); err != nil {
 				return err
@@ -194,9 +195,9 @@ func (w Writer) Write(
 			if err = attachment.WriteInlineHeader(out); err != nil {
 				return err
 			}
-			data, ok := w.cachedAttachmentContents[attachment.ContentID]
+			data, ok := w.cachedAttachmentContents[attachment.Hash]
 			if !ok {
-				return fmt.Errorf("attachment content not found: %s", attachment.ContentID)
+				return fmt.Errorf("attachment content not found: %s", attachment.Hash)
 			}
 			if _, err = io.Copy(out, bytes.NewReader(data)); err != nil {
 				return err
@@ -220,9 +221,9 @@ func (w Writer) Write(
 		if err = attachment.WriteHeader(out); err != nil {
 			return err
 		}
-		data, ok := w.cachedAttachmentContents[attachment.ContentID]
+		data, ok := w.cachedAttachmentContents[attachment.Hash]
 		if !ok {
-			return fmt.Errorf("attachment content not found: %s", attachment.ContentID)
+			return fmt.Errorf("attachment content not found: %s", attachment.Hash)
 		}
 		if _, err = io.Copy(out, bytes.NewReader(data)); err != nil {
 			return err

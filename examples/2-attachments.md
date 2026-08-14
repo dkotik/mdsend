@@ -24,6 +24,8 @@ Inline attachments are placed into message body,
 when linked like so:
 [cat](../internal/media/testdata/cat.jpg "Cat Photo by Cindy vanHeerden").
 
+Image files in templates are likewise included as inline attachments.
+
 ## Creative Commons Credits
 
 - **cat.jpg:** Cindy vanHeerden.

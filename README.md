@@ -93,7 +93,6 @@ Mdsend is under active development. Version 1.0.0 is expected by the end of 2026
 <details>
   <summary><strong>This</strong> is the list of planned features. ↩</summary>
 
-- [ ] attachments should be collected from templates as well
 - [ ] service package with HTTP unsubscribe endpoint package
 - [ ] Queue clean up scanner - should be first added to sqlite Watermill driver.
 - [ ] Sending message with scheduling delay (instead of only queuing) should prompt a confirmation.

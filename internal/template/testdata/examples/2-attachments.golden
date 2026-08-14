@@ -1,5 +1,5 @@
 subject: example message with attachments
-seed_key: TZSZQBfvmuz
+seed_key: hgosx6uiMdk
 
 
 Attach Files to the Message
@@ -12,6 +12,8 @@ Inline Attachments
 ------
 
 Inline attachments are placed into message body,when linked like so:🔗 cat<../internal/media/testdata/cat.jpg> (Cat Photo by Cindy vanHeerden).
+
+Image files in templates are likewise included as inline attachments.
 
 
 Creative Commons Credits
@@ -116,6 +118,7 @@ with <code style="font-family:monospace;background-color:#e8ecfb;">media_constra
 <p style="font-size:12px;font-family:Georgia;color:#11226a;">Inline attachments are placed into message body,
 when linked like so:
 <a href="../internal/media/testdata/cat.jpg" title="Cat Photo by Cindy vanHeerden" style="color:#335c9c;">cat</a>.</p>
+<p style="font-size:12px;font-family:Georgia;color:#11226a;">Image files in templates are likewise included as inline attachments.</p>
 <h2 style="color:#11267;font-family:Georgia;font-size: 22px;">Creative Commons Credits</h2>
 <ul>
 <li style="font-size:12px;padding:6px 8px 6px 2px;font-family:Georgia;color:#11226a;"><strong>cat.jpg:</strong> Cindy vanHeerden.</li>

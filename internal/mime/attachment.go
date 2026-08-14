@@ -37,6 +37,7 @@ func (m mockAttachmentRepository) ListAttachments(ctx context.Context, letterID 
 
 type cachedAttachment struct {
 	Name        string
+	Hash        string
 	ContentID   string
 	ContentType string
 }
