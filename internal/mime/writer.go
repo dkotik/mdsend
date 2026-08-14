@@ -55,7 +55,7 @@ func (w Writer) Write(
 			}
 			attachments = append(attachments, cachedAttachment{
 				Name:        attachment.Name,
-				Hash:        attachment.Hash,
+				ContentID:   attachment.ContentID,
 				ContentType: attachment.ContentType,
 			})
 			b := bytes.NewBuffer(make([]byte, 0, base64.StdEncoding.EncodedLen(len(attachment.Content))+len(CRNL)))
@@ -64,7 +64,7 @@ func (w Writer) Write(
 			if _, err = io.Copy(encoder, bytes.NewReader(attachment.Content)); err != nil {
 				return err
 			}
-			w.cachedAttachmentContents[attachment.Hash] = b.Bytes()
+			w.cachedAttachmentContents[attachment.ContentID] = b.Bytes()
 		}
 		w.cachedAttachments[m.LetterID] = attachments
 	}
@@ -125,9 +125,9 @@ func (w Writer) Write(
 			if err = attachment.WriteHeader(out); err != nil {
 				return err
 			}
-			data, ok := w.cachedAttachmentContents[attachment.Hash]
+			data, ok := w.cachedAttachmentContents[attachment.ContentID]
 			if !ok {
-				return fmt.Errorf("attachment content not found: %s", attachment.Hash)
+				return fmt.Errorf("attachment content not found: %s", attachment.ContentID)
 			}
 			if _, err = io.Copy(out, bytes.NewReader(data)); err != nil {
 				return err
@@ -137,7 +137,7 @@ func (w Writer) Write(
 		return err
 	}
 
-	attachments, inline := SplitAttachments(m.HTML, attachments)
+	attachments, inline := splitAttachments(m.HTML, attachments)
 	if len(attachments) == 0 {
 		return w.writeAlternativeWithAttachments(out, m.Text, m.HTML, w.textBoundary, inline)
 	}
@@ -191,12 +191,12 @@ func (w Writer) Write(
 			if err != nil {
 				return err
 			}
-			if err = attachment.WriteInlineHeader(out, attachment.CanonicalContentID); err != nil {
+			if err = attachment.WriteInlineHeader(out); err != nil {
 				return err
 			}
-			data, ok := w.cachedAttachmentContents[attachment.Hash]
+			data, ok := w.cachedAttachmentContents[attachment.ContentID]
 			if !ok {
-				return fmt.Errorf("attachment content not found: %s", attachment.Hash)
+				return fmt.Errorf("attachment content not found: %s", attachment.ContentID)
 			}
 			if _, err = io.Copy(out, bytes.NewReader(data)); err != nil {
 				return err
@@ -220,9 +220,9 @@ func (w Writer) Write(
 		if err = attachment.WriteHeader(out); err != nil {
 			return err
 		}
-		data, ok := w.cachedAttachmentContents[attachment.Hash]
+		data, ok := w.cachedAttachmentContents[attachment.ContentID]
 		if !ok {
-			return fmt.Errorf("attachment content not found: %s", attachment.Hash)
+			return fmt.Errorf("attachment content not found: %s", attachment.ContentID)
 		}
 		if _, err = io.Copy(out, bytes.NewReader(data)); err != nil {
 			return err

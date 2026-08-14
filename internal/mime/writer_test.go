@@ -221,6 +221,7 @@ func TestRelatedMessageEncoding(t *testing.T) {
 		mdsend.Attachment{
 			Name:        "cat.jpg",
 			Hash:        "string",
+			ContentID:   "cat@gmail.com",
 			ContentType: ContentTypeImageJPEG,
 			Content:     internal.Cat,
 		},
@@ -241,7 +242,7 @@ func TestRelatedMessageEncoding(t *testing.T) {
 		To:      mail.Address{Name: "Recipient", Address: "recipient@example.com"},
 		Subject: "😁 Test Subject",
 		Text:    longText,
-		HTML:    "<b>" + longText + "</b> <img src=\"cid:string@gmail.com\" alt=\"cat\" />",
+		HTML:    "<b>" + longText + "</b> <img src=\"cid:cat@gmail.com\" alt=\"cat\" />",
 	})
 	if err != nil {
 		t.Fatal(err)

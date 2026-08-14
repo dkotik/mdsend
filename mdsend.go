@@ -288,12 +288,12 @@ func (loader loader) LoadLetter(ctx context.Context, p string) (letter Letter, a
 				attachment.ContentID = attachment.Hash + "@" + domain
 				for _, a := range attachments {
 					if a.ContentID == attachment.ContentID {
-						return attachment.ContentID, nil
+						return "cid:" + attachment.ContentID, nil
 					}
 				}
 				attachment.LetterID = letter.ID
 				attachments = append(attachments, attachment)
-				return attachment.ContentID, nil
+				return "cid:" + attachment.ContentID, nil
 			},
 		)
 	}
@@ -317,12 +317,12 @@ func (loader loader) LoadLetter(ctx context.Context, p string) (letter Letter, a
 			attachment.ContentID = attachment.Hash + "@" + domain
 			for _, a := range attachments {
 				if a.ContentID == attachment.ContentID {
-					return attachment.ContentID, nil
+					return "cid:" + attachment.ContentID, nil
 				}
 			}
 			attachment.LetterID = letter.ID
 			attachments = append(attachments, attachment)
-			return attachment.ContentID, nil
+			return "cid:" + attachment.ContentID, nil
 		},
 	)
 

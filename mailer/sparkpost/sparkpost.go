@@ -59,14 +59,14 @@ func New(config Configuration) (mdsend.Mailer, error) {
 		return nil, err
 	}
 
-	return mailer{
+	return sparkPost{
 		Client: client,
 		Queue:  config.Queue,
 		Buffer: bytes.NewBuffer(nil),
 	}, nil
 }
 
-type mailer struct {
+type sparkPost struct {
 	sp.Client
 	Queue  queue.Queue
 	Buffer *bytes.Buffer
@@ -77,7 +77,7 @@ type MimeContent struct {
 }
 
 // SendMail queues one message to one recipient.
-func (s mailer) SendMail(ctx context.Context, m mdsend.Message) (_ string, err error) {
+func (s sparkPost) SendMail(ctx context.Context, m mdsend.Message) (_ string, err error) {
 	defer s.Buffer.Reset()
 	if err = mime.NewWriter(s.Queue, nil).Write(ctx, s.Buffer, m); err != nil {
 		return "", err

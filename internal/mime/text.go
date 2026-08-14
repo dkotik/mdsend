@@ -67,7 +67,7 @@ func writeAlternative(w io.Writer, text, html, boundary string) (err error) {
 	return nil
 }
 
-func (w Writer) writeAlternativeWithAttachments(out io.Writer, text, html, boundary string, inline []inlineAttachment) (err error) {
+func (w Writer) writeAlternativeWithAttachments(out io.Writer, text, html, boundary string, inline []cachedAttachment) (err error) {
 	if len(inline) == 0 {
 		return writeAlternative(out, text, html, boundary)
 	}
@@ -106,12 +106,12 @@ func (w Writer) writeAlternativeWithAttachments(out io.Writer, text, html, bound
 		if err != nil {
 			return err
 		}
-		if err = attachment.WriteInlineHeader(out, attachment.CanonicalContentID); err != nil {
+		if err = attachment.WriteInlineHeader(out); err != nil {
 			return err
 		}
-		data, ok := w.cachedAttachmentContents[attachment.Hash]
+		data, ok := w.cachedAttachmentContents[attachment.ContentID]
 		if !ok {
-			return fmt.Errorf("attachment content not found: %s", attachment.Hash)
+			return fmt.Errorf("attachment content not found: %s", attachment.ContentID)
 		}
 		if _, err = io.Copy(out, bytes.NewReader(data)); err != nil {
 			return err

@@ -37,7 +37,7 @@ func (m mockAttachmentRepository) ListAttachments(ctx context.Context, letterID 
 
 type cachedAttachment struct {
 	Name        string
-	Hash        string
+	ContentID   string
 	ContentType string
 }
 
@@ -55,7 +55,7 @@ func (a cachedAttachment) WriteHeader(w io.Writer) (err error) {
 	return nil
 }
 
-func (a cachedAttachment) WriteInlineHeader(w io.Writer, contentID string) (err error) {
+func (a cachedAttachment) WriteInlineHeader(w io.Writer) (err error) {
 	if _, err = WriteHeader(w, header.ContentType, a.ContentType); err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func (a cachedAttachment) WriteInlineHeader(w io.Writer, contentID string) (err 
 	if _, err = WriteHeader(w, header.ContentTransferEncoding, `base64`); err != nil {
 		return err
 	}
-	if _, err = WriteHeader(w, header.ContentID, contentID); err != nil {
+	if _, err = WriteHeader(w, header.ContentID, "<"+a.ContentID+">"); err != nil {
 		return err
 	}
 	// _, err = io.WriteString(w, CRNL)

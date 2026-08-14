@@ -23,9 +23,9 @@ build:
 update:
 	@echo Updating project test data golden files...
 	@go test . -update
-	@cd internal/template && go test . -update && \
-	@cd ../mime && go test . -update && \
-	@cd ../../markdown && go test . -update
+	@cd internal/template && go test . -update
+	@cd internal/mime && go test . -update
+	@cd markdown && go test . -update
 install:
 	cd ./cmd/mdsend && go build -trimpath -o ~/.local/bin/mdsend
 	chmod +x ~/.local/bin/mdsend
