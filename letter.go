@@ -7,6 +7,7 @@ import (
 	"net/mail"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strings"
 	"time"
 
@@ -89,6 +90,37 @@ func newLetter(b []byte) (letter Letter, err error) {
 		Frontmatter: frontmatter,
 		Content:     string(body),
 	}, nil
+}
+
+var reDomainName = regexp.MustCompile(`^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}$`)
+
+func validateDomainName(domain string) (string, error) {
+	if len(domain) < 4 {
+		return "", fmt.Errorf("domain name is too short: %s", domain)
+	}
+	if !reDomainName.MatchString(domain) {
+		return "", fmt.Errorf("invalid domain name: %s", domain)
+	}
+	return domain, nil
+}
+
+func (l Letter) GetDomain() (string, error) {
+	switch domain := l.Frontmatter[FieldNameDomain].(type) {
+	case string:
+		domain = strings.TrimSpace(domain)
+		if len(domain) > 0 {
+			return validateDomainName(domain)
+		}
+	case nil: // fallthrough
+	default:
+		return validateDomainName(fmt.Sprintf("%v", domain))
+	}
+	from, err := l.GetFrom()
+	if err != nil {
+		return "", fmt.Errorf("failed to extract domain name from the sending address: %w", err)
+	}
+	_, domain, _ := strings.Cut(from.Address, "@")
+	return validateDomainName(domain)
 }
 
 func (l Letter) GetDatabase() string {

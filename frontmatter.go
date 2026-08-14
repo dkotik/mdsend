@@ -8,6 +8,7 @@ import (
 
 const (
 	FieldNameID                        = "id"
+	FieldNameDomain                    = "domain"
 	FieldNameSeed                      = "seed"
 	FieldNameExtends                   = "extends"
 	FieldNameDatabase                  = "queue"

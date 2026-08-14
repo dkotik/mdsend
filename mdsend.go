@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"iter"
 	"path"
+	"path/filepath"
 
 	"github.com/dkotik/mdsend/markdown"
 	"github.com/dkotik/mdsend/media"
 	"github.com/oklog/ulid/v2"
+	"github.com/yuin/goldmark/parser"
 )
 
 type FileReadError struct {
@@ -53,7 +54,7 @@ type Mailer interface {
 }
 
 type Loader interface {
-	LoadLetter(context.Context, string) (Letter, iter.Seq2[Attachment, error], error)
+	LoadLetter(context.Context, string) (Letter, []Attachment, error)
 }
 
 type Defaults struct {
@@ -69,6 +70,7 @@ type loader struct {
 	// DefaultLanguage           language.Tag
 	DefaultMediaContraints media.Constraints
 	DefaultSchedule        Schedule
+	Parser                 parser.Parser
 }
 
 func New(fs fs.FS, options Defaults) (_ Loader, err error) {
@@ -103,6 +105,7 @@ func New(fs fs.FS, options Defaults) (_ Loader, err error) {
 		// DefaultLanguage:           options.Language,
 		DefaultMediaContraints: options.MediaContraints,
 		DefaultSchedule:        options.Schedule,
+		Parser:                 markdown.NewParser(markdown.DefaultLightTheme), // to options
 	}, nil
 }
 
@@ -207,11 +210,15 @@ func (loader loader) LoadAttachment(
 	return a, err
 }
 
-func (loader loader) LoadLetter(ctx context.Context, p string) (Letter, iter.Seq2[Attachment, error], error) {
+func (loader loader) LoadLetter(ctx context.Context, p string) (letter Letter, attachments []Attachment, err error) {
 	rootDirectory := path.Dir(p)
-	letter, err := loader.loadLetterFromFile(ctx, p, rootDirectory)
+	letter, err = loader.loadLetterFromFile(ctx, p, rootDirectory)
 	if err != nil {
-		return letter, nil, err
+		return letter, nil, NewFileReadError(p, err)
+	}
+	domain, err := letter.GetDomain()
+	if err != nil {
+		return letter, nil, NewFileReadError(p, err)
 	}
 	// language, err := letter.GetLanguage()
 	// if err != nil {
@@ -233,12 +240,42 @@ func (loader loader) LoadLetter(ctx context.Context, p string) (Letter, iter.Seq
 	if constraints.Height == 0 {
 		constraints.Height = loader.DefaultMediaContraints.Height
 	}
-	return letter,
-		func(yield func(Attachment, error) bool) {
-			for source, err := range letter.EachAttachmentSource() {
-				if err != nil {
-					yield(Attachment{}, fmt.Errorf("unable to decode attachment source %q: %w", source.Location, err))
-					return
+
+	// load attachments from the front matter
+	for source, err := range letter.EachAttachment() {
+		if err != nil {
+			return letter, nil, fmt.Errorf("unable to decode attachment source %q: %w", source.Location, err)
+		}
+		if !filepath.IsAbs(source.Location) {
+			source.Location = filepath.Join(rootDirectory, source.Location)
+		}
+		for _, attachment := range attachments {
+			if attachment.Source == source.Location {
+				return letter, attachments, fmt.Errorf("duplicate attachment: %s", attachment.Source)
+			}
+		}
+		attachment, err := loader.LoadAttachment(
+			ctx,
+			source,
+			constraints,
+		)
+		if err != nil {
+			return letter, nil, NewFileReadError(source.Location, err)
+		}
+		attachment.LetterID = letter.ID
+		attachments = append(attachments, attachment)
+	}
+
+	// load inline attachments from the templates directory
+	for i, t := range letter.Templates {
+		if !filepath.IsAbs(t.Source) {
+			t.Source = filepath.Join(rootDirectory, t.Source)
+		}
+		letter.Templates[i].Content, err = inlineTemplateAttachments(
+			t.Content,
+			func(source AttachmentSource) (string, error) {
+				if !filepath.IsAbs(source.Location) {
+					source.Location = filepath.Join(t.Source, source.Location)
 				}
 				attachment, err := loader.LoadAttachment(
 					ctx,
@@ -246,13 +283,48 @@ func (loader loader) LoadLetter(ctx context.Context, p string) (Letter, iter.Seq
 					constraints,
 				)
 				if err != nil {
-					yield(Attachment{}, NewFileReadError(source.Location, err))
-					return
+					return "", NewFileReadError(source.Location, err)
+				}
+				attachment.ContentID = attachment.Hash + "@" + domain
+				for _, a := range attachments {
+					if a.ContentID == attachment.ContentID {
+						return attachment.ContentID, nil
+					}
 				}
 				attachment.LetterID = letter.ID
-				if !yield(attachment, nil) {
-					return
+				attachments = append(attachments, attachment)
+				return attachment.ContentID, nil
+			},
+		)
+	}
+
+	// load inline attachments from the Markdown content
+	letter.Content, err = inlineMarkdownAttachments(
+		loader.Parser,
+		[]byte(letter.Content),
+		func(source AttachmentSource) (string, error) {
+			if !filepath.IsAbs(source.Location) {
+				source.Location = filepath.Join(rootDirectory, source.Location)
+			}
+			attachment, err := loader.LoadAttachment(
+				ctx,
+				source,
+				constraints,
+			)
+			if err != nil {
+				return "", NewFileReadError(source.Location, err)
+			}
+			attachment.ContentID = attachment.Hash + "@" + domain
+			for _, a := range attachments {
+				if a.ContentID == attachment.ContentID {
+					return attachment.ContentID, nil
 				}
 			}
-		}, nil
+			attachment.LetterID = letter.ID
+			attachments = append(attachments, attachment)
+			return attachment.ContentID, nil
+		},
+	)
+
+	return letter, attachments, err
 }

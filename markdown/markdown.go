@@ -2,43 +2,16 @@ package markdown
 
 import (
 	"bytes"
+	"strings"
 
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/extension"
-	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer"
 	"github.com/yuin/goldmark/renderer/html"
 	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
 )
-
-func NewParser(theme Theme) parser.Parser {
-	return parser.NewParser(
-		parser.WithBlockParsers(parser.DefaultBlockParsers()...),
-		parser.WithBlockParsers(
-			util.Prioritized(extension.NewDefinitionDescriptionParser(), 700),
-		),
-		parser.WithInlineParsers(parser.DefaultInlineParsers()...),
-		parser.WithInlineParsers(
-			util.Prioritized(extension.NewLinkifyParser(), 500),
-			util.Prioritized(extension.NewFootnoteParser(), 600),
-			util.Prioritized(extension.NewTaskCheckBoxParser(), 700),
-			util.Prioritized(extension.NewTypographerParser(), 9999),
-		),
-		parser.WithParagraphTransformers(
-			parser.DefaultParagraphTransformers()...,
-		),
-		parser.WithParagraphTransformers(
-			util.Prioritized(extension.NewTableParagraphTransformer(), 500),
-		),
-		parser.WithASTTransformers(
-			util.Prioritized(&ActionButtonInjector{}, 100),
-			util.Prioritized(extension.NewTableASTTransformer(), 200),
-			util.Prioritized(theme, 1000),
-		),
-	)
-}
 
 func NewRendererHTML() renderer.Renderer {
 	return renderer.NewRenderer(
@@ -107,4 +80,21 @@ func getListDepth(n ast.Node) int {
 		}
 	}
 	return depth - 1
+}
+
+var escaper = strings.NewReplacer(
+	`\`, `\\`,
+	`*`, `\*`,
+	`_`, `\_`,
+	`#`, `\#`,
+	`[`, `\[`,
+	`]`, `\]`,
+	`(`, `\(`,
+	`)`, `\)`,
+	"`", `\`+"`"+``, // Escapes backticks safely
+)
+
+func Escape(input string) string {
+	// Define the characters that need escaping in Markdown syntax
+	return escaper.Replace(input)
 }

@@ -9,6 +9,7 @@ extends:
 fifth: true
 first: true
 fourth: true
+from: Test Sender <tester@test.com>
 list:
     - 3
     - 1

@@ -1,11 +1,23 @@
 package markdown
 
 import (
+	"strings"
+
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/renderer"
 	"github.com/yuin/goldmark/renderer/html"
 	"github.com/yuin/goldmark/util"
 )
+
+func getImageAltText(source []byte, img *ast.Image) string {
+	b := strings.Builder{}
+	for c := img.FirstChild(); c != nil; c = c.NextSibling() {
+		if textNode, ok := c.(*ast.Text); ok {
+			_, _ = b.Write(textNode.Segment.Value(source))
+		}
+	}
+	return b.String()
+}
 
 type imageRenderer struct {
 	attachmentProvider func(source string) (contentID string, err error)
@@ -28,6 +40,7 @@ func (i *imageRenderer) renderImage(w util.BufWriter, source []byte, node ast.No
 	}
 	_, _ = w.WriteString(contentID)
 
+	// TODO: use getImageAltText instead of this
 	if n.FirstChild() != nil {
 		fc, ok := n.FirstChild().(*ast.Text)
 		if ok {
@@ -36,6 +49,7 @@ func (i *imageRenderer) renderImage(w util.BufWriter, source []byte, node ast.No
 		}
 	}
 	_ = w.WriteByte('"')
+
 	if n.Title != nil {
 		_, _ = w.WriteString(` title="`)
 		_, _ = w.Write(util.EscapeHTML(n.Title))

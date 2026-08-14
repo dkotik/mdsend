@@ -20,7 +20,7 @@ func TestLiveSend(t *testing.T) {
 	}
 
 	config := getLiveConfigOrSkip(t)
-	mg, err := New(config)
+	sparkPost, err := New(config)
 	if err != nil {
 		if errors.Is(err, ErrMissingAPIKey) {
 			t.Skip("missing API key")
@@ -48,7 +48,7 @@ func TestLiveSend(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	messageID, err := mg.SendMail(ctx, mdsend.Message{
+	messageID, err := sparkPost.SendMail(ctx, mdsend.Message{
 		SeedKey:  time.Now().Truncate(time.Minute).Format(time.RFC3339),
 		LetterID: testLetterID,
 		From: mail.Address{

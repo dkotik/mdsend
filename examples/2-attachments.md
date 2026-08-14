@@ -3,9 +3,9 @@ subject: example message with attachments
 from: Test Author <joedoe@test.com>
 to: to@test.com
 attachments:
-  - ../internal/media/testdata/cat.jpg
-  - ../internal/media/testdata/chamillion.jpg
-  - ../internal/media/testdata/panda.jpg
+  - ../internal/testdata/image/cat.jpg
+  - ../internal/testdata/image/chamillion.jpg
+  - ../internal/testdata/image/panda.jpg
 media_constraints:
   quality: 60%
   width: 240

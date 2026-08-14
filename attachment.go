@@ -39,9 +39,7 @@ type Attachment struct {
 	LetterID string
 	Name     string
 	Source   string
-	// Hash                     uint64 // for XXHash2
-	Hash string
-	// mimeEncodedBase64Content []byte
+	Hash     string
 
 	// ContentID is the ID of the inline attachment to use in the message.
 	// It must conform to RFC 2392 format, including the angle brackets:
@@ -185,7 +183,7 @@ func newAttachmentSourceFromAny(fm any) (AttachmentSource, error) {
 	}
 }
 
-func (l Letter) EachAttachmentSource() iter.Seq2[AttachmentSource, error] {
+func (l Letter) EachAttachment() iter.Seq2[AttachmentSource, error] {
 	return func(yield func(AttachmentSource, error) bool) {
 		switch fm := l.Frontmatter[FieldNameAttachments].(type) {
 		case []any:
@@ -199,7 +197,9 @@ func (l Letter) EachAttachmentSource() iter.Seq2[AttachmentSource, error] {
 				return
 			}
 		case string:
-			yield(newAttachmentSourceFromAny(fm))
+			if !yield(newAttachmentSourceFromAny(fm)) {
+				return
+			}
 		case nil:
 		default:
 			yield(AttachmentSource{}, fmt.Errorf("invalid attachment source: %T %+v", fm, fm))

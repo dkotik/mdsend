@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"iter"
 	"log/slog"
 	"net/mail"
 	"os"
@@ -136,7 +135,7 @@ func queueLetter(
 	ctx context.Context,
 	q queue.Queue,
 	letter mdsend.Letter,
-	attachments iter.Seq2[mdsend.Attachment, error],
+	attachments []mdsend.Attachment,
 	letterPath string,
 	fs fs.FS,
 	logger *slog.Logger,
@@ -154,10 +153,7 @@ func queueLetter(
 		return queued, err
 	}
 	rootDirectory := filepath.Dir(letterPath)
-	for attachment, err := range attachments {
-		if err != nil {
-			return queued, err
-		}
+	for _, attachment := range attachments {
 		if err = q.CreateAttachment(ctx, attachment); err != nil {
 			return queued, err
 		}
