@@ -58,20 +58,20 @@ func TestLetterQueries(t *testing.T) {
 		t.Fatal(err)
 	}
 	if ok {
-		t.Error("expected letter to be marked as yet not sent:", q.DB.Changes())
+		t.Error("expected letter to be marked as yet not sent:", q.Conn.Changes())
 	}
 
 	if _, err = q.MarkMessageAsSent(ctx, messageID); err != nil {
 		t.Fatal(err)
 	}
-	if q.DB.Changes() == 0 {
-		t.Error("expected message to be marked as complete:", q.DB.Changes())
+	if q.Conn.Changes() == 0 {
+		t.Error("expected message to be marked as complete:", q.Conn.Changes())
 	}
 	ok, err = q.MarkLetterAsSent(ctx, letterID)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if !ok {
-		t.Error("expected letter to be marked as sent:", q.DB.Changes())
+		t.Error("expected letter to be marked as sent:", q.Conn.Changes())
 	}
 }

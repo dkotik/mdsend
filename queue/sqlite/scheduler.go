@@ -21,7 +21,7 @@ func NewScheduler(q queue.Queue, m queue.Marshaler, topic string, options wmsqli
 	if !ok {
 		panic("queue is not an sqliteQueue")
 	}
-	pub, err := wmsqlitezombiezen.NewPublisher(sq.DB, options)
+	pub, err := wmsqlitezombiezen.NewPublisher(sq.Conn, options)
 	if err != nil {
 		panic(err)
 	}

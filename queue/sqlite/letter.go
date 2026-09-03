@@ -139,7 +139,7 @@ func (q sqliteQueue) MarkLetterAsSent(ctx context.Context, ID string) (ok bool, 
 			break
 		}
 	}
-	return q.DB.Changes() > 0, nil
+	return q.Conn.Changes() > 0, nil
 }
 
 func (q sqliteQueue) DeleteLetter(ctx context.Context, ID string) (err error) {

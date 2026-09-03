@@ -1,6 +1,6 @@
 module github.com/dkotik/mdsend
 
-go 1.26.5
+go 1.27.0
 
 require (
 	cuelang.org/go v0.16.1
@@ -31,6 +31,7 @@ require (
 	github.com/yuin/goldmark v1.8.4
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0
 	golang.org/x/image v0.41.0
+	golang.org/x/net v0.56.0
 	golang.org/x/sync v0.22.0
 	golang.org/x/sys v0.47.0
 	golang.org/x/text v0.40.0
@@ -78,7 +79,6 @@ require (
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/sony/gobreaker v1.0.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/term v0.44.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect

@@ -18,7 +18,7 @@ func (t transaction) Close(err *error) {
 }
 
 type sqliteQueue struct {
-	DB *sqlite.Conn
+	Conn *sqlite.Conn
 
 	stmtInsertLetter             *sqlite.Stmt
 	stmtInsertMessage            *sqlite.Stmt
@@ -128,7 +128,7 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 		}
 	}
 	q := sqliteQueue{
-		DB: conn,
+		Conn: conn,
 	}
 
 	if q.stmtInsertLetter, err = conn.Prepare(`INSERT INTO ` + lettersTable + `(id, frontmatter, content, created_at, sent_at) VALUES(?,?,?,?,?)`); err != nil {
@@ -137,7 +137,7 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 	if q.stmtInsertMessage, err = conn.Prepare(`INSERT INTO ` + messagesTable + ` (id, letter_id, seed_key, headers, from_name, from_email, to_name, to_email, subject, message_text, message_html, queue_after) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`); err != nil {
 		return nil, fmt.Errorf("unable to prepare insert message statement: %w", err)
 	}
-	if q.stmtInsertAttachment, err = q.DB.Prepare(`INSERT INTO ` + attachmentsTable + ` (id, letter_id, name, content_hash, content_id, content_type, content) VALUES (?, ?, ?, ?, ?, ?, ?)`); err != nil {
+	if q.stmtInsertAttachment, err = q.Conn.Prepare(`INSERT INTO ` + attachmentsTable + ` (id, letter_id, name, content_hash, content_id, content_type, content) VALUES (?, ?, ?, ?, ?, ?, ?)`); err != nil {
 		return nil, fmt.Errorf("unable to prepare insert attachment statement: %w", err)
 	}
 	if q.stmtRetrieveLetter, err = conn.Prepare(`SELECT frontmatter, content, created_at, sent_at FROM ` + lettersTable + ` WHERE id=?`); err != nil {
@@ -192,14 +192,14 @@ func New(conn *sqlite.Conn, prefix string) (_ queue.Queue, err error) {
 }
 
 func (q sqliteQueue) BindContext(ctx context.Context) func() {
-	old := q.DB.SetInterrupt(ctx.Done())
+	old := q.Conn.SetInterrupt(ctx.Done())
 	return func() {
-		q.DB.SetInterrupt(old)
+		q.Conn.SetInterrupt(old)
 	}
 }
 
 func (q sqliteQueue) BeginTransaction(context.Context) (queue.Queue, queue.Transaction, error) {
-	return q, transaction(sqlitex.Transaction(q.DB)), nil
+	return q, transaction(sqlitex.Transaction(q.Conn)), nil
 }
 
 func (q sqliteQueue) WithTransaction(

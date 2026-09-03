@@ -153,7 +153,7 @@ func (a Attachment) IsEqualTo(b Attachment) bool {
 }
 
 func newAttachmentSourceFromMap(fm map[string]any) (a AttachmentSource, _ error) {
-	a.Location = strings.TrimSpace(fmt.Sprintf("%v", fm[FieldNameAttachmentLocation]))
+	a.Location = strings.TrimSpace(fmt.Sprintf("%v", fm[FieldNameAttachmentPath]))
 	switch name := fm[FieldNameAttachmentName].(type) {
 	case string:
 		a.Name = strings.TrimSpace(name)

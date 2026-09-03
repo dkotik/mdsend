@@ -1,0 +1,16 @@
+<!--https://www.alexedwards.net/blog/how-i-use-htmx-with-go-->
+<meta
+    name="htmx-config"
+    content='{
+        "includeIndicatorStyles": false,
+        "historyCacheSize": 0,
+        "historyRestoreAsHxRequest": false,
+        "responseHandling":[
+            {"code":"204", "swap": false},
+            {"code":"422", "swap": true},
+            {"code":"[45]..", "swap": true, "target": "body"},
+            {"code":"...", "swap": true}
+        ],
+        "timeout": 5000
+    }'
+>

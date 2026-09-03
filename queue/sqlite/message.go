@@ -219,5 +219,5 @@ func (q sqliteQueue) MarkMessageAsSent(ctx context.Context, ID string) (ok bool,
 			break
 		}
 	}
-	return q.DB.Changes() > 0, nil
+	return q.Conn.Changes() > 0, nil
 }

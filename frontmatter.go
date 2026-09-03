@@ -16,7 +16,7 @@ const (
 	FieldNameReplyTo                   = "reply_to"
 	FieldNameAttachments               = "attachments"
 	FieldNameAttachmentName            = "name"
-	FieldNameAttachmentLocation        = "location"
+	FieldNameAttachmentPath            = "path"
 	FieldNameTemplates                 = "templates"
 	FieldNameHeaders                   = "headers"
 	FieldNameLanguage                  = "language"
