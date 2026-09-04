@@ -46,6 +46,12 @@ var (
 		},
 	}
 
+	flagLimit = &cli.Uint32Flag{
+		Name:  `limit`,
+		Usage: `The maximum count of mail messages to send before stopping.`,
+		Value: 0,
+	}
+
 	flagDestroy = &cli.BoolFlag{
 		Name:   `destroy`,
 		Usage:  `Destroy messages instead of sending them.`,
@@ -162,12 +168,21 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 		)
 	}
 
+	semaphore := mailer.NewSemaphore(mailers...)
+	if messageLimit := c.Uint32(flagLimit.Name); messageLimit > 0 {
+		semaphore = mailer.NewLimitMailer(
+			semaphore,
+			messageLimit,
+			time.Second*3, // grace period
+		)
+	}
+
 	if err = service.New(
 		ctx,
 		wg,
 		router,
 		connectionDSN,
-		mailer.NewSemaphore(mailers...),
+		semaphore,
 		options,
 	); err != nil {
 		return err

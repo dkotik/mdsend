@@ -76,6 +76,7 @@ var application = &cli.Command{
 		flagDelay,
 		flagFluctuate,
 		flagWorkerCount,
+		flagLimit,
 		flagForever,
 		flagDestroy,
 		flagVerbose,
