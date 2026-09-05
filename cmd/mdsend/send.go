@@ -117,6 +117,10 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 		mailers[i] = m
 	}
 
+	// cancellation is needed to stop the wait group
+	// later when there is an error
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	wg, ctx := errgroup.WithContext(ctx)
 	wmLogger := watermill.NewSlogLoggerWithLevelMapping(
 		logger,
@@ -146,6 +150,15 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 			Logger:           logger,
 		},
 		Retry: middleware.Retry{
+			MaxRetries: 3,
+			OnRetriesExhausted: func(params middleware.RetriesExhaustedParams) {
+				if errors.Is(params.Err, mailer.ErrLimitExceeded) {
+					logger.Log(ctx, slog.LevelInfo, "shutting down the service because the sending limit was reached")
+				}
+				// cancel the context to stop the wait group
+				// and execute the deferred router close
+				cancel()
+			},
 			InitialInterval: time.Second * 3,
 			MaxInterval:     time.Minute * 10,
 			// Multiplier is the factor by which the waiting interval will be multiplied between retries.
@@ -158,7 +171,9 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 			Logger:              wmLogger,
 		},
 	}
-	if !c.Bool(flagForever.Name) {
+	if c.Bool(flagForever.Name) {
+		options.Retry.MaxRetries = 0 // retry indefinitely
+	} else {
 		// interrupt send command once everything appears to have
 		// been sent
 		options.Tracker = newInterruptingProgressTracker(
@@ -173,7 +188,7 @@ func cmdSend(ctx context.Context, c *cli.Command) (err error) {
 		semaphore = mailer.NewLimitMailer(
 			semaphore,
 			messageLimit,
-			time.Second*3, // grace period
+			time.Second*3+delay+(fluctuate*2), // grace period
 		)
 	}
 
